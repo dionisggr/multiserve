@@ -1,9 +1,11 @@
+const uuid = require('uuid');
 const { logger } = require("../src/config");
 
 exports.up = async function (db) {
+  await db.schema.raw('CREATE EXTENSION IF NOT EXISTS "pgcrypto"');
   await db.schema.dropTableIfExists('apps');
   await db.schema.createTable('apps', function(table) {
-    table.uuid('id').primary();
+    table.uuid("id").primary().defaultTo(db.raw('uuid_generate_v4()'));
     table.string('name').notNullable();
     table.boolean('is_archived').defaultTo(false);
     table.timestamp('created_at').defaultTo(db.fn.now());

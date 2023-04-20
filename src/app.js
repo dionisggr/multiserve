@@ -13,8 +13,8 @@ const app = express();
 
 // Session-based authentication
 app.use(
-  passport.initialize(),
   config.sessionData,
+  passport.initialize(),
   passport.session(),
 );
 

@@ -44,7 +44,8 @@
     "pg": "^8.10.0",
     "pino": "^8.11.0",
     "pino-pretty": "^10.0.0",
-    "swagger-ui-express": "^4.6.2"
+    "swagger-ui-express": "^4.6.2",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.22",

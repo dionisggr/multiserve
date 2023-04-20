@@ -7,15 +7,19 @@ async function get(req, res, next) {
   const criteria = (app_id === 'all')
     ? { multiple: true }
     : { id: app_id };
+  
+  console.log(app_id, criteria)
 
   try {
-    const apps = await service.find(criteria);
+    let result = await service.find(criteria);
 
-    console.log(criteria);
+    console.log(result);
 
-    logger.info('Apps found:', apps.map(({ id }) => id));
+    if (app_id !== 'all') result = [result];
 
-    res.json(apps);
+    logger.info({ message: 'Apps found:', apps: result.map(({ id, name }) => ({ id, name })) });
+
+    res.json(result);
   } catch (error) {
     return next(error);
   }

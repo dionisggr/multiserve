@@ -29,13 +29,10 @@ async function authentication(req, res, next) {
   const error = new Error(errors.authentication[NODE_ENV]);
   error.status = 401;
 
-  if (!req.isAuthenticated()) return next(error);
-
-  await validateCookie(req.session)
-
-  if (request.app_id !== authenticated.app_id) {
+  if (!req.isAuthenticated()) {
     return next(error);
   }
+  if (session.minutesLeft(req.session) < 30) await req.session.regenerate();
 
   next();
 };
@@ -53,17 +50,13 @@ function admin(req, res, next) {
   next();
 };
 
-const cookie = {
-  validate: async (req, res, next) => {
-    const { cookie } = req.session;
+const session = {
+  minutesLeft: async ({ cookie }) => {
+    const currentTime = new Date().getTime();
+    const expirationTime = cookie._expires && new Date(cookie._expires).getTime();
+    const diff = (currentTime - expirationTime) / (1000 * 60);
 
-    const currentDate = new Date().getTime();
-    const expirationDate = cookie._expires && new Date(cookie._expires).getTime();
-    const diff = (expirationDate.getTime() - currentDate.getTime()) / (1000 * 60);
-
-    if (diff < 30) await req.session.regenerate();
-
-    next();
+    return diff;
   }
 }
 
@@ -71,5 +64,4 @@ module.exports = {
   admin,
   authorization,
   authentication,
-  cookie,
 };

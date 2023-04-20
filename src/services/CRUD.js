@@ -1,9 +1,9 @@
 const db = require('../../db');
 
 async function create(table, data) {
-  return await db(table)
+  return (await db(table)
     .insert(data)
-    .returning('*')
+    .returning('*'))[0]
 }
 
 async function read(table, columns = ['*'], adjustments) {

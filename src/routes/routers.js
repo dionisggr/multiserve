@@ -22,11 +22,7 @@ const docRoutes = [
 
 // Auth Setup
 authorized.use(auth.authorization);
-authenticated.use(
-  auth.authorization,
-  auth.authentication,
-  auth.cookie.validate
-);
+authenticated.use(auth.authorization, auth.authentication);
 authenticated.route('/*/all').all(auth.admin);
 
 // Health Check
@@ -44,12 +40,11 @@ authorized
 // Admin
 authenticated
   .get('/users/all', users.getAllProfiles)
-  .get('/apps/all', apps.get)
   .get('/apps/:id', apps.get)
 
 // Users
 authorized
-  .post('/register', users.createProfile)
+  .post('/register', users.createProfile, passport.authenticate('local'))
 
 authenticated.route('/users/:id')
   .get(users.getProfile)

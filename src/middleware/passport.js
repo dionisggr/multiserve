@@ -35,12 +35,12 @@ passport.use(new LocalStrategy({
     return done(null, false);
   }
 
-  // Callback to update cookie expiration time
   return done(null, { app_id, ...user });
 }));
 
 // Serialize user
 passport.serializeUser(({ id: user_id, app_id }, done) => {
+  console.log('serialize')
   done(null, { user_id, app_id });
 });
 
@@ -50,6 +50,10 @@ passport.deserializeUser(async ({ user_id, app_id }, done) => {
 
   if (!user) {
     return done(new Error('User not found.'));
+  }
+
+  if (!user.is_admin && !user.apps.includes(app_id)) {
+    return done(new Error('Missing app_id.'));
   }
 
   done(null, { app_id, ...user });

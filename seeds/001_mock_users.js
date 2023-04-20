@@ -8,28 +8,28 @@ exports.seed = async function (knex) {
   await knex("users").del();
   await knex("users").insert([
     {
-      id: 'e66a39d0-2b78-42f2-aecb-ee4ec5bbdcdd',
+      id: 'fc0e8a81-8252-42fd-854f-6192c6eed939',
       username: "tec3",
       email: "tec3org@gmail.com",
       password: admin_password,
       is_admin: true,
     },
     {
-      id: '4f39884f-2aa8-45cc-9f39-054b28bd02e9',
+      id: '68ae0a4c-c575-4a44-b9b9-48b49919a3c6',
       username: "dio",
       email: "dionisggr@gmail.com",
       password: admin_password,
       is_admin: true,
     },
     {
-      id: '06278bf3-7476-4c95-84da-57b4f448bb67',
+      id: '0babe65a-d467-4f99-8a04-120e74bc60de',
       username: "doug",
       email: "briancarter340@gmail.com",
       password: admin_password,
       is_admin: true,
     },
     {
-      id: '001ef402-f0ba-46c2-93ef-32886a5a86f3',
+      id: 'a178dda2-5378-4901-aacf-a9137b783ebe',
       username: "lili",
       email: "lile7886@gmail.com",
       password: admin_password,

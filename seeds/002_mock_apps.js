@@ -3,11 +3,11 @@ exports.seed = async function (knex) {
   await knex("apps").del();
   await knex("apps").insert([
     {
-      id: '30fa06cd-68e9-432e-b3de-2610856ab71e',
+      id: '06a63cb0-b8b6-433e-9ab8-e2887bd150f4',
       name: 'financial_health_planner',
     },
     {
-      id: '46a2074d-cfd1-4fa2-ba09-1de4406b5a9b',
+      id: '6d786386-c7b0-41f5-a2b0-2efa1bca065f',
       name: 'prompt_wiz',
     },
   ]);

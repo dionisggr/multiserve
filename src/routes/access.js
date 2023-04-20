@@ -5,7 +5,7 @@ const { logger } = require('../config');
 async function login(req, res, next) {
   const { id, email } = req.user;
 
-  logger.info('User logged in successfully: ', email)
+  logger.info({ message: 'User logged in successfully: ', id, email });
 
   try {
     await userService.updateUser({ id, data: { last_login: db.fn.now() } });
@@ -23,12 +23,12 @@ async function logout(req, res, next) {
   
   try {
     req.logout();
-    
+
     await req.session.destroy();
 
     res.clearCookie('connect.sid');
 
-    logger.info('User logged out successfully', { id, email });
+    logger.info({ message: 'User logged out successfully', id, email });
 
     res.sendStatus(200);
   } catch (error) {

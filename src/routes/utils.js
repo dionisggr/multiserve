@@ -15,7 +15,7 @@ async function generate(req, res, next) {
   try {
     const response = (isAsync(fn)) ? await fn() : fn();
 
-    logger.info(`Generated ${service} value:`, response);
+    logger.info({ message: `Generated ${service} value:`, response });
 
     
     res.json(response);

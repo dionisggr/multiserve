@@ -5,6 +5,7 @@ const table = 'user_apps';
 
 async function registerUser(data) {
   const { user_id, app_id } = data;
+
   const app = await apps.find({ id: app_id });
 
   if (!app || app.is_archived) {
@@ -15,7 +16,6 @@ async function registerUser(data) {
   }
 
   const existing = await CRUD.read(table, ['*'], { filters: data });
-
   if (existing) {
     const error = new Error(`User ${user_id} already registered to app: ${app_id}`);
     error.status = 409;
@@ -24,8 +24,6 @@ async function registerUser(data) {
   }
 
   await CRUD.create(table, data);
-
-  res.sendStatus(201);
 };
 
 async function unregisterUser(data) {

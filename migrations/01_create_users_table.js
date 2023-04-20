@@ -1,9 +1,11 @@
+const uuid = require('uuid');
 const { logger } = require("../src/config");
 
 exports.up = async function (db) {
+  await db.schema.raw('CREATE EXTENSION IF NOT EXISTS "pgcrypto"');
   await db.schema.dropTableIfExists('users');
   await db.schema.createTable("users", function (table) {
-    table.uuid("id").primary();
+    table.uuid("id").primary().defaultTo(db.raw('uuid_generate_v4()'));
     table.string("username").unique();
     table.string("email").notNullable().unique();
     table.string("password").notNullable();

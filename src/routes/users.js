@@ -6,8 +6,13 @@ const { logger } = require('../config');
 
 async function createProfile(req, res, next) {
   try {
-    const data = req.body;
-    const { email, app_id, password: encryptedPassword } = data;
+    const { body: data } = req;
+    const { email, app_id } = data;
+    const shouldEncrypt = !req.headers['user-agent'] || req.headers['user-agent'].includes('PostmanRuntime');
+    let { password: encryptedPassword } = data;
+
+
+    if (shouldEncrypt) encryptedPassword = passwords.encrypt(encryptedPassword);
 
     await schemas.apps.validateAsync({ id: app_id });
     await schemas.users.new.validateAsync(data);
@@ -15,17 +20,17 @@ async function createProfile(req, res, next) {
     const user = await service.getUser({ filters: { email } });
 
     if (user) {
-      logger.info('User already exists, registering to app instead.', { user, app_id });
+      logger.info({ message: 'User already exists, registering to app instead.', user, app_id });
 
       return await userApps.registerUser({ user_id: user.id, app_id });
     }
-    
-    const hashedPassword = await passwords.hash(encryptedPassword);
-    const newUser = await service.createUser({ ...data, hashedPassword });
 
-    logger.info('User created:', newUser);
+    const password = await passwords.hash(encryptedPassword);
+    const newUser = await service.createUser({ ...data, password });
 
-    res.redirect(307, '/login', { body: data });
+    logger.info({ message: 'User created:', newUser });
+
+    res.json(newUser);
   } catch (error) {
     return next(error)
   }
@@ -45,7 +50,7 @@ async function getProfile(req, res, next) {
       return next(error);
     }
 
-    logger.info('User found:', { email: user.email });
+    logger.info({ message: 'User found:', email: user.email });
 
     res.json(user);
   } catch (error) {
@@ -63,7 +68,7 @@ async function getAllProfiles(req, res, next) {
       return next(error);
     }
 
-    logger.info('Users found', users.map(({ email }) => email));
+    logger.info({ message: 'Users found', users: users.map(({ email }) => email) });
 
     res.json(users);
   } catch (error) {
@@ -115,11 +120,11 @@ async function deleteProfile(req, res, next) {
     if (shouldDelete) {
       await service.deleteUser(id);
 
-      logger.info('User deleted', user);
+      logger.info({ message: 'User deleted', user });
     } else {
       await userApps.unregisterUser({ user_id, app_id });
 
-      logger.info(`User ${user_id} unregistered from app: ${app_id}`, user);
+      logger.info({ message: `User ${user_id} unregistered from app: ${app_id}`, user });
     }
 
     res.sendStatus(204);

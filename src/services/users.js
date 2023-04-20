@@ -4,28 +4,26 @@ const userApps = require('./user_apps');
 
 const table = 'users';
 
-async function createUser(data) {
+async function createUser({ app_id, ...data }) {
   const newUser = await CRUD.create(table, data);
 
-  await userApps.registerUser({ user_id: newUser.id, app_id: 1 });
+  await userApps.registerUser({ user_id: newUser.id, app_id });
   
   return newUser;
 }
 
 async function getUser({ id, filters, multiple } = {}) {
-  const queryFilters = {};
-
   if (id && filters) {
-    filters = { ...filters, 'users.id': id }
+    filters = { ...filters, 'users.id': id };
   } else if (id) {
-    filters = { 'users.id': id }
+    filters = { 'users.id': id };
   }
 
   const columns = ['users.*', db.raw('array_agg(user_apps.app_id) as app_ids')];
   const adjustments = {
     leftJoin: ['user_apps', 'users.id', 'user_apps.user_id'],
     groupBy: ['users.id'],
-    filters: queryFilters,
+    filters,
     multiple,
   };
 
