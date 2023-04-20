@@ -1,9 +1,9 @@
-<h1 align="center">Baseport</h1>
+<h1 align="center">Tec3 API</h1>
 
 ## Overview
-Baseport is a really simple boilerplate to build a REST API with authentication written in JavaScript and using Docker, Express, Joi, Knex, Supabase and Passport
+Tec3 API is a straightforward REST API with authentication written in JavaScript and using Docker, Express, Joi, Knex, Supabase and Passport
 
-It sets up an Express REST API with Supabase, providing features like Docker containerization, database connection, authentication, error handling, and more. It includes some basic routes for authentication and user creation to kickstart most projects.
+It sets up an Express REST API with Supabase, providing features like Docker containerization, database connection, authentication, error handling, and more. It includes some basic routes for authentication and user creation to kickstart most new projects as well.
 
 ## Key Features
 - **Docker containerization** to enable easy deployment with no need to install PostgreSQL.
@@ -15,17 +15,6 @@ It sets up an Express REST API with Supabase, providing features like Docker con
 - Basic security features provided through [**Helmet**](https://helmetjs.github.io/) and [**Cors**](https://github.com/expressjs/cors).
 - Flexible logging implemented with [**pino**]().
 - Security enhancements thanks to [**bcrypt**](https://github.com/validatorjs/validator.js) hashing and [**crypto**]() encryption.
-
-## Use Case
-Not all projects require a full-blown backend framework like [NestJS](https://nestjs.com/), [AdonisJS](https://adonisjs.com/), [Loopback](https://loopback.io/), etc. Sometimes you just need a simple REST API with just authentication and a database connection.
-
-The historic process has been to start from scratch, setting up the project structure, installing dependencies, configuring the database, etc. This process can be time-consuming and tedious, especially if you're not fully familiar with the technologies involved. And quality or integrity shouldn't be sacrificed by using less than ideal solutions.
-
-Thus, Baseport provides (myself) a ready-to-use but comprehensive template to quickly start building REST APIs for small projects (hobbies, small websites, etc.) with authentication and other common features, that are able and safe to share a same database. This saves me time and effort in setting up the initial project structure and configurations every single time.
-
-Better yet, Baseport is designed to serve as a main server so that multiple created apps can share the same database, while their unique concerns remain separate. For example, wy have 10 user tables with the same columns, when you could simply link new tables and databases of new projects to a singular user repository?
-
-For entrepreneurship and bringing small ideas / MVPS to life, it feels like a godsend so far.
 
 ---
 
