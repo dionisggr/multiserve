@@ -28,7 +28,7 @@ authenticated.route('/*/all').all(auth.admin);
 // Health Check
 public
   .use(docs.serve)
-  .get('/', health)
+  .get(['/', '/favicon.ico'], health)
   .get(docRoutes, docs.setup, docs.handler)
   .get('/utils/:service', utils.generate)
   .post('/utils/:service', utils.transform)

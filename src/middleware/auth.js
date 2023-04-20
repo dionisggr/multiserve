@@ -12,6 +12,10 @@ const errors = {
 };
 
 function authorization(req, res, next) {
+  // if (req.path === '/') return next();
+
+  console.log(req.path)
+
   const auth = req.get('Authorization');
 
   if (!auth || !auth.includes(API_KEY)) {
@@ -25,7 +29,6 @@ function authorization(req, res, next) {
 };
 
 async function authentication(req, res, next) {
-  const { body: request, user: authenticated } = req;
   const error = new Error(errors.authentication[NODE_ENV]);
   error.status = 401;
 

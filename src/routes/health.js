@@ -27,7 +27,7 @@ async function healthCheck(req, res, next) {
       ...health
     };
 
-    res.json(response);
+    return res.json(response);
   } catch (error) {
     return next(error);
   }

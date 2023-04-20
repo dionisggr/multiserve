@@ -8,12 +8,6 @@ info:
     [Visit the GitHub repository](https://github.com/tec3org/tec3-api)
 produces:
   - application/json
-tags:
-  - name: Health
-  - name: Register
-  - name: Login
-  - name: Users
-  - name: Utils
 paths:
   /:
     get:

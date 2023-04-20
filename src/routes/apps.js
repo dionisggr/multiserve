@@ -13,8 +13,6 @@ async function get(req, res, next) {
   try {
     let result = await service.find(criteria);
 
-    console.log(result);
-
     if (app_id !== 'all') result = [result];
 
     logger.info({ message: 'Apps found:', apps: result.map(({ id, name }) => ({ id, name })) });
