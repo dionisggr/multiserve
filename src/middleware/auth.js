@@ -24,12 +24,14 @@ function authorization(req, res, next) {
   next();
 };
 
-function authentication(req, res, next) {
+async function authentication(req, res, next) {
   const { body: request, user: authenticated } = req;
   const error = new Error(errors.authentication[NODE_ENV]);
   error.status = 401;
 
   if (!req.isAuthenticated()) return next(error);
+
+  await validateCookie(req.session)
 
   if (request.app_id !== authenticated.app_id) {
     return next(error);
@@ -40,12 +42,34 @@ function authentication(req, res, next) {
 
 function admin(req, res, next) {
   const { user: authenticated } = req;
-  const error = new Error(errors.authentication[NODE_ENV]);
-  error.status = 401;
 
-  if (!authenticated.is_admin) return next(error);
+  if (!authenticated.is_admin) {
+    const error = new Error(errors.authentication[NODE_ENV]);
+    error.status = 401;
+    
+    return next(error);
+  }
 
   next();
 };
 
-module.exports = { authorization, authentication, admin };
+const cookie = {
+  validate: async (req, res, next) => {
+    const { cookie } = req.session;
+
+    const currentDate = new Date().getTime();
+    const expirationDate = cookie._expires && new Date(cookie._expires).getTime();
+    const diff = (expirationDate.getTime() - currentDate.getTime()) / (1000 * 60);
+
+    if (diff < 30) await req.session.regenerate();
+
+    next();
+  }
+}
+
+module.exports = {
+  admin,
+  authorization,
+  authentication,
+  cookie,
+};

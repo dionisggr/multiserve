@@ -18,4 +18,24 @@ async function login(req, res, next) {
   }
 }
 
-module.exports = login;
+async function logout(req, res, next) {
+  const { id, email } = req.user;
+  
+  try {
+    req.logout();
+    
+    await req.session.destroy();
+
+    res.clearCookie('connect.sid');
+
+    logger.info('User logged out successfully', { id, email });
+
+    res.sendStatus(200);
+  } catch (error) {
+    logger.error('Failed to destroy session:', { error });
+    
+    return next(error);
+  }
+}
+
+module.exports = { login, logout };

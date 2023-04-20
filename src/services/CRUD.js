@@ -16,10 +16,10 @@ async function read(table, columns = ['*'], adjustments) {
   } = adjustments || {};
   const response = db(table).select(...columns)
 
-  if (leftJoin) response.leftJoin(...leftJoin);
-  if (rightJoin) response.rightJoin(...rightJoin);
-  if (filters) response.where(filters);
-  if (groupBy) response.groupBy(...groupBy);
+  if (leftJoin) response.leftJoin(...leftJoin)
+  if (rightJoin) response.rightJoin(...rightJoin)
+  if (filters) response.where(filters)
+  if (groupBy) response.groupBy(...groupBy)
 
   if (multiple) {
     return await response;

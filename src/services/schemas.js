@@ -5,6 +5,7 @@ const schemas = {
     new: Joi.object({
       email: Joi.string().email().required(),
       password: Joi.string().min(8).max(64).required(),
+      app_id: Joi.string().guid({ version: 'uuidv4' }),
     }),
     existing: Joi.object({
       id: Joi.string().guid({ version: 'uuidv4' }),

@@ -12,7 +12,7 @@ async function createProfile(req, res, next) {
     await schemas.apps.validateAsync({ id: app_id });
     await schemas.users.new.validateAsync(data);
 
-    const user = await service.getUser({ email });
+    const user = await service.getUser({ filters: { email } });
 
     if (user) {
       logger.info('User already exists, registering to app instead.', { user, app_id });
@@ -37,7 +37,7 @@ async function getProfile(req, res, next) {
 
     await schemas.users.existing.validateAsync({ id });
 
-    const user = await service.getUser({ id })
+    const user = await service.getUser({ id });
 
     if (!user) {
       const error = createCustomError(`Failed to find user: ${id}`, 404);

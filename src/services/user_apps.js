@@ -8,7 +8,8 @@ async function registerUser(data) {
   const app = await apps.find({ id: app_id });
 
   if (!app || app.is_archived) {
-    const error = createCustomError(`App is archived or does not exist: ${app_id}`, 404);
+    const error = new Error(`App is archived or does not exist: ${app_id}`);
+    error.status = 404;
 
     throw error;
   }
@@ -16,7 +17,8 @@ async function registerUser(data) {
   const existing = await CRUD.read(table, ['*'], { filters: data });
 
   if (existing) {
-    const error = createCustomError(`User ${user_id} already registered to app: ${app_id}`, 409);
+    const error = new Error(`User ${user_id} already registered to app: ${app_id}`);
+    error.status = 409;
 
     throw error;
   }

@@ -13,13 +13,19 @@ async function createUser(data) {
 }
 
 async function getUser({ id, filters, multiple } = {}) {
-  if (id) filters = { id, ...filters };
+  const queryFilters = {};
+
+  if (id && filters) {
+    filters = { ...filters, 'users.id': id }
+  } else if (id) {
+    filters = { 'users.id': id }
+  }
 
   const columns = ['users.*', db.raw('array_agg(user_apps.app_id) as app_ids')];
   const adjustments = {
     leftJoin: ['user_apps', 'users.id', 'user_apps.user_id'],
     groupBy: ['users.id'],
-    filters,
+    filters: queryFilters,
     multiple,
   };
 

@@ -36,7 +36,7 @@ passport.use(new LocalStrategy({
   }
 
   // Callback to update cookie expiration time
-  return done(null, { app_id, ...user }, { renewCookie: true });
+  return done(null, { app_id, ...user });
 }));
 
 // Serialize user
@@ -45,21 +45,11 @@ passport.serializeUser(({ id: user_id, app_id }, done) => {
 });
 
 // Deserialize user
-passport.deserializeUser(async ({ user_id, app_id }, done, { renewCookie }) => {
+passport.deserializeUser(async ({ user_id, app_id }, done) => {
   const user = await userService.getUser({ filters: { id: user_id } });
 
   if (!user) {
     return done(new Error('User not found.'));
-  }
-
-  if (renewCookie) {
-    const thirtyMinutes = 30 * 60 * 1000; // 30 minutes in milliseconds
-
-    // Update the cookie expiration time if 30 minutes or less
-    if (new Date(user.cookie.expires) - Date.now() <= thirtyMinutes) {
-      user.cookie.expires = new Date(Date.now() + thirtyMinutes);
-      await userService.updateUser(user);
-    }
   }
 
   done(null, { app_id, ...user });

@@ -1,9 +1,9 @@
 const express = require('express');
-const { authentication, authorization, admin } = require('../middleware/auth');
 const health = require('./health');
-const login = require('./login');
-const docs = require('./docs');
 const passport = require('../middleware/passport');
+const auth = require('../middleware/auth');
+const access = require('./access');
+const docs = require('./docs');
 const users = require('./users');
 const apps = require('./apps');
 const utils = require('./utils');
@@ -21,9 +21,13 @@ const docRoutes = [
 ];
 
 // Auth Setup
-authorized.use(authorization);
-authenticated.use(authorization, authentication);
-authenticated.route('/*/all').all(admin);
+authorized.use(auth.authorization);
+authenticated.use(
+  auth.authorization,
+  auth.authentication,
+  auth.cookie.validate
+);
+authenticated.route('/*/all').all(auth.admin);
 
 // Health Check
 public
@@ -35,12 +39,13 @@ public
 
 // Login
 authorized
-  .post('/login', passport.authenticate('local'), login);
+  .post('/login', passport.authenticate('local'), access.login);
 
 // Admin
 authenticated
   .get('/users/all', users.getAllProfiles)
   .get('/apps/all', apps.get)
+  .get('/apps/:id', apps.get)
 
 // Users
 authorized
@@ -51,4 +56,7 @@ authenticated.route('/users/:id')
   .patch(users.updateProfile)
   .delete(users.deleteProfile);
 
+authenticated
+  .post('/logout', access.logout)
+  
 module.exports = { public, authorized, authenticated };
