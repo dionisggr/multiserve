@@ -1,12 +1,11 @@
 <h1 align="center">Baseport</h1>
 
-## What is it?
+## Overview
 Baseport is a really simple boilerplate to build a REST API with authentication written in JavaScript and using Docker, Express, Joi, Knex, Supabase and Passport
 
-## How does it work?
 It sets up an Express REST API with Supabase, providing features like Docker containerization, database connection, authentication, error handling, and more. It includes some basic routes for authentication and user creation to kickstart most projects.
 
-## What does it use?
+## Key Features
 - **Docker containerization** to enable easy deployment with no need to install PostgreSQL.
 - Session-based authentication provided using [**Passport**](https://www.passportjs.org/).
 - A strong and reliable relational database included with [**PostgreSQL**](https://www.postgresql.org/).
@@ -17,7 +16,7 @@ It sets up an Express REST API with Supabase, providing features like Docker con
 - Flexible logging implemented with [**pino**]().
 - Security enhancements thanks to [**bcrypt**](https://github.com/validatorjs/validator.js) hashing and [**crypto**]() encryption.
 
-## Why build it?
+## Use Case
 Not all projects require a full-blown backend framework like [NestJS](https://nestjs.com/), [AdonisJS](https://adonisjs.com/), [Loopback](https://loopback.io/), etc. Sometimes you just need a simple REST API with just authentication and a database connection.
 
 The historic process has been to start from scratch, setting up the project structure, installing dependencies, configuring the database, etc. This process can be time-consuming and tedious, especially if you're not fully familiar with the technologies involved. And quality or integrity shouldn't be sacrificed by using less than ideal solutions.
@@ -26,7 +25,7 @@ Thus, Baseport provides (myself) a ready-to-use but comprehensive template to qu
 
 Better yet, Baseport is designed to serve as a main server so that multiple created apps can share the same database, while their unique concerns remain separate. For example, wy have 10 user tables with the same columns, when you could simply link new tables and databases of new projects to a singular user repository?
 
-For entrepreneurship and bringing small ideas / MVPS to life, this was my creation. I hope it can help others too.
+For entrepreneurship and bringing small ideas / MVPS to life, it feels like a godsend so far.
 
 ---
 
@@ -39,7 +38,6 @@ For entrepreneurship and bringing small ideas / MVPS to life, this was my creati
 - [Authentication](#authentication)
 - [Migrations](#migrations)
 - [Logging](#logging)
-- [Contributing](#contributing)
 - [License](#license)
 
 ---
