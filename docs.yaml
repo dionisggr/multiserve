@@ -1,0 +1,382 @@
+swagger: '2.0'
+info:
+  title: Tec3 API
+  version: '1.0.0'
+produces:
+  - application/json
+tags:
+  - name: health
+  - name: register
+  - name: login
+  - name: users
+  - name: utils
+paths:
+  /:
+    get:
+      summary: Health Check
+      tags:
+        - health
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            properties:
+              owner:
+                type: string
+                example: 'Tec3, LLC'
+              ok:
+                type: boolean
+              message:
+                type: string
+                example: 'The world will not burn today.'
+              API:
+                type: 'string'
+                example: 'healthy'
+              auth:
+                type: 'string'
+                example: 'healthy'
+              database:
+                type: 'string'
+                example: 'healthy'
+        '500':
+          description: Server error
+  /register:
+    post:
+      summary: Register
+      tags:
+        - register
+      parameters:
+        - in: body
+          name: info
+          description: User information
+          required: true
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+              email:
+                type: string
+              password:
+                type: string
+              is_admin:
+                type: boolean
+              created_at:
+                type: string
+                format: date
+              updated_at:
+                type: string
+                format: date
+              last_login:
+                type: string
+                format: date
+              avatar:
+                type: string
+              app_id:
+                type: string
+        - in: header
+          name: authorization
+          description: API Key
+          type: string
+          required: true
+          value: Bearer d5f5c5e5a9bc9b714f263b11f63c7bdf
+      responses:
+        '201':
+          description: Created
+          headers:
+            conn.sid:
+              description: 'Set-Cookie header with session ID after login'
+              type: string
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+                example: 'string (hash)'
+              username:
+                type: string
+              email:
+                type: string
+              is_admin:
+                type: boolean
+              created_at:
+                type: string
+                format: date
+              updated_at:
+                type: string
+                format: date
+              last_login:
+                type: string
+                format: date
+              avatar:
+                type: string
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+  /login:
+    post:
+      summary: Login
+      tags:
+        - login
+      parameters:
+        - in: body
+          name: credentials
+          description: Login credentials
+          required: true
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+              password:
+                type: string
+              app_id:
+                type: string
+        - in: header
+          name: authorization
+          description: API Key
+          type: string
+          required: true
+          value: Bearer d5f5c5e5a9bc9b714f263b11f63c7bdf
+      responses:
+        '200':
+          description: OK
+          headers:
+            conn.sid:
+              description: 'Set-Cookie header with session ID after login'
+              type: string
+        '401':
+          description: Unauthorized
+  /users/all:
+    get:
+      summary: Get all users
+      tags:
+        - users
+      parameters:
+        - in: header
+          name: cookie
+          type: string
+          required: true
+          description: Authentication cookie from login
+          value: conn.sid=abcdef1234567890
+        - in: header
+          name: authorization
+          description: API Key
+          type: string
+          required: true
+          value: Bearer d5f5c5e5a9bc9b714f263b11f63c7bdf
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: 'string (hash)'
+                username:
+                  type: string
+                email:
+                  type: string
+                is_admin:
+                  type: boolean
+                created_at:
+                  type: string
+                  format: date
+                updated_at:
+                  type: string
+                  format: date
+                last_login:
+                  type: string
+                  format: date
+                avatar:
+                  type: string
+                  example: 'string (URL)'
+        '401':
+          description: Unauthorized
+  '/users/{id}':
+    get:
+      summary: Get a user by ID
+      tags:
+        - users
+      parameters:
+        - in: path
+          name: id
+          description: User ID
+          type: string
+          required: true
+        - in: header
+          name: cookie
+          type: string
+          required: true
+          description: Authentication cookie from login
+          value: conn.sid=abcdef1234567890
+        - in: header
+          name: authorization
+          description: API Key
+          type: string
+          required: true
+          value: Bearer d5f5c5e5a9bc9b714f263b11f63c7bdf
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+                example: 'string (hash)'
+              username:
+                type: string
+              email:
+                type: string
+              is_admin:
+                type: boolean
+              created_at:
+                type: string
+                format: date
+              updated_at:
+                type: string
+                format: date
+              last_login:
+                type: string
+                format: date
+              avatar:
+                type: string
+                example: 'string (URL)'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+    patch:
+      summary: Update a user by ID
+      tags:
+        - users
+      parameters:
+        - in: path
+          name: id
+          description: User ID
+          type: string
+          required: true
+        - in: header
+          name: cookie
+          type: string
+          required: true
+          description: Authentication cookie from login
+          value: conn.sid=abcdef1234567890
+        - in: header
+          name: authorization
+          description: API Key
+          type: string
+          required: true
+          value: Bearer d5f5c5e5a9bc9b714f263b11f63c7bdf 
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+                example: 'string (hash)'
+              username:
+                type: string
+              email:
+                type: string
+              password:
+                type: string
+                required: true
+              is_admin:
+                type: boolean
+              created_at:
+                type: string
+                format: date
+              updated_at:
+                type: string
+                format: date
+              last_login:
+                type: string
+                format: date
+              avatar:
+                type: string
+                example: 'string (URL)'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+    delete:
+      summary: Delete a user by ID
+      tags:
+        - users
+      parameters:
+        - in: path
+          name: id
+          description: User ID
+          type: string
+          required: true
+        - in: header
+          name: cookie
+          type: string
+          required: true
+          description: Authentication cookie from login
+          value: conn.sid=abcdef1234567890
+        - in: header
+          name: authorization
+          description: API Key
+          type: string
+          required: true
+          value: Bearer d5f5c5e5a9bc9b714f263b11f63c7bdf
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+        '404':
+          description: Not Found
+  /utils/{service}:
+    get:
+      summary: Generate data using a service
+      tags:
+        - utils
+      parameters:
+        - in: path
+          name: service
+          type: string
+          enum: [encrypt, hash]
+          required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: string
+            example: 'd5f5c5e5a9bc9b714f263b11f63c7bdf'
+    post:
+      summary: Transform data using a service
+      tags:
+        - utils
+      parameters:
+        - in: path
+          name: service
+          type: string
+          enum: [encrypt, hash]
+          value: hash
+          required: true
+        - in: body
+          name: values
+          schema:
+            type: object
+            properties:
+              '[custom_key]':
+                type: string
+                example: 'random_value'
+          required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: string
+            example: '$2b$10$U6NOrsGLsGjPZ56AdfOyx.E1RzAD1Z.KMjZo3YX0Q.DJxrp1nVE7O'
