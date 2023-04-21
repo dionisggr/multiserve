@@ -13,6 +13,7 @@ const secrets = require('./secrets');
 const public = express.Router();
 const authorized = express.Router();
 const authenticated = express.Router();
+const secret = express.Router();
 const docRoutes = [
   '/docs',
   '/login',
@@ -26,6 +27,10 @@ authorized.use(auth.authorization);
 authenticated.use(auth.authorization, auth.authentication);
 authenticated.route('/*/all').all(auth.admin);
 
+// Secrets
+secret
+  .post('/secrets', passport.authenticate('local'), secrets.reveal);
+  
 // Health Check
 public
   .use(docs.serve)
@@ -42,7 +47,6 @@ authorized
 authenticated
   .get('/users/all', users.getAllProfiles)
   .get('/apps/:id', apps.get)
-  .get('/secrets', secrets.reveal)
 
 // Users
 authorized
@@ -56,4 +60,4 @@ authenticated.route('/users/:id')
 authenticated
   .post('/logout', access.logout)
   
-module.exports = { public, authorized, authenticated };
+module.exports = { public, authorized, authenticated, secret };

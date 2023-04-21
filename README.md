@@ -66,7 +66,15 @@ npx supabase login
 ```
 
 ### Step 5: Setting up environment variables
-Rename the `new.env` file to `.env` and add the missing environment variables. If you're authorized, you can find the list of environment variables [here](#environment-variables).
+Rename the `new.env` file to `.env` and add the missing environment variables. If you're authorized, you can request the secrets directly to the `/secrets` endpoint, using Postman or the Swagger UI. If you're an `admin`, you should receive the secrets back in JSON format.
+
+You will need to provide your email and password in the request body, like so:
+```bash
+{
+  "email": "<email>",
+  "password": "<password>"
+}
+```
 
 ### Step 6-A: Setup (Quick)
 The following command will pull any table schema changes done through Supabase's web client, start the Supabase server, run the migrations and seed the database.

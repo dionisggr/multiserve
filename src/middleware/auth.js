@@ -12,10 +12,6 @@ const errors = {
 };
 
 function authorization(req, res, next) {
-  // if (req.path === '/') return next();
-
-  console.log(req.path)
-
   const auth = req.get('Authorization');
 
   if (!auth || !auth.includes(API_KEY)) {

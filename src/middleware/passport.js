@@ -13,7 +13,10 @@ passport.use(new LocalStrategy({
 }, async (req, email, password, done) => {
   const app_id = req.body.app_id;
 
-  await schemas.apps.validateAsync({ id: app_id });
+  if (req.path !== '/secrets') {
+    await schemas.apps.validateAsync({ id: app_id });
+  }
+
   await schemas.users.new.validateAsync({ email, password });
 
   const user = await userService.getUser({ filters: { email } });

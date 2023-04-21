@@ -28,6 +28,7 @@ app.use(
 );
 
 // Routers
+app.use(routers.secret);
 app.use(routers.public);
 app.use(routers.authorized);
 app.use(routers.authenticated);
