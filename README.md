@@ -6,22 +6,22 @@ Tec3 API is a straightforward REST API with authentication written in JavaScript
 It sets up an Express REST API with Supabase, providing features like Docker containerization, database connection, authentication, error handling, and more. It includes some basic routes for authentication and user creation to kickstart most new projects as well.
 
 ## Key Features
-- **Docker containerization** to enable easy deployment with no need to install PostgreSQL.
+- [**Docker containerization**](https://www.docker.com/resources/what-container/) to enable easy deployment with no need to install PostgreSQL.
 - Session-based authentication provided using [**Passport**](https://www.passportjs.org/).
 - A strong and reliable relational database included with [**PostgreSQL**](https://www.postgresql.org/).
-- A simplified database query builder managed by [**Knex**]().
-- A Straightforward database migration and seeding strategy with [**Knex**]().
-- Custom error handling implemented using [**error-handler**]().
+- A simplified database query builder managed by [**Knex**](https://knexjs.org/).
+- A Straightforward database migration and seeding strategy with [**Knex**](https://knexjs.org/).
+- Custom error handling implemented using [**error-handler**](https://github.com/tec3org/tec3-api/blob/main/src/middleware/error-handler.js).
 - Basic security features provided through [**Helmet**](https://helmetjs.github.io/) and [**Cors**](https://github.com/expressjs/cors).
-- Flexible logging implemented with [**pino**]().
-- Security enhancements thanks to [**bcrypt**](https://github.com/validatorjs/validator.js) hashing and [**crypto**]() encryption.
+- Flexible logging implemented with [**pino**](https://github.com/pinojs/pino).
+- Security enhancements thanks to [**bcrypt**](https://github.com/kelektiv/node.bcrypt.js/) hashing and [**crypto**](https://www.npmjs.com/package/crypto-js) encryption.
 
 ---
 
 ## Table of Contents
 
 - [Getting Started](#getting-started)
-- [API Endpoints](#scripts)
+- [API Endpoints](#api-endpoints)
 - [Project Structure](#project-structure)
 - [Environment Variables](#environment-variables)
 - [Authentication](#authentication)
@@ -50,26 +50,23 @@ You need to set up your development environment before you can do anything.
 ### Step 2: Clone the project
 
 ```bash
-git clone https://github.com/dionisggr/backend-template.git
-cd backend-template
-rm -rf .git # Windows: rd /s /q .git
-```
-> `rm -rf .git` (or `rd /s /q .git` on Windows) deletes the git info of the branch like history.
+git clone https://github.com/tec3org/tec3-api.git
 
-To create your new history, simply run `git init`.
+cd tec3-api
+```
 
 ### Step 3: Install dependencies
 - Install all dependencies with `npm ci`.
   ##### Note that running `npm install` instead will install the latest versions of dependencies, which may surface incompatibility.
 
 ### Step 4: Login to Supabase
-The PostgreSQL setup is already done, thanks to [Supabase](https://supabase.com/). You just need to login to your Supabase account.
+The PostgreSQL setup is already done, thanks to [Supabase](https://supabase.com/). You just need to create or login to your Supabase account.
 ```bash
 npx supabase login
 ```
 
 ### Step 5: Setting up environment variables
-Rename the `new.env` file to `.env` and add your environment variables. If you're authorized, you can find the list of environment variables [here](#environment-variables).
+Rename the `new.env` file to `.env` and add the missing environment variables. If you're authorized, you can find the list of environment variables [here](#environment-variables).
 
 ### Step 6-A: Setup (Quick)
 The following command will pull any table schema changes done through Supabase's web client, start the Supabase server, run the migrations and seed the database.
@@ -122,7 +119,7 @@ npm run seeds:create
 
 ## API Endpoints
 
-You can watch the full API Docs powered by Swagger UI [here](). Here is a summary:
+You can watch the full API Docs powered by Swagger UI [here](https://tec3-api-production.up.railway.app/docs). Here is a summary:
 <table style="width: 500px;">
   <tr>
     <th>Endpoints</th>
@@ -205,6 +202,7 @@ You can watch the full API Docs powered by Swagger UI [here](). Here is a summar
 ---
 
 ## Environment Variables
+Rename the `new.env` file to `.env` and add the missing environment variables. If you're authorized, you can find the list of environment variables [here](#environment-variables).
 
 | Name             | Description                        | Default value |
 | ---------------- | ---------------------------------- | ------------- |
@@ -214,6 +212,7 @@ You can watch the full API Docs powered by Swagger UI [here](). Here is a summar
 | PROD_DB_URL      | Database username                  | none |
 | API_KEY          | Server host                        | none |
 | ADMIN_PASSWORD   | Database host port                 | none |
+
 
 ---
 
@@ -296,7 +295,7 @@ exports.down = async function(db) {
 
 To log HTTP requests, the [`morgan`](https://github.com/expressjs/morgan) express middleware is used. It can be easily configured through the `morgan` object in `src/config.js`.
 
-For more structured logging, the [`pino`]() logging library is leveraged. Similarly, more specific configuration can be set within the `logger` obect in `src/config.js`.
+For more structured logging, the [`pino`](https://www.npmjs.com/package/pino) logging library is leveraged. Similarly, more specific configuration can be set within the `logger` obect in `src/config.js`.
 
 ---
 
@@ -312,4 +311,4 @@ If you want to propose new features, fix a bug or improve the README, don't hesi
 
 ## License
 
-[MIT](/LICENSE)
+[MIT](https://opensource.org/license/mit/)

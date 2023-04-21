@@ -7,6 +7,7 @@ const docs = require('./docs');
 const users = require('./users');
 const apps = require('./apps');
 const utils = require('./utils');
+const secrets = require('./secrets');
 
 // Definitions
 const public = express.Router();
@@ -41,6 +42,7 @@ authorized
 authenticated
   .get('/users/all', users.getAllProfiles)
   .get('/apps/:id', apps.get)
+  .get('/secrets', secrets.reveal)
 
 // Users
 authorized
