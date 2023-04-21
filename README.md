@@ -151,12 +151,12 @@ You can watch the full API Docs powered by Swagger UI [here](). Here is a summar
   </tr>
   <tr>
     <td><b>/users</b></td>
-    <td>GET | PATCH | DELETE</td>
+    <td>GET, PATCH, DELETE</td>
     <td>User data</td>
   </tr>
   <tr>
     <td><b>/utils</b></td>
-    <td>GET | POST</td>
+    <td>GET, POST</td>
     <td>Services</td>
   </tr>
 </table>
