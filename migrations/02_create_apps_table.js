@@ -1,4 +1,3 @@
-const uuid = require('uuid');
 const { logger } = require("../src/config");
 
 exports.up = async function (db) {

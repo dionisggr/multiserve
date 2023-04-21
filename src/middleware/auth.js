@@ -63,4 +63,5 @@ module.exports = {
   admin,
   authorization,
   authentication,
+  session,
 };

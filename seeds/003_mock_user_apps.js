@@ -1,5 +1,4 @@
 exports.seed = async function (db) {
-  // Deletes ALL existing entries
   await db("user_apps").del();
   await db("user_apps").insert([
     {

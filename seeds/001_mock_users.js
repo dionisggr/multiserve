@@ -1,12 +1,12 @@
-const { API_KEY, ADMIN_PASSWORD } = require('../src/config');
+const { ADMIN_PASSWORD } = require('../src/config');
 const passwords = require('../src/services/passwords');
 
-exports.seed = async function (knex) {
+exports.seed = async function (db) {
   const encryptedAdminPassword = passwords.encrypt(ADMIN_PASSWORD);
   const admin_password = await passwords.hash(encryptedAdminPassword);
 
-  await knex("users").del();
-  await knex("users").insert([
+  await db("users").del();
+  await db("users").insert([
     {
       id: 'fc0e8a81-8252-42fd-854f-6192c6eed939',
       username: "tec3",

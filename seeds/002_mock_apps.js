@@ -1,7 +1,6 @@
-exports.seed = async function (knex) {
-  // Deletes ALL existing entries
-  await knex("apps").del();
-  await knex("apps").insert([
+exports.seed = async function (db) {
+  await db("apps").del();
+  await db("apps").insert([
     {
       id: '06a63cb0-b8b6-433e-9ab8-e2887bd150f4',
       name: 'financial_health_planner',
