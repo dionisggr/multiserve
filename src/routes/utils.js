@@ -1,5 +1,7 @@
-const passwords = require('../services/passwords');
+const Services = require('../services');
 const { logger } = require('../config');
+
+const { passwords } = new Services();
 
 const services = {
   encrypt: passwords.encrypt,
@@ -16,7 +18,6 @@ async function generate(req, res, next) {
     const response = (isAsync(fn)) ? await fn() : fn();
 
     logger.info({ message: `Generated ${service} value:`, response });
-
     
     res.json(response);
   } catch (error) {
@@ -25,17 +26,21 @@ async function generate(req, res, next) {
 }
 
 async function transform(req, res, next) {
-  const { body, params: { service } } = req;
+  const { body, params: { service, value } } = req;
   const fn = services[service];
-  const response = {};
+  let response = {};
 
   try {
-    for (let item in body) {
-      const value = body[item];
-      response[item] = (isAsync(fn)) ? await fn(value) : fn(value);
+    if (value) {
+      response = (isAsync(fn)) ? await fn(value) : fn(value);
+    } else {
+      for (let item in body) {
+        const input = body[item];
+        response[item] = (isAsync(fn)) ? await fn(input) : fn(input);
+      }
     }
 
-    res.json(response);
+    return res.json(response);
   } catch (error) {
     return next(error);
   }

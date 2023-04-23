@@ -1,0 +1,24 @@
+@baseUrl = http://localhost:8000
+
+##### All admin tests require admin credentials in req.body
+
+### Service: Get all users
+GET {{baseUrl}}/apps/promptwiz/users
+Authorization: Bearer {{$dotenv API_KEY}}
+Content-Type: application/json
+
+{
+  "email": "tec3org@gmail.com",
+  "password": "{{$dotenv ADMIN_PASSWORD}}"
+}
+
+### Service: Get API secrets
+GET {{baseUrl}}/secrets
+Authorization: Bearer {{$dotenv API_KEY}}
+Content-Type: application/json
+
+{
+  "email": "tec3org@gmail.com",
+  "password": "{{$dotenv ADMIN_PASSWORD}}",
+  "app_id": "promptwiz"
+}

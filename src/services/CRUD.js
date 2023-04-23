@@ -1,44 +1,66 @@
 const db = require('../../db');
 
-async function create(table, data) {
+async function create(table, { data, returning = ['*'] }) {
   return (await db(table)
     .insert(data)
-    .returning('*'))[0]
+    .returning(returning))[0];
 }
 
-async function read(table, columns = ['*'], adjustments) {
+async function read(table, adjustments) {
   const {
-    multiple = false,
     filters = true,
+    multiple = false,
+    columns = ['*'],
     leftJoin,
     rightJoin,
-    groupBy
+    innerJoin,
+    groupBy,
   } = adjustments || {};
-  const response = db(table).select(...columns)
 
-  if (leftJoin) response.leftJoin(...leftJoin)
-  if (rightJoin) response.rightJoin(...rightJoin)
-  if (filters) response.where(filters)
-  if (groupBy) response.groupBy(...groupBy)
+  let response = db(table).select(...columns);
 
-  if (multiple) {
-    return await response;
-  } else {
-    return await response.first();
-  }
+  if (leftJoin) response = response.leftJoin(...leftJoin);
+  if (rightJoin) response = response.rightJoin(...rightJoin);
+  if (innerJoin) response = response.innerJoin(...innerJoin);
+  if (filters) response = response.where(filters);
+  if (groupBy) response = response.groupBy(...groupBy);
+
+  return await (multiple ? response : response.first());
 }
 
-async function update(table, id, data) {
-  return await db(table)
-    .where({ id })
-    .update(data)
-    .returning('*')
+async function update(table, adjustments) {
+  const {
+    data,
+    filters = true,
+    multiple = false,
+    returning = ['*'],
+    leftJoin,
+    rightJoin,
+    innerJoin,
+  } = adjustments || {};
+
+  let response = db(table).update(data);
+
+  if (leftJoin) response = response.leftJoin(...leftJoin);
+  if (rightJoin) response = response.rightJoin(...rightJoin);
+  if (innerJoin) response = response.innerJoin(...innerJoin);
+  if (filters) response = response.where(filters)
+  if (returning) response = response.returning(returning)
+
+  response = response.then(rows => rows);
+  response = (multiple)
+    ? await response.then(rows => rows)
+    : await response.then(rows => rows[0]);
+  
+  return response;
 }
 
-async function _delete(table, id) {
+async function _delete(table, { filters }) {
+  if (!filters) throw new Error('Missing filters to delete.');
+  
   return await db(table)
-    .where({ id })
-    .delete()
+    .where(filters)
+    .delete();
 }
 
 module.exports = { create, read, update, _delete };

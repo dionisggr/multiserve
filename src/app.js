@@ -3,7 +3,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 const helmet = require('helmet');
 const config = require('./config');
-const routers = require('./routes/routers');
+const routers = require('./routes');
 const passport = require('./middleware/passport');
 const errorHandler = require('./middleware/error-handler');
 const { xss } = require('express-xss-sanitizer');
@@ -28,7 +28,6 @@ app.use(
 );
 
 // Routers
-app.use(routers.secret);
 app.use(routers.public);
 app.use(routers.authorized);
 app.use(routers.authenticated);

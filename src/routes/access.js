@@ -1,38 +1,39 @@
+const Service = require('../services');
 const db = require('../../db');
-const userService = require('../services/users');
 const { logger } = require('../config');
 
-async function login(req, res, next) {
-  const { id, email } = req.user;
+async function login(req, res) {
+  const { id, email, app_id } = req.user;
 
-  logger.info({ message: 'User logged in successfully: ', id, email });
+  logger.info({ id, email }, 'Login successful');
 
   try {
-    await userService.updateUser({ id, data: { last_login: db.fn.now() } });
-    
-    res.sendStatus(200);
-  } catch (error) {
-    logger.error('', error);
+    const service = await new Service().use(app_id);
+    const last_login = db.fn.now();
 
-    return next(error);
+    await service.users.update({ filters: { id }, data: { last_login } });
+  } catch (error) {
+    logger.error({ id, error: error.message }, 'Failed to update user last_login.');
   }
+
+  return res.sendStatus(200);
 }
 
 async function logout(req, res, next) {
   const { id, email } = req.user;
   
   try {
-    req.logout();
+    await req.logout(async () => {
+      await req.session.destroy();
+    });
 
-    await req.session.destroy();
+    await res.clearCookie('connect.sid');
 
-    res.clearCookie('connect.sid');
+    logger.info({ id, email }, 'User logged out successfully');
 
-    logger.info({ message: 'User logged out successfully', id, email });
-
-    res.sendStatus(200);
+    return res.sendStatus(200);
   } catch (error) {
-    logger.error('Failed to destroy session:', { error });
+    logger.error({ error }, 'Failed to destroy session.');
     
     return next(error);
   }

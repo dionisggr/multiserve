@@ -1,151 +1,143 @@
-const service = require('../services/users');
-const userApps = require('../services/user_apps');
-const passwords = require('../services/passwords');
-const schemas = require('../services/schemas');
+const { isBrowserRequest, isAdminRequest } = require('../utils');
+const { customError } = require('../utils');
+const Service = require('../services');
+const schemas = require('../schemas');
 const { logger } = require('../config');
 
-async function createProfile(req, res, next) {
+async function create(req, res, next) {
+  const data = req.body;
+  const { email } = data;
+  const { id: app_id } = req.params;
+
   try {
-    const { body: data } = req;
-    const { email, app_id } = data;
-    const shouldEncrypt = !req.headers['user-agent'] || req.headers['user-agent'].includes('PostmanRuntime');
-    let { password: encryptedPassword } = data;
+    await schemas.users.new.validateAsync({ ...data, app_id });
 
+    const service = await new Service().use(app_id);
+    const isDuplicate = await service.users.get({ filters: { email } });
 
-    if (shouldEncrypt) encryptedPassword = passwords.encrypt(encryptedPassword);
-
-    await schemas.apps.validateAsync({ id: app_id });
-    await schemas.users.new.validateAsync(data);
-
-    const user = await service.getUser({ filters: { email } });
-
-    if (user) {
-      logger.info({ message: 'User already exists, registering to app instead.', user, app_id });
-
-      return await userApps.registerUser({ user_id: user.id, app_id });
+    if (isDuplicate) {
+      return next(
+        customError(`User (${email}) already registered to app: ${app_id}`, 409)
+      );
     }
 
-    const password = await passwords.hash(encryptedPassword);
-    const newUser = await service.createUser({ ...data, password });
-
-    logger.info({ message: 'User created:', newUser });
-
-    res.json(newUser);
-  } catch (error) {
-    return next(error)
-  }
-}
-
-async function getProfile(req, res, next) {
-  try {
-    const id = req.params.id;
-
-    await schemas.users.existing.validateAsync({ id });
-
-    const user = await service.getUser({ id });
+    let user = await service.users.get({ filters: { email } });
 
     if (!user) {
-      const error = createCustomError(`Failed to find user: ${id}`, 404);
+      const encrypted = (isBrowserRequest(req))
+        ? data.password
+        : service.passwords.encrypt(data.password);
+      const password = await service.passwords.hash(encrypted);
+      
+      user = await service.users.create({ data: { ...data, password } });
 
-      return next(error);
+      logger.info(user, 'User created.');
     }
 
-    logger.info({ message: 'User found:', email: user.email });
+    delete user.password;
 
-    res.json(user);
+    logger.info({ id: user.id, email, app_id }, 'User successfully registered to app.');
+
+    return res.json(user);
   } catch (error) {
     return next(error)
   }
 }
 
-async function getAllProfiles(req, res, next) {
+async function get(req, res, next) {
+  const { user_id, app_id } = req.params;
+
   try {
-    const users = await service.getUser({ multiple: true })
+    await schemas.users.existing.validateAsync({ user_id });
+    await schemas.apps.validateAsync({ app_id });
 
-    if (!users) {
-      const error = createCustomError('Failed to find users', 404);
-
-      return next(error);
-    }
-
-    logger.info({ message: 'Users found', users: users.map(({ email }) => email) });
-
-    res.json(users);
-  } catch (error) {
-    return next(error)
-  }
-}
-
-async function updateProfile(req, res, next) {
-  try {
-    const id = req.params.id;
-    const data = req.body;
-
-    await schemas.users.existing.validateAsync(data);
-
-    const user = await service.getUser({ id })
+    const service = await new Service().use(app_id);
+    const user = await service.users.get({ filters: { id: user_id } });
 
     if (!user) {
-      const error = createCustomError(`User does not exist: ${id}`, 404);
-
-      return next(error);
+      return next(customError(`Failed to find user: ${user_id}`, 404));
     }
 
-    const updatedUser = await service.updateUser({ id, data })
+    delete user.password;
 
-    delete updatedUser.password
-
-    res.json(updatedUser);
-  } catch (error) {
-    return next(error)
-  }
-}
-
-async function deleteProfile(req, res, next) {
-  try {
-    const { id: user_id } = req.params;
-    const { app_id, delete: shouldDelete } = req.body;
-
-    await schemas.apps.validateAsync({ id: app_id });
-    await schemas.users.existing.validateAsync({ id });
+    logger.info(user, 'User found.');
     
-    const user = await service.getUser({ id: user_id })
-
-    if (!user) {
-      const error = createCustomError(`User does not exist: ${user_id}`, 404);
-
-      return next(error);
-    }
-
-    if (shouldDelete) {
-      await service.deleteUser(id);
-
-      logger.info({ message: 'User deleted', user });
-    } else {
-      await userApps.unregisterUser({ user_id, app_id });
-
-      logger.info({ message: `User ${user_id} unregistered from app: ${app_id}`, user });
-    }
-
-    res.sendStatus(204);
+    return res.json(user);
   } catch (error) {
     return next(error)
   }
 }
 
+async function getAll(req, res, next) {
+  const { id } = req.params;
 
+  try {
+    await schemas.apps.validateAsync({ id });
 
-function createCustomError(message, status) {
-  const error = new Error(message);
-  error.status = status;
+    const service = await new Service().use(id);
+    let users = await service.users.get({ multiple: true });
 
-  return error;
+    if (!users || !users.length) {
+      return next(customError(`Failed to find users.`, 404));
+    }
+
+    users = users.map(({ password, ...user }) => user);
+
+    logger.info(users, 'Users found.');
+
+    return res.json(users);
+  } catch (error) {
+    return next(error);
+  }
+}
+
+async function update(req, res, next) {
+  try {
+    const { user_id, app_id } = req.params;
+
+    await schemas.users.existing.validateAsync({ user_id, ...req.body });
+    await schemas.apps.validateAsync({ app_id });
+
+    const service = await new Service().use(app_id);
+    const user = await service.users.update({
+      filters: { id: user_id },
+      data: req.body,
+    });
+
+    delete user.password;
+
+    logger.info({ ...req.params, ...req.body }, 'User updated.');
+
+    return res.json(user);
+  } catch (error) {
+    return next(error);
+  }
+}
+
+async function remove(req, res, next) {
+  try {
+    const { user_id, app_id } = req.params;
+
+    await schemas.users.existing.validateAsync({ user_id });
+    await schemas.apps.validateAsync({ app_id });
+
+    const service = await new Service().use(app_id);
+    const user = await service.users.get({ filters: { id: user_id } })
+
+    await service.users.remove({ filters: { id: user_id } });
+
+    logger.info(user, 'User deleted permanently.');
+
+    return res.sendStatus(204);
+  } catch (error) {
+    return next(error)
+  }
 }
 
 module.exports = {
-  createProfile,
-  getProfile,
-  getAllProfiles,
-  updateProfile,
-  deleteProfile,
+  create,
+  get,
+  getAll,
+  update,
+  remove,
 }

@@ -1,0 +1,24 @@
+@baseUrl = http://localhost:8000
+
+##### All of the following require Login first (see authorized.http)
+
+### Service: Logout (Destroy session)
+POST {{baseUrl}}/apps/promptwiz/logout
+Authorization: Bearer {{$dotenv API_KEY}}
+
+### Service: Find user
+GET {{baseUrl}}/apps/promptwiz/users/d951085c-7b5c-40c7-8607-5f909228557b
+Authorization: Bearer {{$dotenv API_KEY}}
+
+### Service: Edit user
+PATCH {{baseUrl}}/apps/promptwiz/users/d951085c-7b5c-40c7-8607-5f909228557b
+Authorization: Bearer {{$dotenv API_KEY}}
+Content-Type: application/json
+
+{
+  "username": "tec3"
+}
+
+### Service: Delete user
+DELETE {{baseUrl}}/apps/promptwiz/users/a83ef916-21d5-468f-a8c3-35a59b947b32
+Authorization: Bearer {{$dotenv API_KEY}}
