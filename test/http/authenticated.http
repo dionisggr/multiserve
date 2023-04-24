@@ -3,15 +3,15 @@
 ##### All of the following require Login once first (see authorized.http)
 
 ### Service: Logout (Destroy session)
-POST {{baseUrl}}/apps/promptwiz/logout
+POST {{baseUrl}}/apps/fhp/logout
 Authorization: Bearer {{$dotenv API_KEY}}
 
 ### Service: Find user
-GET {{baseUrl}}/apps/promptwiz/users/demo
+GET {{baseUrl}}/apps/fhp/users/demo
 Authorization: Bearer {{$dotenv API_KEY}}
 
 ### Service: Edit user
-PATCH {{baseUrl}}/apps/promptwiz/users/demo
+PATCH {{baseUrl}}/apps/fhp/users/demo
 Authorization: Bearer {{$dotenv API_KEY}}
 Content-Type: application/json
 
@@ -20,5 +20,5 @@ Content-Type: application/json
 }
 
 ### Service: Delete user
-DELETE {{baseUrl}}/apps/promptwiz/users/demo
+DELETE {{baseUrl}}/apps/fhp/users/demo
 Authorization: Bearer {{$dotenv API_KEY}}

@@ -182,24 +182,31 @@ You can watch the full API Docs powered by Swagger UI [here](https://tec3-api-pr
 │   │   ├── error-handler.js  # Middleware for error handling
 │   │   └── passport.js  # Middleware for Passport session-based authentication
 │   ├── routes/
+│   │   ├── access.js  # Route handler for post-authentication login/logout
 │   │   ├── apps.js  # Route handler for app requests
 │   │   ├── docs.js  # Route handler for API documentation
 │   │   ├── health.js  # Route handler for health check
-│   │   ├── login.js  # Route handler for user login
-│   │   ├── routers.js  # Main router file
+│   │   ├── index.js  # Main router file
+│   │   ├── passwords.js  # Route handler for 2FA processes
+│   │   ├── secrets.js  # Route handler for admin-authenticated secrets
 │   │   ├── users.js  # Route handler for user requests
-│   │   └── utils.js  # Route handler for using utility functions {hash, encryption}
+│   │   └── utils.js  # Route handler for using utility services {hash, encryption}
 │   ├── services/
 │   │   ├── apps.js  # Database service for apps
-│   │   ├── CRUD.js  # Database service for the general CRUD operations (ie. utils)
+│   │   ├── CRUD.js  # Database service for the general CRUD operations (i.e. utils)
+│   │   ├── index.js  # Database service for generating and verifying passwords
 │   │   ├── passwords.js  # Database service for generating and verifying passwords
-│   │   ├── schemas.js  # Database service for request input schema management
-│   │   ├── user_apps.js  # Database service for links between users and apps
+│   │   ├── two-factor-auth.js  # 2FA service processes (email/verification)
 │   │   └── users.js  # Database service for users
 │   ├── app.js  # Main application file
 │   └── config.js  # Main configuration file
+│   └── schemas.js  # Data schema validator
+│   └── utils.js  # Utilities (General purpose)
 ├── supabase
 │   ├── ...  # Directory containing Supabase configuration files
+├── test
+│   ├── http/ 
+│   │   └── ...  # Local GET, POST, PATCH, DELETE endpoint manipulation (e.g. tests)
 ├── .env  # Environment variables file
 ├── db.js  # Database connection file (Knex instance)
 ├── docs.yaml  # API documentation file

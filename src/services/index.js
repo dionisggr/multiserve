@@ -1,6 +1,6 @@
 const Users = require('./users');
 const passwords = require('./passwords');
-const twoFactorAuth = require('./2FA');
+const twoFactorAuth = require('./two-factor-auth');
 
 class Service {
   constructor() {

@@ -4,8 +4,9 @@
 GET {{baseUrl}}/utils/uuid
 
 ### Service: Register (Create user)
+# Send the uuid request above first to generate a unique email address
 @email = {{uuid.response.body.$}}
-POST {{baseUrl}}/apps/promptwiz/register
+POST {{baseUrl}}/apps/fhp/register
 Authorization: Bearer {{$dotenv API_KEY}}
 Content-Type: application/json
 
@@ -15,7 +16,7 @@ Content-Type: application/json
 }
 
 ### Service: Login (Authentication)
-POST {{baseUrl}}/apps/promptwiz/login
+POST {{baseUrl}}/apps/fhp/login
 Authorization: Bearer {{$dotenv API_KEY}}
 Content-Type: application/json
 

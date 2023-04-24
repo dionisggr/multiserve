@@ -3,7 +3,7 @@
 ##### All admin tests require admin credentials in req.body
 
 ### Service: Get all users
-GET {{baseUrl}}/apps/promptwiz/users
+GET {{baseUrl}}/apps/fhp/users
 Authorization: Bearer {{$dotenv API_KEY}}
 Content-Type: application/json
 
@@ -20,5 +20,5 @@ Content-Type: application/json
 {
   "email": "tec3org@gmail.com",
   "password": "{{$dotenv ADMIN_PASSWORD}}",
-  "app_id": "promptwiz"
+  "app_id": "fhp"
 }
