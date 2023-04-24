@@ -19,7 +19,7 @@ async function generate(req, res, next) {
 
     logger.info({ message: `Generated ${service} value:`, response });
     
-    res.json(response);
+    return res.json(response);
   } catch (error) {
     return next(error);
   }

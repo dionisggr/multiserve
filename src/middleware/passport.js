@@ -37,8 +37,6 @@ passport.use(new LocalStrategy({
     server: user.password
   });
 
-  console.log(isAuthenticated);
-
   if (!isAuthenticated) {
     logger.error({ email }, 'Incorrect email or password.');
 

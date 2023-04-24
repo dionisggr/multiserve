@@ -1,5 +1,7 @@
 const { NODE_ENV, API_KEY } = require('../config');
 const { customError } = require('../utils');
+const schemas = require('../schemas');
+const Service = require('../services');
 
 const errors = {
   authentication: {
@@ -23,6 +25,7 @@ const session = {
 }
 
 function authorization(req, res, next) {
+  console.log(req.path)
   const auth = req.get('Authorization');
 
   if (!auth || !auth.includes(API_KEY)) {

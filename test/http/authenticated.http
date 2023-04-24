@@ -1,6 +1,6 @@
 @baseUrl = http://localhost:8000
 
-##### All of the following require Login first (see authorized.http)
+##### All of the following require Login once first (see authorized.http)
 
 ### Service: Logout (Destroy session)
 POST {{baseUrl}}/apps/promptwiz/logout

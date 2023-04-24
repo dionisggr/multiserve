@@ -10,6 +10,7 @@ exports.up = async function (db) {
     table.string('username').unique();
     table.string("password").notNullable();
     table.string('email').notNullable().unique();
+    table.string('phone').unique();
     table.boolean('is_admin').notNullable().defaultTo(false);
     table.timestamp('created_at').defaultTo(db.fn.now());
     table.timestamp("updated_at").defaultTo(db.fn.now());

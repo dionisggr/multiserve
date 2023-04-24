@@ -2,13 +2,15 @@ const uuid = require('uuid');
 const { ADMIN_PASSWORD } = require('../src/config');
 const Service = require('../src/services');
 
+const table = 'promptwiz__users';
+
 exports.seed = async function (db) {
   const service = new Service();
   const encryptedAdminPassword = service.passwords.encrypt(ADMIN_PASSWORD);
   const admin_password = await service.passwords.hash(encryptedAdminPassword);
 
-  await db("promptwiz__users").del();
-  await db("promptwiz__users").insert([
+  await db(table).del();
+  await db(table).insert([
     {
       id: uuid.v4(),
       username: "tec3",

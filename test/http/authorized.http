@@ -6,7 +6,7 @@ Authorization: Bearer {{$dotenv API_KEY}}
 Content-Type: application/json
 
 {
-  "email": "adfgasghghgyfdodddfdfsdfsa@gmail.com",
+  "email": "adfgasghghgyfdodddffdfsdfsa@gmail.com",
   "password": "{{$dotenv ADMIN_PASSWORD}}"
 }
 
