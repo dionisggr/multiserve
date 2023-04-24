@@ -1,5 +1,6 @@
-const Services = require('../services');
+const uuid = require('uuid');
 const { logger } = require('../config');
+const Services = require('../services');
 
 const { passwords } = new Services();
 
@@ -8,6 +9,7 @@ const services = {
   encryption: passwords.encrypt,
   hash: passwords.hash,
   hashing: passwords.hash,
+  uuid: uuid.v4,
 };
 
 async function generate(req, res, next) {
