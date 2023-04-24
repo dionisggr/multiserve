@@ -1,12 +1,16 @@
 @baseUrl = http://localhost:8000
 
+# @name uuid
+GET {{baseUrl}}/utils/uuid
+
 ### Service: Register (Create user)
+@email = {{uuid.response.body.$}}
 POST {{baseUrl}}/apps/promptwiz/register
 Authorization: Bearer {{$dotenv API_KEY}}
 Content-Type: application/json
 
 {
-  "email": "adfgasghghgyfdodddffdfsdfsa@gmail.com",
+  "email": "{{email}}@example.com",
   "password": "{{$dotenv ADMIN_PASSWORD}}"
 }
 
@@ -18,4 +22,5 @@ Content-Type: application/json
 {
   "email": "tec3org@gmail.com",
   "password": "{{$dotenv ADMIN_PASSWORD}}"
+
 }

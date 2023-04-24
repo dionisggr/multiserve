@@ -9,20 +9,17 @@ GET {{baseUrl}}/favicon.ico
 ### Docs
 GET {{baseUrl}}/docs
 
+### Service: Generate random uuid
+GET {{baseUrl}}/utils/uuid
+
 ### Service: Generate random hash
 GET {{baseUrl}}/utils/hash
-
-### Service: Generate random encryption
-GET {{baseUrl}}/utils/encryption
-
-### Service: Encrypt input (Param)
-POST {{baseUrl}}/utils/encrypt/:value
 
 ### Service: Hash input value (Param)
 POST {{baseUrl}}/utils/hash/:value
 
-### Service: Encrypt values (Body)
-POST {{baseUrl}}/utils/encrypt
+### Service: Hash values (Body)
+POST {{baseUrl}}/utils/hash HTTP/1.1
 content-type: application/json
 
 {
@@ -30,8 +27,14 @@ content-type: application/json
     "another_key": "another_value"
 }
 
-### Service: Hash values (Body)
-POST {{baseUrl}}/utils/hash HTTP/1.1
+### Service: Generate random encryption
+GET {{baseUrl}}/utils/encryption
+
+### Service: Encrypt value (Param)
+POST {{baseUrl}}/utils/encrypt/:value
+
+### Service: Encrypt values (Body)
+POST {{baseUrl}}/utils/encryption
 content-type: application/json
 
 {

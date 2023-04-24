@@ -38,7 +38,7 @@ async function create(req, res, next) {
 
     logger.info({ id: user.id, email, app_id }, 'User successfully registered to app.');
 
-    return res.json(user);
+    return res.status(201).json(user);
   } catch (error) {
     return next(error)
   }

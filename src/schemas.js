@@ -8,8 +8,14 @@ const schemas = {
       app_id: Joi.string().required(),
     }),
     existing: Joi.object({
-      id: Joi.string().guid({ version: 'uuidv4' }),
-      user_id: Joi.string().guid({ version: 'uuidv4' }),
+      id: Joi.alternatives().try(
+        Joi.string().guid({ version: 'uuidv4' }),
+        Joi.string()
+      ),
+      user_id: Joi.alternatives().try(
+        Joi.string().guid({ version: 'uuidv4' }),
+        Joi.string()
+      ),
       username: Joi.string().allow(null),
       email: Joi.string().email(),
       password: Joi.string().min(8).max(64),
