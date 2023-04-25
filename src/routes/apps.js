@@ -4,7 +4,6 @@ const schemas = require('../schemas');
 const { logger } = require('../config');
 
 async function get(req, res, next) {
-  console.log('get')
   const { id } = req.params;
 
   try {
@@ -26,7 +25,6 @@ async function get(req, res, next) {
 }
 
 async function getAll(req, res, next) {
-  console.log('getAll')
   try {
     const service = new Service('apps');
     const apps = await service.apps.get({ multiple: true });

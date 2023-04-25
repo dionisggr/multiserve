@@ -9,27 +9,26 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "migrations": "knex migrate:latest",
-    "migrations:create": "knex migrate:make",
-    "migrations:rollback": "knex migrate:rollback --all",
+    "migrations": "knex --knexfile src/db/knexfile.js migrate:latest",
+    "migrations:create": "knex --knexfile src/db/knexfile.js migrate:make",
+    "migrations:rollback": "knex --knexfile src/db/knexfile.js migrate:rollback --all",
     "migrations:reset": "npm run migrations:rollback && npm run migrations",
     "rollback": "npm run migrations:rollback",
     "reset": "npm run migrations:reset && npm run seeds",
-    "seeds": "knex seed:run",
-    "seeds:create": "knex seed:make",
+    "seeds": "knex --knexfile src/db/knexfile.js seed:run",
+    "seeds:create": "knex --knexfile src/db/knexfile.js seed:make",
     "login": "npx supabase login",
     "db:create": "createdb tec3",
     "db:pull": "npx supabase db remote commit",
     "db:start": "npx supabase start",
     "db:stop": "npx supabase stop",
     "db:reset": "npx supabase db reset",
-    "setup": "npm run db:pull && npm run db:start && npm run migrations && npm run seeds"
+    "setup": "npm run db:pull && npm run db:start && npm run reset && source src/aliases.sh"
   },
   "dependencies": {
     "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
-    "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
     "express-xss-sanitizer": "^1.1.6",
@@ -49,6 +48,7 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "dotenv": "^16.0.3",
     "nodemon": "^2.0.22",
     "supabase-cli": "^0.0.21"
   }

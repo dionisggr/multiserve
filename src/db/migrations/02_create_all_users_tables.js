@@ -1,4 +1,4 @@
-const { logger } = require('../src/config');
+const { logger } = require('../../config');
 
 const apps = ['tec3', 'fhp']
 

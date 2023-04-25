@@ -1,6 +1,6 @@
-require('dotenv').config();
+require('dotenv').config({ path: '../../.env' });
 
-const { NODE_ENV, DEV_DB_URL, PROD_DB_URL } = process.env;
+const { DEV_DB_URL, PROD_DB_URL } = process.env;
 const config = {
   development: {
     client: 'postgresql',
@@ -28,4 +28,4 @@ const config = {
   }
 }
 
-module.exports = config[NODE_ENV];
+module.exports = config;

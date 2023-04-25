@@ -1,5 +1,5 @@
 const passport = require('../middleware/passport');
-const db = require("../../db");
+const db = require("../db");
 
 async function healthCheck(req, res, next) {
   try {

@@ -6,7 +6,7 @@ function handler(req, res, next) {
   return res.sendStatus(200);
 }
 
-const swaggerDocument = YAML.load(fs.readFileSync('./docs.yaml', 'utf8'));
+const swaggerDocument = YAML.load(fs.readFileSync('./src/docs.yaml', 'utf8'));
 const docs = {
   serve: swaggerUi.serve,
   setup: swaggerUi.setup(swaggerDocument),

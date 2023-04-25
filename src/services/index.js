@@ -6,8 +6,6 @@ class Service extends CRUD {
   constructor(app_id) {
     super(app_id);
 
-    console.log('service')
-
     this.app_id = app_id;
     this.passwords = passwords;
     this.twoFactorAuth = twoFactorAuth;

@@ -1,6 +1,6 @@
 const uuid = require('uuid');
-const { ADMIN_PASSWORD } = require('../src/config');
-const Service = require('../src/services');
+const { ADMIN_PASSWORD } = require('../../config');
+const Service = require('../../services');
 
 const service = new Service();
 const apps = ['tec3', 'fhp']

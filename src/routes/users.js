@@ -3,7 +3,7 @@ const { customError } = require('../utils');
 const Service = require('../services');
 const { logger } = require('../config');
 const schemas = require('../schemas');
-const db = require('../../db');
+const db = require('../db');
 
 async function create(req, res, next) {
   const data = req.body;
@@ -59,9 +59,6 @@ async function get(req, res, next) {
       return next(customError(`Failed to find user: ${user_id}`, 404));
     }
 
-    console.log(req.user)
-    console.log(!req.user.is_admin, user_id !== user.id)
-
     if (!req.user.is_admin && req.user.id !== user_id) {
       return next(
         customError(`Unauthorized user request from ${user_id} for ${user.id}.`, 404)
@@ -111,13 +108,13 @@ async function update(req, res, next) {
     const service = new Service(app_id);
     const data = { ...req.body, updated_at: db.fn.now() };
     const user = await service.users.update({
-      filters: { id: user_id },asdfasdf
+      filters: { id: user_id },
       data,
     });
 
     delete user.password;
 
-    logger.info({ ...req.params, ...data }, 'User updated.');
+    logger.info({ ...req.params, ...req.body }, 'User updated.');
 
     return res.json(user);
   } catch (error) {

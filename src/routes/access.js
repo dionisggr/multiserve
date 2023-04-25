@@ -1,5 +1,5 @@
 const Service = require('../services');
-const db = require('../../db');
+const db = require('../db');
 const { logger } = require('../config');
 
 async function login(req, res) {
