@@ -266,7 +266,7 @@ paths:
             description: API Key
             type: string
             required: true
-            value: Bearer d5f5c5e5a9bc9b714f263b11f63c7bdf
+            value: Bearer <API_KEY>
           - in: header
             name: cookie
             type: string
@@ -424,7 +424,7 @@ paths:
           description: API Key
           type: string
           required: true
-          value: Bearer d5f5c5e5a9bc9b714f263b11f63c7bdf 
+          value: Bearer <API_KEY> 
       responses:
         '200':
           description: OK
@@ -485,7 +485,7 @@ paths:
           description: API Key
           type: string
           required: true
-          value: Bearer d5f5c5e5a9bc9b714f263b11f63c7bdf
+          value: Bearer <API_KEY>
       responses:
         '204':
           description: No Content
@@ -577,7 +577,7 @@ paths:
           description: OK
           schema:
             type: string
-            example: 'd5f5c5e5a9bc9b714f263b11f63c7bdf'
+            example: '<API_KEY>'
   /utils/{service}/{value}?:
     post:
       summary: Transform data using a service
