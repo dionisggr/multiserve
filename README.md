@@ -150,24 +150,49 @@ You can watch the full API Docs powered by Swagger UI [here](https://tec3-api-pr
     <td>API Docs</td>
   </tr>
   <tr>
-    <td><b>/register</b></td>
+    <td><b>/secrets</b></td>
+    <td>GET</td>
+    <td>Admin-authenticated ENV vars</td>
+  </tr>
+  <tr>
+    <td><b>/apps/:id</b></td>
+    <td>GET, POST, PATCH, DELETE</td>
+    <td>Entry endpoint for app-related routes</td>
+  </tr>
+  <tr>
+    <td><b>/apps/:id/register</b></td>
     <td>POST</td>
     <td>User registration</td>
   </tr>
   <tr>
-    <td><b>/login</b></td>
+    <td><b>/apps/:id/login</b></td>
     <td>POST</td>
     <td>User login</td>
   </tr>
   <tr>
-    <td><b>/users</b></td>
+    <td><b>/apps/:id/logout</b></td>
+    <td>POST</td>
+    <td>User logout</td>
+  </tr>
+  <tr>
+    <td><b>/apps/:id/users/:user_id?</b></td>
     <td>GET, PATCH, DELETE</td>
     <td>User data</td>
   </tr>
   <tr>
-    <td><b>/utils</b></td>
+    <td><b>/apps/:id/passwords/verify</b></td>
+    <td>POST</td>
+    <td>User data</td>
+  </tr>
+  <tr>
+    <td><b>/apps/:id/passwords/reset</b></td>
+    <td>PATCH</td>
+    <td>User data</td>
+  </tr>
+  <tr>
+    <td><b>/utils/:service/:value?</b></td>
     <td>GET, POST</td>
-    <td>Services</td>
+    <td>Util services</td>
   </tr>
 </table>
 
@@ -211,10 +236,10 @@ You can watch the full API Docs powered by Swagger UI [here](https://tec3-api-pr
 │   ├── ...  # Directory containing Supabase configuration files
 ├── test
 │   ├── http/ 
-│   │   └── ...  # Local GET, POST, PATCH, DELETE endpoint manipulation (e.g. tests)
+│   │   ├── ...  # Directory for .http files with API endpoints
 ├── .env  # Environment variables file
 ├── db.js  # Database connection file (Knex instance)
-├── docs.yaml  # API documentation file
+├── docs.yaml  # API documentation file (Swagger UI)
 ├── knexfile.js  # Knex configuration file
 └── server.js  # Server entry point file
 ```
@@ -227,19 +252,18 @@ Rename the `new.env` file to `.env` and add the missing environment variables. I
 | Name             | Description                        | Default value |
 | ---------------- | ---------------------------------- | ------------- |
 | PORT             | Server host port                   | 8000 |
-| NODE_ENV         | Defines environment var            | development | 
-| DEV_DB_URL       | Database name                      | postgresql://postgres:postgres@localhost:54322/postgres |
-| PROD_DB_URL      | Database username                  | none |
-| API_KEY          | Server host                        | none |
-| ADMIN_PASSWORD   | Database host port                 | none |
-
+| NODE_ENV         | Defines environment                | development | 
+| DEV_DB_URL       | Dev DB connection string           | postgresql://postgres:postgres@localhost:54322/postgres |
+| PROD_DB_URL      | Prod DB connection string          | none |
+| API_KEY          | API Key (Secret)                   | none |
+| ADMIN_PASSWORD   | Admin password                     | none |
 
 ---
 
 ## Authentication
 `Passport.js` is used to handle authentication. This is a flexible and modular authentication middleware that allows you to easily add new authentication strategies like login with Facebook, Google, Github, etc. The current setup allows only for a fully manual authentication process that leverages a local strategy using `passport-local`.
 
-The `Passport` configuration and functions are located in `src/middlware/passport.js`.
+The `Passport` configuration and functions are located in `src/middleware/passport.js`.
 
 ### Access
 The `serializeUser` defines what data are saved in request session, generally we save the user id.
@@ -249,7 +273,7 @@ The `deserializeUser` allows getting the whole user object and assigning it in `
 > You can find the Passport docs [here](https://www.passportjs.org/).
 
 ### Route Protection
-To protect a route, you can assign the path to the `authorized` or the `authenticated` auth middlewares within `src/routes/routers.js` for the desired level of protection.
+To protect a route, you can assign the path to the `authorized` or the `authenticated` auth middlewares within `src/routes/index.js` for the desired level of protection.
 
 To check if a user is authenticated before accessing a route, the authentication middleware checks for `req.isAuthenticated()`. This runs to check if a particular `Cookie` set from a previous login process is present and unexpired. You can set the expiration time in `src/config.js` within the `auth` object. The default expiration time is 1 hour, with a check every 30 minutes for new requests to renew cookies as appropriate.
 
