@@ -9,7 +9,7 @@ Baseport is a really simple but comprehensive boilerplate written for Node.js/Ex
 - A strong and reliable relational database included with [**PostgreSQL**](https://www.postgresql.org/).
 - A simplified database query builder managed by [**Knex**](https://knexjs.org/).
 - A Straightforward database migration and seeding strategy with [**Knex**](https://knexjs.org/).
-- Custom error handling implemented using [**error-handler**](https://github.com/tec3org/tec3-api/blob/main/src/middleware/error-handler.js).
+- Custom error handling implemented using [**error-handler**](https://github.com/dionisggr/baseport/blob/main/src/middleware/error-handler.js).
 - Basic security features provided through [**Helmet**](https://helmetjs.github.io/) and [**Cors**](https://github.com/expressjs/cors).
 - Flexible logging implemented with [**pino**](https://github.com/pinojs/pino).
 - Security enhancements thanks to [**bcrypt**](https://github.com/kelektiv/node.bcrypt.js/) hashing and [**crypto**](https://www.npmjs.com/package/crypto-js) encryption.
@@ -55,9 +55,9 @@ You need to set up your development environment before you can do anything.
 ### Step 2: Clone the project
 
 ```bash
-git clone https://github.com/tec3org/tec3-api.git
+git clone https://github.com/dionisggr/baseport.git
 
-cd tec3-api
+cd baseport
 ```
 
 ### Step 3: Install dependencies
@@ -155,9 +155,14 @@ You can watch the full API Docs powered by Swagger UI [here](https://tec3-api-pr
     <td>Admin-authenticated ENV vars</td>
   </tr>
   <tr>
+    <td><b>/apps</b></td>
+    <td>GET</td>
+    <td>All apps</td>
+  </tr>
+  <tr>
     <td><b>/apps/:id</b></td>
-    <td>GET, POST, PATCH, DELETE</td>
-    <td>Entry endpoint for app-related routes</td>
+    <td>GET</td>
+    <td>Sigle app</td>
   </tr>
   <tr>
     <td><b>/apps/:id/register</b></td>
@@ -186,7 +191,7 @@ You can watch the full API Docs powered by Swagger UI [here](https://tec3-api-pr
   </tr>
   <tr>
     <td><b>/apps/:id/passwords/reset</b></td>
-    <td>PATCH</td>
+    <td>POST</td>
     <td>User data</td>
   </tr>
   <tr>
@@ -237,10 +242,10 @@ You can watch the full API Docs powered by Swagger UI [here](https://tec3-api-pr
 ├── test
 │   ├── http/ 
 │   │   ├── ...  # Directory for .http files with API endpoints
-├── .env  # Environment variables file
 ├── db.js  # Database connection file (Knex instance)
 ├── docs.yaml  # API documentation file (Swagger UI)
 ├── knexfile.js  # Knex configuration file
+├── new.env  # Clean environment variables file for new projects
 └── server.js  # Server entry point file
 ```
 

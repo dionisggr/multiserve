@@ -15,7 +15,7 @@ const public = express.Router();
 const authorized = express.Router().use(auth.authorization);
 const authenticated = express.Router().use(auth.authorization, auth.authentication);
 const authenticate = passport.authenticate('local');
-// const admin = express.Router().use(authenticate, auth.admin);
+const admin = express.Router().use(authenticate, auth.admin);
 
 // Routes
 public
@@ -27,14 +27,15 @@ public
     .post(utils.transform)
 
 authorized
-  .get('/secrets', authenticate, auth.admin, secrets.reveal)
-  .get('/apps', authenticate, auth.admin, apps.getAll)
-  .get('/apps/:id', authenticate, auth.admin, apps.get)
-  .get('/apps/:id/users', authenticate, auth.admin, users.getAll)
   .post('/apps/:id/register', users.create, authenticate, access.login)
   .post('/apps/:id/login', authenticate, access.login)
   .post('/apps/:id/passwords/verify', passwords.verify)
   .post('/apps/:id/passwords/reset', passwords.reset)
+  .use(admin
+    .get('/secrets', secrets.reveal)
+    .get('/apps', apps.getAll)
+    .get('/apps/:id', apps.get)
+    .get('/apps/:id/users', users.getAll))
 
 authenticated
   .post('/apps/:id/logout', access.logout)
