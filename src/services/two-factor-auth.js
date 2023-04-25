@@ -27,6 +27,8 @@ function send({ email, app_id, req }) {
   transporter.sendMail(config, (error, info) => {
     if (error) {
       logger.info(error, 'Error');
+
+      throw error;
     } else {
       req.session.twoFactorAuth = { email, app_id, code };
 
@@ -35,9 +37,9 @@ function send({ email, app_id, req }) {
   });
 }
 
-function validate({ session, input }) {
-  for (field in session) {
-    if (session[field] !== input[field]) {
+function validate({ session: { twoFactorAuth }, body: input }) {
+  for (field in twoFactorAuth) {
+    if (twoFactorAuth[field] !== input[field]) {
       throw customError('Invalid token', 401);
     }
   }

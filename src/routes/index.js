@@ -34,7 +34,7 @@ authorized
   .post('/apps/:id/register', users.create, authenticate, access.login)
   .post('/apps/:id/login', authenticate, access.login)
   .post('/apps/:id/passwords/verify', passwords.verify)
-  .patch('/apps/:id/passwords/reset', passwords.reset)
+  .post('/apps/:id/passwords/reset', passwords.reset)
 
 authenticated
   .post('/apps/:id/logout', access.logout)
