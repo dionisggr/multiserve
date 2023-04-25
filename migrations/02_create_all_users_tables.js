@@ -13,6 +13,9 @@ exports.up = async function (db) {
       table.string('id').primary().defaultTo(db.raw('uuid_generate_v4()'));
       table.string('username').unique();
       table.string("password").notNullable();
+      table.string('first_name');
+      table.string('last_name');
+      table.date('DOB');
       table.string('email').notNullable().unique();
       table.string('phone').unique();
       table.string("avatar").unique();
