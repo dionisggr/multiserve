@@ -111,7 +111,7 @@ async function update(req, res, next) {
     const service = new Service(app_id);
     const data = { ...req.body, updated_at: db.fn.now() };
     const user = await service.users.update({
-      filters: { id: user_id },
+      filters: { id: user_id },asdfasdf
       data,
     });
 
