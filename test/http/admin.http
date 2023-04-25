@@ -2,7 +2,27 @@
 
 ##### All admin tests require admin credentials in req.body
 
-### Service: Get all users
+### Get all apps
+GET {{baseUrl}}/apps
+Authorization: Bearer {{$dotenv API_KEY}}
+Content-Type: application/json
+
+{
+  "email": "tec3org@gmail.com",
+  "password": "{{$dotenv ADMIN_PASSWORD}}"
+}
+
+### Get app by id
+GET {{baseUrl}}/apps/fhp
+Authorization: Bearer {{$dotenv API_KEY}}
+Content-Type: application/json
+
+{
+  "email": "tec3org@gmail.com",
+  "password": "{{$dotenv ADMIN_PASSWORD}}"
+}
+
+### Get all users
 GET {{baseUrl}}/apps/fhp/users
 Authorization: Bearer {{$dotenv API_KEY}}
 Content-Type: application/json
@@ -12,7 +32,7 @@ Content-Type: application/json
   "password": "{{$dotenv ADMIN_PASSWORD}}"
 }
 
-### Service: Get API secrets
+### Get API secrets
 GET {{baseUrl}}/secrets
 Authorization: Bearer {{$dotenv API_KEY}}
 Content-Type: application/json

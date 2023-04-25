@@ -1,4 +1,4 @@
-const { isBrowserRequest, isAdminRequest } = require('../utils');
+const { isBrowserRequest } = require('../utils');
 const { customError } = require('../utils');
 const Service = require('../services');
 const schemas = require('../schemas');
@@ -12,7 +12,7 @@ async function create(req, res, next) {
   try {
     await schemas.users.new.validateAsync({ ...data, app_id });
 
-    const service = await new Service().use(app_id);
+    const service = new Service(app_id);
     const isDuplicate = await service.users.get({ filters: { email } });
 
     if (isDuplicate) {
@@ -51,11 +51,20 @@ async function get(req, res, next) {
     await schemas.users.existing.validateAsync({ user_id });
     await schemas.apps.validateAsync({ app_id });
 
-    const service = await new Service().use(app_id);
+    const service = new Service(app_id);
     const user = await service.users.get({ filters: { id: user_id } });
 
     if (!user) {
       return next(customError(`Failed to find user: ${user_id}`, 404));
+    }
+
+    console.log(req.user)
+    console.log(!req.user.is_admin, user_id !== user.id)
+
+    if (!req.user.is_admin && req.user.id !== user_id) {
+      return next(
+        customError(`Unauthorized user request from ${user_id} for ${user.id}.`, 404)
+      );
     }
 
     delete user.password;
@@ -74,7 +83,7 @@ async function getAll(req, res, next) {
   try {
     await schemas.apps.validateAsync({ id });
 
-    const service = await new Service().use(id);
+    const service = new Service(id);
     let users = await service.users.get({ multiple: true });
 
     if (!users || !users.length) {
@@ -98,7 +107,7 @@ async function update(req, res, next) {
     await schemas.users.existing.validateAsync({ user_id, ...req.body });
     await schemas.apps.validateAsync({ app_id });
 
-    const service = await new Service().use(app_id);
+    const service = new Service(app_id);
     const user = await service.users.update({
       filters: { id: user_id },
       data: req.body,
@@ -121,7 +130,7 @@ async function remove(req, res, next) {
     await schemas.users.existing.validateAsync({ user_id });
     await schemas.apps.validateAsync({ app_id });
 
-    const service = await new Service().use(app_id);
+    const service = new Service(app_id);
     const user = await service.users.get({ filters: { id: user_id } })
 
     await service.users.remove({ filters: { id: user_id } });

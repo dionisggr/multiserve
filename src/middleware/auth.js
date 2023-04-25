@@ -25,7 +25,6 @@ const session = {
 }
 
 function authorization(req, res, next) {
-  console.log(req.path)
   const auth = req.get('Authorization');
 
   if (!auth || !auth.includes(API_KEY)) {

@@ -4,7 +4,7 @@
 GET {{baseUrl}}/utils/uuid
 
 ### Service: Register (Create user)
-# Send the uuid request above first to generate a unique email address
+# Send the "uuid" request above every time before this one to generate a unique email
 @email = {{uuid.response.body.$}}
 POST {{baseUrl}}/apps/fhp/register
 Authorization: Bearer {{$dotenv API_KEY}}
@@ -15,7 +15,7 @@ Content-Type: application/json
   "password": "{{$dotenv ADMIN_PASSWORD}}"
 }
 
-### Service: Login (Authentication)
+### Service: Login as Admin (Authentication)
 POST {{baseUrl}}/apps/fhp/login
 Authorization: Bearer {{$dotenv API_KEY}}
 Content-Type: application/json
@@ -23,5 +23,14 @@ Content-Type: application/json
 {
   "email": "tec3org@gmail.com",
   "password": "{{$dotenv ADMIN_PASSWORD}}"
+}
 
+### Service: Login as user (Authentication)
+POST {{baseUrl}}/apps/fhp/login
+Authorization: Bearer {{$dotenv API_KEY}}
+Content-Type: application/json
+
+{
+  "email": "demo@tec3org.com",
+  "password": "password"
 }

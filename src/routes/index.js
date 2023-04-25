@@ -4,47 +4,43 @@ const passport = require('../middleware/passport');
 const auth = require('../middleware/auth');
 const access = require('./access');
 const docs = require('./docs');
+const apps = require('./apps');
 const users = require('./users');
+const passwords = require('./passwords');
 const utils = require('./utils');
 const secrets = require('./secrets');
-const passwords = require('./passwords');
 
-// Definitions
+// Definitions / Auth
 const public = express.Router();
-const authorized = express.Router();
-const authenticated = express.Router();
+const authorized = express.Router().use(auth.authorization);
+const authenticated = express.Router().use(auth.authorization, auth.authentication);
 const authenticate = passport.authenticate('local');
-
-// Auth
-authorized.use(auth.authorization);
-authenticated.use(auth.authorization, auth.authentication);
+// const admin = express.Router().use(authenticate, auth.admin);
 
 // Routes
 public
   .use(docs.serve)
   .get('/docs', docs.setup, docs.handler)
   .get(['/', '/favicon.ico'], health)
-
-public.route('/utils/:service/:value?')
-  .get(utils.generate)
-  .post(utils.transform)
+  .route('/utils/:service/:value?')
+    .get(utils.generate)
+    .post(utils.transform)
 
 authorized
   .get('/secrets', authenticate, auth.admin, secrets.reveal)
-
-authorized
-  .get('/apps/:id/users', users.getAll)
-  .post('/apps/:id/login', authenticate, access.login)
+  .get('/apps', authenticate, auth.admin, apps.getAll)
+  .get('/apps/:id', authenticate, auth.admin, apps.get)
+  .get('/apps/:id/users', authenticate, auth.admin, users.getAll)
   .post('/apps/:id/register', users.create, authenticate, access.login)
+  .post('/apps/:id/login', authenticate, access.login)
   .post('/apps/:id/passwords/verify', passwords.verify)
   .patch('/apps/:id/passwords/reset', passwords.reset)
 
 authenticated
   .post('/apps/:id/logout', access.logout)
-  
-authenticated.route('/apps/:app_id/users/:user_id')
-  .get(users.get)
-  .patch(users.update)
-  .delete(users.remove)
+  .route('/apps/:app_id/users/:user_id')
+    .get(users.get)
+    .patch(users.update)
+    .delete(users.remove)
 
 module.exports = { public, authorized, authenticated };

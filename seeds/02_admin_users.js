@@ -3,15 +3,18 @@ const { ADMIN_PASSWORD } = require('../src/config');
 const Service = require('../src/services');
 
 const service = new Service();
-const tables = ['fhp__users'];
+const apps = ['tec3', 'fhp']
 
 exports.seed = async function (db) {
-  const encrypted = service.passwords.encrypt(ADMIN_PASSWORD);
   const admin_password = await service.passwords.hash(
     service.passwords.encrypt(ADMIN_PASSWORD)
   );
+  const demo_password = await service.passwords.hash(
+    service.passwords.encrypt('password')
+  );
   
-  for (let table of tables) {
+  for (app of apps) {
+    const table = app + '__users';
     await db(table).del();
     await db(table).insert([
       {
@@ -46,7 +49,7 @@ exports.seed = async function (db) {
         id: "demo",
         username: "demo",
         email: "demo@tec3org.com",
-        password: "password",
+        password: demo_password,
         is_admin: false,
       },
     ]);

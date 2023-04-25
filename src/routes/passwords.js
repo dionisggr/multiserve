@@ -8,7 +8,7 @@ async function reset(req, res, next) {
     await schemas.users.existing.validateAsync({ email });
     await schemas.apps.validateAsync({ app_id });
   
-    const service = await new Service().use(app_id);
+    const service = new Service(app_id);
     const user = await service.users.get({ filters: { email } });
 
     if (!user) {
@@ -31,7 +31,7 @@ async function verify(req, res, next) {
     await schemas.users.existing.validateAsync({ email });
     await schemas.apps.validateAsync({ app_id });
 
-    const service = await new Service().use(app_id);
+    const service = new Service(app_id);
     const user = await service.users.get({ filters: { email } });
     
     if (!user) {

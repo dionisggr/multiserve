@@ -7,8 +7,9 @@ POST {{baseUrl}}/apps/fhp/logout
 Authorization: Bearer {{$dotenv API_KEY}}
 
 ### Service: Find user
-GET {{baseUrl}}/apps/fhp/users/demo
+GET {{baseUrl}}/apps/fhp/users/79eb3800-ceae-43b1-85a0-3c383072e4db
 Authorization: Bearer {{$dotenv API_KEY}}
+Cookie: connect.sid=s%3AZHoRrIvWTMmO8m1lAUbTSwDO7xg9A0a6.fXC%2FFITQ52ueYebbqOTReRthMG9Q9osTDNnELOdsuU0; Path=/; Expires=Tue, 25 Apr 2023 20:00:30 GMT; HttpOnly
 
 ### Service: Edit user
 PATCH {{baseUrl}}/apps/fhp/users/demo
@@ -16,7 +17,7 @@ Authorization: Bearer {{$dotenv API_KEY}}
 Content-Type: application/json
 
 {
-  "username": "new_username"
+  "username": "another"
 }
 
 ### Service: Delete user

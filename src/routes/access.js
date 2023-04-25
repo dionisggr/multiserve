@@ -8,7 +8,7 @@ async function login(req, res) {
   logger.info({ id, email }, 'Login successful');
 
   try {
-    const service = await new Service().use(app_id);
+    const service = new Service(app_id);
     const last_login = db.fn.now();
 
     await service.users.update({ filters: { id }, data: { last_login } });

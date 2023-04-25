@@ -1,6 +1,6 @@
 const LocalStrategy = require('passport-local').Strategy;
 const passport = require('passport');
-const { isBrowserRequest, isAdminRequest } = require('../utils');
+const { isBrowserRequest } = require('../utils');
 const schemas = require('../schemas');
 const Service = require('../services');
 const { auth, logger } = require('../config');
@@ -11,7 +11,7 @@ passport.use(new LocalStrategy({
   passwordField: auth.passwordField,
   passReqToCallback: true,
 }, async (req, email, password, done) => {
-  const app_id = req.params.id || req.params.app_id || req.body.app_id;
+  const app_id = req.params.id || req.params.app_id || req.body.app_id || 'tec3';
 
   if (app_id) {
     await schemas.users.new.validateAsync({ email, password, app_id });
@@ -19,7 +19,7 @@ passport.use(new LocalStrategy({
     await schemas.users.existing.validateAsync({ email, password });
   }
 
-  const service = await new Service().use(app_id);
+  const service = new Service(app_id);
   const user = await service.users.get({ filters: { email } });
 
   if (!user) {
@@ -56,8 +56,7 @@ passport.deserializeUser(async (authenticated, done) => {
   await schemas.users.existing.validateAsync({ id });
   await schemas.apps.validateAsync({ id: app_id });
 
-  const service = await new Service().use(app_id);
-
+  const service = new Service(app_id);
   const user = await service.users.get({
     filters: { id, email, password },
   });
