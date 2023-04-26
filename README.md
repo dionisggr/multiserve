@@ -13,6 +13,7 @@ Baseport is a really simple but comprehensive boilerplate written for Node.js/Ex
 - Basic security features provided through [**Helmet**](https://helmetjs.github.io/) and [**Cors**](https://github.com/expressjs/cors).
 - Flexible logging implemented with [**pino**](https://github.com/pinojs/pino).
 - Security enhancements thanks to [**bcrypt**](https://github.com/kelektiv/node.bcrypt.js/) hashing and [**crypto**](https://www.npmjs.com/package/crypto-js) encryption.
+- Straightforward email management and delivery through with [SendGrid](https://sendgrid.com/).
 
 ## Why build it?
 Not all projects require a full-blown backend framework like [NestJS](https://nestjs.com/), [AdonisJS](https://adonisjs.com/), [Loopback](https://loopback.io/), etc. Sometimes you just need a simple REST API with a database connection and some essentials like authentication, input validation/sanitizing and easy database manipulation.
