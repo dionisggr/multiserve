@@ -9,7 +9,7 @@ async function send({ app, email, code }) {
     to: email,
     from: ADMIN_EMAIL,
     subject: `Your One-Time Code for ${app}`,
-    text: `Hello from ${app}!\n\nYour one-time code is: ${code}\n\nIt expires in 5 minutes!\n\nBest regards,\nTec3 team`,
+    text: `Hello from ${app}!\n\nYour one-time code is: ${code}\n\nIt expires in 5 minutes!\n\nBest regards,\nBaseport team`,
   };
   const response = (await sendgrid.send(msg))[0];
   const log = { app, email, code, status: response.statusCode };

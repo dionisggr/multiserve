@@ -18,7 +18,6 @@
     "seeds": "knex --knexfile src/db/knexfile.js seed:run",
     "seeds:create": "knex --knexfile src/db/knexfile.js seed:make",
     "login": "npx supabase login",
-    "db:create": "createdb tec3",
     "db:pull": "npx supabase db remote commit",
     "db:start": "npx supabase start",
     "db:stop": "npx supabase stop",

@@ -3,7 +3,7 @@ const { ADMIN_EMAIL, ADMIN_PASSWORD } = require('../../config');
 const Service = require('../../services');
 
 const service = new Service();
-const apps = ['demo', 'tec3', 'fhp']
+const apps = ['demo', 'baseport', 'promptwiz']
 
 exports.seed = async function (db) {
   const admin_password = await service.passwords.hash(
@@ -19,7 +19,7 @@ exports.seed = async function (db) {
     await db(table).insert([
       {
         id: uuid.v4(),
-        username: 'tec3',
+        username: 'admin',
         email: ADMIN_EMAIL,
         password: admin_password,
         is_admin: true,
@@ -33,22 +33,22 @@ exports.seed = async function (db) {
       },
       {
         id: uuid.v4(),
-        username: 'doug',
-        email: 'briancarter340@gmail.com',
-        password: admin_password,
+        username: 'superman',
+        email: 'ckent@krypton.com',
+        password: demo_password,
         is_admin: true,
       },
       {
         id: uuid.v4(),
-        username: 'lili',
-        email: 'lile7886@gmail.com',
-        password: admin_password,
+        username: 'wonder_woman',
+        email: 'dprincess@themy.com',
+        password: demo_password,
         is_admin: true,
       },
       {
-        id: "demo",
+        id: "aquaman",
         username: "demo",
-        email: "demo@tec3org.com",
+        email: "acurry@lantis.com",
         password: demo_password,
         is_admin: false,
       },
