@@ -8,7 +8,9 @@ const {
   API_KEY,
   DEV_DB_URL,
   PROD_DB_URL,
+  ADMIN_EMAIL,
   ADMIN_PASSWORD,
+  SENDGRID_API_KEY,
 } = process.env;
 const auth = {
   sessionSecret: API_KEY,
@@ -48,7 +50,9 @@ module.exports = {
   API_KEY,
   DEV_DB_URL,
   PROD_DB_URL,
+  ADMIN_EMAIL,
   ADMIN_PASSWORD,
+  SENDGRID_API_KEY,
   sessionData,
   bodyParser,
   morgan,

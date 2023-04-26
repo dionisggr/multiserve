@@ -1,9 +1,9 @@
 const uuid = require('uuid');
-const { ADMIN_PASSWORD } = require('../../config');
+const { ADMIN_EMAIL, ADMIN_PASSWORD } = require('../../config');
 const Service = require('../../services');
 
 const service = new Service();
-const apps = ['tec3', 'fhp']
+const apps = ['demo', 'tec3', 'fhp']
 
 exports.seed = async function (db) {
   const admin_password = await service.passwords.hash(
@@ -20,7 +20,7 @@ exports.seed = async function (db) {
       {
         id: uuid.v4(),
         username: 'tec3',
-        email: 'tec3org@gmail.com',
+        email: ADMIN_EMAIL,
         password: admin_password,
         is_admin: true,
       },

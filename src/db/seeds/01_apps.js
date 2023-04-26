@@ -8,5 +8,10 @@ exports.seed = async function (db) {
       name: 'Financial Health Planner',
       created_at: db.fn.now(),
     },
+    {
+      id: 'demo',
+      name: 'Mock Demo App',
+      created_at: db.fn.now(),
+    },
   ]);
 };

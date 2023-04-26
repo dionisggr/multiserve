@@ -1,50 +1,45 @@
-const nodemailer = require('nodemailer');
 const uuid = require('uuid');
-const { ADMIN_PASSWORD, logger } = require('../config');
-const { customError } = require('../utils');
+const { logger } = require('../config');
+const { customError, isBrowserRequest } = require('../utils');
+const service = { email: require('./email') };
 
-function send({ email, app_id, req }) {
+async function send({ email, app_id, req }) {
   const code = uuid.v4().substring(0, 6);
-  const appName = app_id
+  const app = app_id
     .replace(/_/g, ' ')
     .replace(/\b\w/g, c => c.toUpperCase());
-  const config = {
-    subject: `Your One-Time Code for ${appName}`,
-    text: `Your one-time code is: ${code}`,
-    from: 'tec3org@gmail.com',
-    to: email,
-  };
+  const data = { app, email, code };
+  const expires_at = Date.now() + 1000 * 60 * 5  // +5 minutes
 
-  // Email sender
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: 'tec3org@gmail.com',
-      pass: ADMIN_PASSWORD + '!',
-    }
-  });
+  if (!isBrowserRequest(req)) {
+    const result = await service.email.send(data);
+    const log = { ...data, status: result.statusCode };
 
-  transporter.sendMail(config, (error, info) => {
-    if (error) {
-      logger.info(error, 'Error');
+    logger.info(log, 'Message sent: %s')
+  }
+  
+  Object.assign(req.session, { email, app_id, code, expires_at });
 
-      throw error;
-    } else {
-      req.session.twoFactorAuth = { email, app_id, code };
+  return code;
+};
 
-      logger.info(info.response, 'Email sent.');
-    }
-  });
-}
+function validate(req) {
+  const { session, body: input } = req;
+  const { expires_at, ...twoFactorAuth } = session;
 
-function validate({ session: { twoFactorAuth }, body: input }) {
-  for (field in twoFactorAuth) {
-    if (twoFactorAuth[field] !== input[field]) {
+  if (Date.now() > expires_at) {
+    logger.error({ twoFactorAuth, input }, 'Token expired');
+
+    throw customError('Token expired', 401);
+  }
+
+  for (field in input) {
+    if (input[field] !== twoFactorAuth[field]) {
+      logger.error({ twoFactorAuth, input }, 'Invalid token');
+
       throw customError('Invalid token', 401);
     }
   }
-  
-  res.sendStatus(200);
-}
+};
 
 module.exports = { send, validate };

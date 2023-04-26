@@ -82,7 +82,7 @@ You will need to provide your email and password in the request body, like so:
 ```
 
 ### Step 6-A: Setup (Quick)
-The following command will pull any table schema changes done through Supabase's web client, start the Supabase server, run the migrations and seed the database.
+The following command will pull any table schema changes done through Supabase's web client, start the Supabase server, run the migrations, seed the database and set up some helpful terminal aliases.
 ```bash
 npm run setup
 ```
@@ -93,6 +93,7 @@ If you prefer a more granular step-by-step approach, you can follow these steps:
 2. Start the Supabase start: `npm run db:start`
 3. Create the database tables: `npm run migrations`
 4. Seed the database: `npm run seeds`
+4. Set up terminal alises: `source src/aliases.sh`
 
 ### Step 6-C: Setup (Control the matrix)
 If you prefer a fully manual setup, you can follow these steps:
@@ -205,13 +206,16 @@ You can watch the full API Docs powered by Swagger UI [here](https://tec3-api-pr
 
 ## Project Structure
 ```bash
-├── migrations/
-│   ├── ...  # Directory for database migration scripts
 ├── node_modules/
 │   ├── ...  # Directory for third-party packages installed by npm
-├── seeds/
-│   ├── ...  # Directory for database seed data
 ├── src/
+│   ├── db/
+│   │   ├── migrations/  # Directory for database migration scripts
+│   │   │   ├── ...  
+│   │   ├── seeds/  # Directory for database seed data
+│   │   │   ├── ...
+│   │   ├── index.js  # Main database connection file
+│   │   └── knexfile.js  # Knex configuration file
 │   ├── middleware/
 │   │   ├── auth.js  # Middleware for authentication
 │   │   ├── error-handler.js  # Middleware for error handling
@@ -225,27 +229,29 @@ You can watch the full API Docs powered by Swagger UI [here](https://tec3-api-pr
 │   │   ├── passwords.js  # Route handler for 2FA processes
 │   │   ├── secrets.js  # Route handler for admin-authenticated secrets
 │   │   ├── users.js  # Route handler for user requests
-│   │   └── utils.js  # Route handler for using utility services {hash, encryption}
+│   │   └── utils.js  # Route handler for using utility services {hash, encryption, uuid}
 │   ├── services/
-│   │   ├── apps.js  # Database service for apps
 │   │   ├── CRUD.js  # Database service for the general CRUD operations (i.e. utils)
 │   │   ├── index.js  # Database service for generating and verifying passwords
 │   │   ├── passwords.js  # Database service for generating and verifying passwords
 │   │   ├── two-factor-auth.js  # 2FA service processes (email/verification)
 │   │   └── users.js  # Database service for users
+│   ├── aliases.sh  # Shell script with aliases for commonly used commands
 │   ├── app.js  # Main application file
-│   └── config.js  # Main configuration file
-│   └── schemas.js  # Data schema validator
-│   └── utils.js  # Utilities (General purpose)
-├── supabase
-│   ├── ...  # Directory containing Supabase configuration files
-├── test
-│   ├── http/ 
+│   ├── config.js  # Main configuration file
+│   ├── docs.yaml  # API documentation file (Swagger UI)
+│   ├── schemas.js  # Data schema validator
+│   ├── utils.js  # Utilities (General purpose)
+│   └── supabase/  # Directory containing Supabase configuration files
 │   │   ├── ...  # Directory for .http files with API endpoints
-├── db.js  # Database connection file (Knex instance)
-├── docs.yaml  # API documentation file (Swagger UI)
-├── knexfile.js  # Knex configuration file
+├── test/
+│   ├── ...  # Directory for .http files with API endpoints
+├── .env  # Environment variables file
+├── .gitignore  # Git ignore file
 ├── new.env  # Clean environment variables file for new projects
+├── package-lock.json  # Lock file for npm packages
+├── package.json  # File containing project metadata and npm dependencies
+├── README.md  # Project documentation file
 └── server.js  # Server entry point file
 ```
 

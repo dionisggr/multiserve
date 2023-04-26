@@ -1,6 +1,16 @@
 @baseUrl = http://localhost:8000
 
-##### All admin tests require admin credentials in req.body
+### Login as ADMIN (Authentication)
+POST {{baseUrl}}/apps/demo/login
+Authorization: Bearer {{$dotenv API_KEY}}
+Content-Type: application/json
+
+{
+  "email": "{{$dotenv ADMIN_EMAIL}}",
+  "password": "{{$dotenv ADMIN_PASSWORD}}"
+}
+
+##### All of the following require ADMIN Login above once first
 
 ### Get all apps
 GET {{baseUrl}}/apps
@@ -8,27 +18,27 @@ Authorization: Bearer {{$dotenv API_KEY}}
 Content-Type: application/json
 
 {
-  "email": "tec3org@gmail.com",
+  "email": "{{$dotenv ADMIN_EMAIL}}",
   "password": "{{$dotenv ADMIN_PASSWORD}}"
 }
 
 ### Get app by id
-GET {{baseUrl}}/apps/fhp
+GET {{baseUrl}}/apps/demo
 Authorization: Bearer {{$dotenv API_KEY}}
 Content-Type: application/json
 
 {
-  "email": "tec3org@gmail.com",
+  "email": "{{$dotenv ADMIN_EMAIL}}",
   "password": "{{$dotenv ADMIN_PASSWORD}}"
 }
 
 ### Get all users
-GET {{baseUrl}}/apps/fhp/users
+GET {{baseUrl}}/apps/demo/users
 Authorization: Bearer {{$dotenv API_KEY}}
 Content-Type: application/json
 
 {
-  "email": "tec3org@gmail.com",
+  "email": "{{$dotenv ADMIN_EMAIL}}",
   "password": "{{$dotenv ADMIN_PASSWORD}}"
 }
 
@@ -38,7 +48,7 @@ Authorization: Bearer {{$dotenv API_KEY}}
 Content-Type: application/json
 
 {
-  "email": "tec3org@gmail.com",
+  "email": "{{$dotenv ADMIN_EMAIL}}",
   "password": "{{$dotenv ADMIN_PASSWORD}}",
-  "app_id": "fhp"
+  "app_id": "demo"
 }

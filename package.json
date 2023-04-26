@@ -23,12 +23,16 @@
     "db:start": "npx supabase start",
     "db:stop": "npx supabase stop",
     "db:reset": "npx supabase db reset",
-    "setup": "npm run db:pull && npm run db:start && npm run reset && source src/aliases.sh"
+    "setup": "npm run db:pull && npm run db:start && npm run reset && source src/aliases.sh",
+    "setup:alias": "source src/aliases.sh",
+    "setup:aliases": "source src/aliases.sh"
   },
   "dependencies": {
     "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
+    "emailjs": "^4.0.1",
+    "emailjs-com": "^3.2.0",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
     "express-xss-sanitizer": "^1.1.6",
@@ -38,7 +42,6 @@
     "js-yaml": "^4.1.0",
     "knex": "^2.4.2",
     "morgan": "^1.10.0",
-    "nodemailer": "^6.9.1",
     "passport": "^0.6.0",
     "passport-local": "^1.0.0",
     "pg": "^8.10.0",
@@ -48,6 +51,7 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "@sendgrid/mail": "^7.7.0",
     "dotenv": "^16.0.3",
     "nodemon": "^2.0.22",
     "supabase-cli": "^0.0.21"

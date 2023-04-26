@@ -1,25 +1,34 @@
 @baseUrl = http://localhost:8000
 
-##### All of the following require Login once first (see authorized.http)
-
-### Service: Logout (Destroy session)
-POST {{baseUrl}}/apps/fhp/logout
-Authorization: Bearer {{$dotenv API_KEY}}
-
-### Service: Find user
-GET {{baseUrl}}/apps/fhp/users/79eb3800-ceae-43b1-85a0-3c383072e4db
-Authorization: Bearer {{$dotenv API_KEY}}
-Cookie: connect.sid=s%3AZHoRrIvWTMmO8m1lAUbTSwDO7xg9A0a6.fXC%2FFITQ52ueYebbqOTReRthMG9Q9osTDNnELOdsuU0; Path=/; Expires=Tue, 25 Apr 2023 20:00:30 GMT; HttpOnly
-
-### Service: Edit user
-PATCH {{baseUrl}}/apps/fhp/users/demo
+### Login as USER (Authentication)
+POST {{baseUrl}}/apps/demo/login
 Authorization: Bearer {{$dotenv API_KEY}}
 Content-Type: application/json
 
 {
-  "username": "another"
+  "email": "{{$dotenv ADMIN_EMAIL}}",
+  "password": "{{$dotenv ADMIN_PASSWORD}}"
+}
+
+##### All of the following require Login above once first
+
+### Service: Logout (Destroy session)
+POST {{baseUrl}}/apps/demo/logout
+Authorization: Bearer {{$dotenv API_KEY}}
+
+### Service: Find user
+GET {{baseUrl}}/apps/demo/users/demo
+Authorization: Bearer {{$dotenv API_KEY}}
+
+### Service: Edit user
+PATCH {{baseUrl}}/apps/demo/users/demo
+Authorization: Bearer {{$dotenv API_KEY}}
+Content-Type: application/json
+
+{
+  "username": "masterchiefsensei"
 }
 
 ### Service: Delete user
-DELETE {{baseUrl}}/apps/fhp/users/demo
+DELETE {{baseUrl}}/apps/demo/users/demo
 Authorization: Bearer {{$dotenv API_KEY}}

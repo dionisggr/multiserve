@@ -12,10 +12,14 @@ const secrets = require('./secrets');
 
 // Definitions / Auth
 const public = express.Router();
-const authorized = express.Router().use(auth.authorization);
-const authenticated = express.Router().use(auth.authorization, auth.authentication);
+const authorized = express.Router()
+const authenticated = express.Router()
 const authenticate = passport.authenticate('local');
 const admin = express.Router().use(authenticate, auth.admin);
+
+//Auth
+authorized.use(auth.authorization);
+authenticated.use(auth.authorization, auth.authentication);
 
 // Routes
 public
@@ -27,16 +31,15 @@ public
     .post(utils.transform)
 
 authorized
+  .get('/secrets', admin, secrets.reveal)
+  .get('/apps', admin, apps.getAll)
+  .get('/apps/:id/users', admin, users.getAll)
+  .get('/apps/:id', admin, apps.get)
   .post('/apps/:id/register', users.create, authenticate, access.login)
   .post('/apps/:id/login', authenticate, access.login)
-  .post('/apps/:id/passwords/verify', passwords.verify)
   .post('/apps/:id/passwords/reset', passwords.reset)
-  .use(admin
-    .get('/secrets', secrets.reveal)
-    .get('/apps', apps.getAll)
-    .get('/apps/:id', apps.get)
-    .get('/apps/:id/users', users.getAll))
-
+  .post('/apps/:id/passwords/verify', passwords.verify)
+  
 authenticated
   .post('/apps/:id/logout', access.logout)
   .route('/apps/:app_id/users/:user_id')

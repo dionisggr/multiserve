@@ -1,4 +1,7 @@
 const Service = require('../services');
+const { customError } = require('../utils');
+const { logger } = require('../config');
+const schemas = require('../schemas');
 
 async function reset(req, res, next) {
   try {
@@ -15,7 +18,9 @@ async function reset(req, res, next) {
       throw new Error('User not found');
     }
 
-    service.twoFactorAuth.send({ email, app_id, req })
+    const code = await service.twoFactorAuth.send({ email, app_id, req });
+
+    if (code) logger.info({ code }, '2FA code generated.')
 
     return res.sendStatus(200);
   } catch(error) {
@@ -27,6 +32,7 @@ async function verify(req, res, next) {
   try {
     const { id: app_id } = req.params;
     const { email } = req.body;
+    req.body.app_id = app_id;
 
     await schemas.users.existing.validateAsync({ email });
     await schemas.apps.validateAsync({ app_id });
@@ -37,12 +43,8 @@ async function verify(req, res, next) {
     if (!user) {
       return next(customError('User not found.', 404));
     }
-
-    const verified = service.twoFactorAuth.validate(req);
-
-    if (!verified) {
-      return next(customError('Invalid token.', 401));
-    }
+    
+    service.twoFactorAuth.validate(req);
 
     return res.sendStatus(200);
   } catch (error) {
