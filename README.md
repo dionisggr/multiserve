@@ -1,25 +1,20 @@
-<h1 align="center">Baseport</h1>
+<h1 align="center">Tec3 API</h1>
 
-## What is it?
-Baseport is a really simple but comprehensive boilerplate written for Node.js/Express.js to build a containerized REST API that includes authentication, input validation and sanitizing, database migrations, seeding and query building, and the open-source PostgreSQL-based Firebase alernative, [Supabase](https://supabase.com/).
+## Overview
+Tec3 API is a straightforward REST API with authentication written in JavaScript and using Docker, Express, Joi, Knex, Supabase and Passport
 
-## What does it use?
+It sets up an Express REST API with Supabase, providing features like Docker containerization, database connection, authentication, error handling, and more. It includes some basic routes for authentication and user creation to kickstart most new projects as well.
+
+## Key Features
 - [**Docker containerization**](https://www.docker.com/resources/what-container/) to enable easy deployment with no need to install PostgreSQL.
 - Session-based authentication provided using [**Passport**](https://www.passportjs.org/).
 - A strong and reliable relational database included with [**PostgreSQL**](https://www.postgresql.org/).
 - A simplified database query builder managed by [**Knex**](https://knexjs.org/).
 - A Straightforward database migration and seeding strategy with [**Knex**](https://knexjs.org/).
-- Custom error handling implemented using [**error-handler**](https://github.com/dionisggr/baseport/blob/main/src/middleware/error-handler.js).
+- Custom error handling implemented using [**error-handler**](https://github.com/tec3org/tec3-api/blob/main/src/middleware/error-handler.js).
 - Basic security features provided through [**Helmet**](https://helmetjs.github.io/) and [**Cors**](https://github.com/expressjs/cors).
 - Flexible logging implemented with [**pino**](https://github.com/pinojs/pino).
 - Security enhancements thanks to [**bcrypt**](https://github.com/kelektiv/node.bcrypt.js/) hashing and [**crypto**](https://www.npmjs.com/package/crypto-js) encryption.
-
-## Why build it?
-Not all projects require a full-blown backend framework like [NestJS](https://nestjs.com/), [AdonisJS](https://adonisjs.com/), [Loopback](https://loopback.io/), etc. Sometimes you just need a simple REST API with a database connection and some essentials like authentication, input validation/sanitizing and easy database manipulation.
-
-The historic process has been to start from scratch, setting up the project structure, installing dependencies, configuring the database, etc. This process can be time-consuming and tedious, especially if you're not fully familiar with the technologies involved and their extensive configuration files. And quality or integrity shouldn't be sacrificed by using less than ideal solutions.
-
-Thus, Baseport provides (myself) a strong production-ready template to quickly start building REST APIs for smaller projects (hobbies, small websites, etc.), including all the features abovementioned, and set up in a single, common database. This saves me time and effort in setting up the initial structure and configurations every single time for every project, and allows me to focus in the faster-paced client requirements cycle. Naturally, as projects and user bases grow, more isolated alternatives should be considered.
 
 ---
 
