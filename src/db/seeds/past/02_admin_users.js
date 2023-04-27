@@ -3,7 +3,7 @@ const { ADMIN_EMAIL, ADMIN_PASSWORD } = require('../../config');
 const Service = require('../../services');
 
 const service = new Service();
-const apps = ['demo', 'baseport', 'promptwiz']
+const apps = ['demo', 'baseport', 'promptwiz'];
 
 exports.seed = async function (db) {
   const admin_password = await service.passwords.hash(
@@ -33,7 +33,7 @@ exports.seed = async function (db) {
       },
       {
         id: uuid.v4(),
-        username: 'superman',
+        username: 'lili',
         email: 'ckent@krypton.com',
         password: demo_password,
         is_admin: true,

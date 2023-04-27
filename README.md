@@ -184,12 +184,12 @@ You can watch the full API Docs powered by Swagger UI [here](https://baseport.up
   <tr>
     <td><b>/apps/:id/passwords/verify</b></td>
     <td>POST</td>
-    <td>User data</td>
+    <td>Password recovery</td>
   </tr>
   <tr>
     <td><b>/apps/:id/passwords/reset</b></td>
     <td>POST</td>
-    <td>User data</td>
+    <td>Password recovery</td>
   </tr>
   <tr>
     <td><b>/utils/:service/:value?</b></td>

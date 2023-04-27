@@ -7,6 +7,7 @@ const routers = require('./routes');
 const passport = require('./middleware/passport');
 const errorHandler = require('./middleware/error-handler');
 const { xss } = require('express-xss-sanitizer');
+const backupScheduler = require('./services/cron');
 
 // Initialize
 const app = express();
@@ -34,5 +35,8 @@ app.use(routers.authenticated);
 
 // Error handling
 app.use(errorHandler);
+
+// Backup handler
+backupScheduler.start();
 
 module.exports = app;
