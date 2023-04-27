@@ -5,17 +5,17 @@ exports.seed = async function (db) {
   await db(table).insert([
     {
       id: 'demo',
-      name: 'Mock Demo App',
+      name: 'Demo App',
       created_at: db.fn.now(),
     },
     {
-      id: 'baseport',
-      name: 'Baseport',
+      id: 'fhp',
+      name: 'Financial Health Planner',
       created_at: db.fn.now(),
     },
     {
-      id: 'promptwiz',
-      name: 'PromptWiz',
+      id: 'gpt',
+      name: 'GPT',
       created_at: db.fn.now(),
     },
   ]);

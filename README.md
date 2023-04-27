@@ -1,7 +1,7 @@
 <h1 align="center">Tec3 API</h1>
 
 ## Overview
-Tec3 API is a straightforward REST API with authentication written in JavaScript and using Docker, Express, Joi, Knex, Supabase and Passport
+Tec3 API is a straightforward REST API with authentication written in JavaScript and using Docker, Express, Joi, Knex, Supabase and Passport.
 
 It sets up an Express REST API with Supabase, providing features like Docker containerization, database connection, authentication, error handling, and more. It includes some basic routes for authentication and user creation to kickstart most new projects as well.
 
@@ -51,9 +51,9 @@ You need to set up your development environment before you can do anything.
 ### Step 2: Clone the project
 
 ```bash
-git clone https://github.com/dionisggr/baseport.git
+git clone https://github.com/tec3org/tec3-api.git
 
-cd baseport
+cd tec3-api
 ```
 
 ### Step 3: Install dependencies
@@ -129,7 +129,7 @@ npm run seeds:create
 
 ## API Endpoints
 
-You can watch the full API Docs powered by Swagger UI [here](https://baseport.up.railway.app/docs). Here is a summary:
+You can watch the full API Docs powered by Swagger UI [here](https://tec3-api.up.railway.app/docs). Here is a summary:
 <table style="width: 500px;">
   <tr>
     <th>Endpoints</th>

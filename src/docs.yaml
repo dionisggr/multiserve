@@ -1,11 +1,11 @@
 swagger: '2.0'
 info:
-  title: Baseport
+  title: Tec3 API
   version: '1.0.0'
   description:
-    Baseport is a straightforward REST API with authentication written in JavaScript and using Docker, Express, Joi, Knex, Supabase and Passport.
+    Tec3 API is a straightforward REST API with authentication written in JavaScript and using Docker, Express, Joi, Knex, Supabase and Passport.
     <br><br>
-    [Visit the GitHub repository!](https://github.com/dionisggr/baseport)
+    [Visit the GitHub repository!](https://github.com/tec3org/tec3-api)
 produces:
   - application/json
 paths:
