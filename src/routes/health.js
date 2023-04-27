@@ -21,7 +21,7 @@ async function healthCheck(req, res, next) {
         ? 'The world is on fire.'
         : 'The fire department is out controlling flames.'
     const response = { 
-      owner: 'Tec3, LLC',
+      owner: 'Dionis Gonzalez',
       ok: true,
       message,
       ...health

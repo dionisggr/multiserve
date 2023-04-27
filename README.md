@@ -15,6 +15,7 @@ It sets up an Express REST API with Supabase, providing features like Docker con
 - Basic security features provided through [**Helmet**](https://helmetjs.github.io/) and [**Cors**](https://github.com/expressjs/cors).
 - Flexible logging implemented with [**pino**](https://github.com/pinojs/pino).
 - Security enhancements thanks to [**bcrypt**](https://github.com/kelektiv/node.bcrypt.js/) hashing and [**crypto**](https://www.npmjs.com/package/crypto-js) encryption.
+- Straightforward email management and delivery through with [SendGrid](https://sendgrid.com/).
 
 ---
 
@@ -128,7 +129,7 @@ npm run seeds:create
 
 ## API Endpoints
 
-You can watch the full API Docs powered by Swagger UI [here](https://tec3-api-production.up.railway.app/docs). Here is a summary:
+You can watch the full API Docs powered by Swagger UI [here](https://baseport.up.railway.app/docs). Here is a summary:
 <table style="width: 500px;">
   <tr>
     <th>Endpoints</th>

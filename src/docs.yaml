@@ -22,7 +22,7 @@ paths:
             properties:
               owner:
                 type: string
-                example: 'Tec3, LLC'
+                example: 'Dionis Gonzalez'
               ok:
                 type: boolean
               message:

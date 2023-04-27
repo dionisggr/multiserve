@@ -1,6 +1,6 @@
 const { logger } = require('../../config');
 
-const apps = ['demo', 'tec3', 'fhp']
+const apps = ['demo', 'baseport', 'promptwiz']
 
 exports.up = async function (db) {
   await db.schema.raw('CREATE EXTENSION IF NOT EXISTS "pgcrypto"');

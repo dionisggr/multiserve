@@ -11,7 +11,7 @@ passport.use(new LocalStrategy({
   passwordField: auth.passwordField,
   passReqToCallback: true,
 }, async (req, email, password, done) => {
-  const app_id = req.params.id || req.params.app_id || req.body.app_id || 'tec3';
+  const app_id = req.params.id || req.params.app_id || req.body.app_id || 'baseport';
 
   if (app_id) {
     await schemas.users.new.validateAsync({ email, password, app_id });
