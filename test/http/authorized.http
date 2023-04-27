@@ -42,7 +42,7 @@ Authorization: Bearer {{$dotenv API_KEY}}
 Content-Type: application/json
 
 {
-  "email": "{{$dotenv ADMIN_PASSWORD}}"
+  "email": "{{$dotenv ADMIN_EMAIL}}"
 }
 
 ### 2FA - Verify 2FA code
@@ -52,6 +52,6 @@ Authorization: Bearer {{$dotenv API_KEY}}
 Content-Type: application/json
 
 {
-  "email": "{{$dotenv ADMIN_PASSWORD}}",
-  "code": "c0ef27"
+  "email": "{{$dotenv ADMIN_EMAIL}}",
+  "code": "b48a50"
 }
