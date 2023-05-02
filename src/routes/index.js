@@ -9,6 +9,9 @@ const users = require('./users');
 const passwords = require('./passwords');
 const utils = require('./utils');
 const secrets = require('./secrets');
+const conversations = require('./conversations');
+const messages = require('./messages');
+const GPT = require('./gpt');
 
 // Definitions / Auth
 const public = express.Router();
@@ -39,12 +42,28 @@ authorized
   .post('/apps/:id/login', authenticate, access.login)
   .post('/apps/:id/passwords/reset', passwords.reset)
   .post('/apps/:id/passwords/verify', passwords.verify)
-  
+
 authenticated
-  .post('/apps/:id/logout', access.logout)
-  .route('/apps/:app_id/users/:user_id')
-    .get(users.get)
-    .patch(users.update)
-    .delete(users.remove)
+  .post('/:app_id/apps/:id/logout', access.logout)
+
+authenticated.route('/apps/:app_id/users/:user_id')
+  .get(users.get)
+  .patch(users.update)
+  .delete(users.remove)
+
+authenticated
+  .get('/:app_id/conversations', conversations.getAll)
+  .get('/:app_id/conversations/:id', conversations.get)
+  .post('/:app_id/conversations', conversations.create)
+  .patch('/:app_id/conversations/:id', conversations.update)
+  .delete('/:app_id/conversations/:id', conversations.remove)
+
+authenticated
+  .get('/:app_id/messages', messages.getAll)
+  .get('/:app_id/messages/:id', messages.get)
+  .post('/:app_id/messages', messages.create)
+  .patch('/:app_id/messages/:id', messages.update)
+  .delete('/:app_id/messages/:id', messages.remove)
+  .use('/gpt', GPT)
 
 module.exports = { public, authorized, authenticated };

@@ -1,8 +1,9 @@
-const apps = ['gpt'];
+const apps = ['demo', 'gpt'];
 
 exports.seed = async function (db) {
   for (app of apps) {
     const table = app + '__conversations';
+    
     await db(table).del();
     await db(table).insert([
       {

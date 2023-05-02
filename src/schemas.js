@@ -23,7 +23,9 @@ const schemas = {
       created_at: Joi.date().iso(),
       updated_at: Joi.date().iso(),
       last_login: Joi.date().iso(),
-      avatar: Joi.string().allow(null).uri({ scheme: ['http', 'https'] }),
+      avatar: Joi.string()
+        .allow(null)
+        .uri({ scheme: ['http', 'https'] }),
     }).xor('id', 'user_id', 'email'),
   },
   apps: Joi.object({
@@ -37,20 +39,34 @@ const schemas = {
   conversations: {
     new: Joi.object({
       title: Joi.string().required(),
-      user_id: Joi.string().guid({ version: 'uuidv4' }).required(),
-      app_id: Joi.string().guid({ version: 'uuidv4' }).required(),
-      type: Joi.string().valid('single', 'group')
+      created_by: Joi.string().required(),
     }),
     existing: Joi.object({
-      id: Joi.string().guid({ version: 'uuidv4' }).required(),
+      id: Joi.string().guid({ version: 'uuidv4' }),
+      conversation_id: Joi.string().guid({ version: 'uuidv4' }),
       title: Joi.string(),
+      created_by: Joi.string(),
+      type: Joi.string().valid('single', 'group'),
       updated_at: Joi.date().iso(),
       archived_at: Joi.date().iso(),
-      app_id: Joi.string().guid({ version: 'uuidv4' }),
-      user_id: Joi.string().guid({ version: 'uuidv4' }).required(),
+    }).xor('id', 'conversation_id'),
+  },
+  messages: {
+    new: Joi.object({
+      conversation_id: Joi.string().guid({ version: 'uuidv4' }).required(),
+      updated_from: Joi.string().guid({ version: 'uuidv4' }),
+      content: Joi.string().required(),
+      user_id: Joi.string().required(),
     }),
-    
-  }
+    existing: Joi.object({
+      id: Joi.string().guid({ version: 'uuidv4' }),
+      message_id: Joi.string().guid({ version: 'uuidv4' }),
+      conversation_id: Joi.string().guid({ version: 'uuidv4' }),
+      updated_from: Joi.string().guid({ version: 'uuidv4' }),
+      content: Joi.string(),
+      user_id: Joi.string(),
+    }).xor('id', 'message_id'),
+  },
 };
 
 module.exports = schemas;

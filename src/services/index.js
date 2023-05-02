@@ -4,10 +4,11 @@ const twoFactorAuth = require('./two-factor-auth');
 const email = require('./email');
 
 class Service extends CRUD {
-  constructor(app_id) {
+  constructor(app_id, table) {
     super(app_id);
 
     this.app_id = app_id;
+    this.table = `${app_id}__${table}`;
     this.passwords = passwords;
     this.twoFactorAuth = twoFactorAuth;
     this.email = email;
@@ -20,8 +21,26 @@ class Service extends CRUD {
   }
 
   get users() {
-    this.table = `${this.app_id}__users`
+    this.table = `${this.app_id}__users AS ${this.app_id[0] + 'u'}`
     
+    return this;
+  }
+
+  get conversations() {
+    this.table = `${this.app_id}__conversations AS ${this.app_id[0] + 'c'}`;
+
+    return this;
+  }
+
+  get messages() {
+    this.table = `${this.app_id}__messages AS ${this.app_id[0] + 'm'}`
+
+    return this;
+  }
+
+  inTable(name) {
+    this.table = name;
+
     return this;
   }
 };

@@ -1,0 +1,18 @@
+@baseUrl = http://localhost:8000
+
+### Login as ADMIN (Authentication)
+POST {{baseUrl}}/apps/gpt/login
+Authorization: Bearer {{$dotenv API_KEY}}
+Content-Type: application/json
+
+{
+  "email": "{{$dotenv ADMIN_EMAIL}}",
+  "password": "{{$dotenv ADMIN_PASSWORD}}"
+}
+
+##### The following endpoints require an Admin Login first (above)
+##### One Login is enough to test all endpoints
+
+### Init (Get all conversations and messages)
+GET {{baseUrl}}/gpt/init
+Authorization: Bearer {{$dotenv API_KEY}}

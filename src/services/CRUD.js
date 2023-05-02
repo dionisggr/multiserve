@@ -17,20 +17,48 @@ class CRUD {
       multiple = false,
       columns = ['*'],
       leftJoin,
+      leftJoins,
       rightJoin,
+      rightJoins,
       innerJoin,
+      innerJoins,
+      whereRaw,
+      whereIn,
+      andWhereNotExists,
       groupBy,
     } = adjustments || {};
 
     let response = db(this.table).select(...columns);
 
-    if (leftJoin) response = response.leftJoin(...leftJoin);
-    if (rightJoin) response = response.rightJoin(...rightJoin);
-    if (innerJoin) response = response.innerJoin(...innerJoin);
+    if (leftJoin || leftJoins) {
+      for (let join of leftJoins || [leftJoin]) {
+        response = response.leftJoin(...join);
+      }
+    }
+
+    if (rightJoin || rightJoins) {
+      for (let join of rightJoins || [rightJoin]) {
+        response = response.rightJoin(...join);
+      }
+    }
+
+    if (innerJoin || innerJoins) {
+      for (let join of innerJoins || [innerJoin]) {
+        response = response.innerJoin(...join);
+      }
+    }
+
     if (filters) response = response.where(filters);
+    if (whereRaw) response = response.whereRaw(...whereRaw);
+    if (whereIn) response = response.whereIn(...whereIn);
+    if (andWhereNotExists) response = response.andWhereNotExists(...andWhereNotExists);
     if (groupBy) response = response.groupBy(...groupBy);
 
-    return await (multiple ? response : response.first());
+    response = await response;
+
+    if (!multiple) response = response[0];
+
+    return response;
   }
 
   async update(adjustments) {

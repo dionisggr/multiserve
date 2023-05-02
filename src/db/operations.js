@@ -77,8 +77,8 @@ async function createUserConversations({ db, apps, app }) {
     await db.schema.raw('CREATE EXTENSION IF NOT EXISTS "pgcrypto"');
     await db.schema.dropTableIfExists(tableName);
     await db.schema.createTable(tableName, function (table) {
-        table.string('user_id').unsigned().references('id').inTable(`${appName}__users`);
-        table.uuid('conversation_id').unsigned().references('id').inTable(`${appName}__conversations`);
+        table.string('user_id').unsigned().references('id').inTable(`${appName}__users`).onDelete('CASCADE');
+        table.uuid('conversation_id').unsigned().references('id').inTable(`${appName}__conversations`).onDelete('CASCADE');
       })
       .catch((error) => logger.error(error, 'Error creating table.'));
 

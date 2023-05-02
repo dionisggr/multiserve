@@ -15,6 +15,7 @@ exports.seed = async function (db) {
   
   for (app of apps) {
     const table = app + '__users';
+    
     await db(table).del();
     await db(table).insert([
       {
@@ -44,6 +45,13 @@ exports.seed = async function (db) {
         email: 'briancarter340@gmail.com',
         password: admin_password,
         is_admin: true,
+      },
+      {
+        id: 'gpt',
+        username: 'gpt',
+        email: 'gpt@tec3org.com',
+        password: admin_password,
+        is_admin: false,
       },
       {
         id: 'demo',
