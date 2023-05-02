@@ -5,12 +5,13 @@ const schemas = require('../schemas');
 const db = require('../db');
 
 async function create(req, res, next) {
+  const { app_id } = req.params;
   const data = req.body;
 
   try {
     await schemas.conversations.new.validateAsync(data);
 
-    const service = new Service('gpt');
+    const service = new Service(app_id);
     const conversation = await service.conversations.create({ data });
     const user_id = req.isAuthenticated() && req.user.id;
     const response = {
@@ -27,12 +28,12 @@ async function create(req, res, next) {
 }
 
 async function get(req, res, next) {
-  const { id: conversation_id } = req.params;
+  const { app_id, id: conversation_id } = req.params;
 
   try {
     await schemas.conversations.existing.validateAsync({ conversation_id });
 
-    const service = new Service('gpt');
+    const service = new Service(app_id);
     const conversation = await service.conversations.get({ filters: { id: conversation_id } });
 
     if (!conversation) {
@@ -54,9 +55,11 @@ async function get(req, res, next) {
 }
 
 async function getAll(req, res, next) {
+  const { app_id } = req.params;
+
   try {
 
-    const service = new Service('gpt');
+    const service = new Service(app_id);
     const conversations = await service.conversations.get({ multiple: true });
 
     if (!conversations || !conversations.length) {
@@ -84,11 +87,11 @@ async function getAll(req, res, next) {
 
 async function update(req, res, next) {
   try {
-    const { id: conversation_id } = req.params;
+    const { app_id, id: conversation_id } = req.params;
 
     await schemas.conversations.existing.validateAsync({ conversation_id, ...req.body });
 
-    const service = new Service('gpt');
+    const service = new Service(app_id);
     const data = { ...req.body, updated_at: db.fn.now() };
     const conversation = await service.conversations.update({
       filters: { id: conversation_id }, data,
@@ -104,11 +107,11 @@ async function update(req, res, next) {
 
 async function remove(req, res, next) {
   try {
-    const { id: conversation_id } = req.params;
+    const { app_id, id: conversation_id } = req.params;
 
     await schemas.conversations.existing.validateAsync({ conversation_id });
 
-    const service = new Service('gpt');
+    const service = new Service(app_id);
     const conversation = await service.conversations.get({
       filters: { id: conversation_id }
     });

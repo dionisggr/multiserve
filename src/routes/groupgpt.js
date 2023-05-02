@@ -7,7 +7,7 @@ const Service = require('../services');
 const Router = express.Router();
 
 async function init(req, res, next) {
-  const service = new Service('gpt');
+  const service = new Service('groupgpt');
 
   try {
     const conversations = await service.users.get({
@@ -55,7 +55,7 @@ async function init(req, res, next) {
 }
 
 async function validate(req, res, next) {
-  if (!req.user.is_admin && req.user.app_id !== 'gpt') {
+  if (!req.user.is_admin && req.user.app_id !== 'groupgpt') {
     return next(
       customError(`Unauthorized request from ${req.user.id}.`, 400)
     );

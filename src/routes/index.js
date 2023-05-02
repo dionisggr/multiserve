@@ -11,7 +11,7 @@ const utils = require('./utils');
 const secrets = require('./secrets');
 const conversations = require('./conversations');
 const messages = require('./messages');
-const GPT = require('./gpt');
+const GPT = require('./groupgpt');
 
 // Definitions
 const public = express.Router();
@@ -36,7 +36,7 @@ public
 authorized
   .get('/secrets', admin, secrets.reveal)
   .get('/apps', admin, apps.getAll)
-  .get('/apps/:app_id', admin, apps.get)
+  .get('/apps/:id', admin, apps.get)
   .get('/:app_id/users', admin, users.getAll)
   .post('/:app_id/register', users.create, authenticate, access.login)
   .post('/:app_id/login', authenticate, access.login)

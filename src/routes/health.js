@@ -18,10 +18,10 @@ async function healthCheck(req, res, next) {
     const message = (isHealthy)
       ? 'The world will not burn today.'
       : (isSick)
-        ? 'The world is on fire.'
-        : 'The fire department is out controlling flames.'
+        ? 'The fire department has been called.'
+        : 'The world is on fire.'
     const response = { 
-      owner: 'Dionis Gonzalez',
+      owner: 'Tec3, LLC',
       ok: true,
       message,
       ...health
