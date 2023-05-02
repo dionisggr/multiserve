@@ -27,6 +27,11 @@ exports.seed = async function (db) {
         created_by: 'a698f684-c659-46a1-b77e-c30c33e9c117',
       },
       {
+        id: 'f2936c4c-5e19-4050-bf6a-cfead71fb4eb',
+        title: 'Test Title',
+        created_by: 'a698f684-c659-46a1-b77e-c30c33e9c117',
+      },
+      {
         id: '269be190-6475-4969-a55c-c733081120de',
         title: 'Test Title',
         created_by: 'demo',

@@ -26,6 +26,10 @@ exports.seed = async function (db) {
         conversation_id: '269be190-6475-4969-a55c-c733081120de',
         user_id: 'demo',
       },
+      {
+        conversation_id: 'f2936c4c-5e19-4050-bf6a-cfead71fb4eb',
+        user_id: 'demo',
+      },
     ]);
   }
 };

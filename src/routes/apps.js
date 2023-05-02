@@ -1,7 +1,10 @@
+const express = require('express');
 const { customError } = require('../utils');
 const Service = require('../services');
 const schemas = require('../schemas');
 const { logger } = require('../config');
+
+const Apps = express.Router();
 
 async function get(req, res, next) {
   const { id } = req.params;
@@ -40,6 +43,9 @@ async function getAll(req, res, next) {
     return next(error);
   }
 }
+
+Apps
+  
 
 module.exports = {
   get,

@@ -6,14 +6,9 @@ Authorization: Bearer {{$dotenv API_KEY}}
 Content-Type: application/json
 
 {
-  "email": "{{$dotenv ADMIN_EMAIL}}",
-  "password": "{{$dotenv ADMIN_PASSWORD}}"
+  "email": "demo@tec3org.com",
+  "password": "password"
 }
-
-# {
-#   "email": "demo@tec3org.com",
-#   "password": "password"
-# }
 
 ##### The following endpoints require an Admin Login first (above)
 ##### One Login is enough to test all endpoints

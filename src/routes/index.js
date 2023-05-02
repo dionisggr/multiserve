@@ -13,7 +13,7 @@ const conversations = require('./conversations');
 const messages = require('./messages');
 const GPT = require('./gpt');
 
-// Definitions / Auth
+// Definitions
 const public = express.Router();
 const authorized = express.Router()
 const authenticated = express.Router()
@@ -36,21 +36,23 @@ public
 authorized
   .get('/secrets', admin, secrets.reveal)
   .get('/apps', admin, apps.getAll)
-  .get('/apps/:id/users', admin, users.getAll)
-  .get('/apps/:id', admin, apps.get)
-  .post('/apps/:id/register', users.create, authenticate, access.login)
-  .post('/apps/:id/login', authenticate, access.login)
-  .post('/apps/:id/passwords/reset', passwords.reset)
-  .post('/apps/:id/passwords/verify', passwords.verify)
+  .get('/apps/:app_id', admin, apps.get)
+  .get('/:app_id/users', admin, users.getAll)
+  .post('/:app_id/register', users.create, authenticate, access.login)
+  .post('/:app_id/login', authenticate, access.login)
+  .post('/:app_id/passwords/reset', passwords.reset)
+  .post('/:app_id/passwords/verify', passwords.verify)
 
+// General | Apps | Misc
 authenticated
-  .post('/:app_id/apps/:id/logout', access.logout)
+  .post('/:app_id/logout', access.logout)
+  .use('/gpt/init', GPT)
+  .route('/:app_id/users/:user_id')
+    .get(users.get)
+    .patch(users.update)
+    .delete(users.remove)
 
-authenticated.route('/apps/:app_id/users/:user_id')
-  .get(users.get)
-  .patch(users.update)
-  .delete(users.remove)
-
+// Conversations
 authenticated
   .get('/:app_id/conversations', conversations.getAll)
   .get('/:app_id/conversations/:id', conversations.get)
@@ -58,12 +60,12 @@ authenticated
   .patch('/:app_id/conversations/:id', conversations.update)
   .delete('/:app_id/conversations/:id', conversations.remove)
 
+// Messages
 authenticated
   .get('/:app_id/messages', messages.getAll)
   .get('/:app_id/messages/:id', messages.get)
   .post('/:app_id/messages', messages.create)
   .patch('/:app_id/messages/:id', messages.update)
   .delete('/:app_id/messages/:id', messages.remove)
-  .use('/gpt', GPT)
 
 module.exports = { public, authorized, authenticated };

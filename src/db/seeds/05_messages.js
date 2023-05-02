@@ -36,6 +36,18 @@ exports.seed = async function (db) {
         user_id: 'demo',
         conversation_id: '269be190-6475-4969-a55c-c733081120de',
       },
+      {
+        id: 'abb2fac7-283e-4e20-aff7-47ba2c4d9399',
+        content: 'Test Content',
+        user_id: 'demo',
+        conversation_id: 'f2936c4c-5e19-4050-bf6a-cfead71fb4eb',
+      },
+      {
+        id: '917a1a4f-4bf4-45b1-8af7-8ee296787870',
+        content: 'Another Content',
+        user_id: 'demo',
+        conversation_id: 'f2936c4c-5e19-4050-bf6a-cfead71fb4eb',
+      },
     ]);
   }
 };

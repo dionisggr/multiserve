@@ -21,7 +21,7 @@ GET {{baseUrl}}/apps/demo/users/demo
 Authorization: Bearer {{$dotenv API_KEY}}
 
 ### Service: Edit user
-PATCH {{baseUrl}}/apps/demo/users/demo
+PATCH {{baseUrl}}/apps/demo/users/tec3
 Authorization: Bearer {{$dotenv API_KEY}}
 Content-Type: application/json
 
