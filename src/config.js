@@ -11,6 +11,7 @@ const {
   ADMIN_EMAIL,
   ADMIN_PASSWORD,
   SENDGRID_API_KEY,
+  OPENAI_API_KEY,
 } = process.env;
 const auth = {
   sessionSecret: API_KEY,
@@ -53,6 +54,7 @@ module.exports = {
   ADMIN_EMAIL,
   ADMIN_PASSWORD,
   SENDGRID_API_KEY,
+  OPENAI_API_KEY,
   sessionData,
   bodyParser,
   morgan,

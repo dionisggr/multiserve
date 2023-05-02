@@ -1,8 +1,8 @@
-const { customError } = require('../utils');
+const { customError } = require('../../utils');
 const express = require('express');
-const { logger } = require('../config');
-const db = require('../db');
-const Service = require('../services');
+const { logger } = require('../../config');
+const db = require('../../db');
+const Service = require('../../services');
 
 const Router = express.Router();
 
