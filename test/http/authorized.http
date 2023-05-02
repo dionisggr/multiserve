@@ -1,23 +1,7 @@
 @baseUrl = http://localhost:8000
 
-### Generate random email
-# Send this every time you need a new one for registering below
-# @name uuid
-GET {{baseUrl}}/utils/uuid
-
-### Register (Create user)
-@email = {{uuid.response.body.$}}
-POST {{baseUrl}}/apps/demo/register
-Authorization: Bearer {{$dotenv API_KEY}}
-Content-Type: application/json
-
-{
-  "email": "{{email}}@example.com",
-  "password": "{{$dotenv ADMIN_PASSWORD}}"
-}
-
 ### Login as ADMIN (Authentication)
-POST {{baseUrl}}/apps/demo/login
+POST {{baseUrl}}/demo/login
 Authorization: Bearer {{$dotenv API_KEY}}
 Content-Type: application/json
 
@@ -27,7 +11,7 @@ Content-Type: application/json
 }
 
 ### Login as USER (Authentication)
-POST {{baseUrl}}/apps/demo/login
+POST {{baseUrl}}/demo/login
 Authorization: Bearer {{$dotenv API_KEY}}
 Content-Type: application/json
 
@@ -36,8 +20,24 @@ Content-Type: application/json
   "password": "password"
 }
 
+### Register (Create user)
+##### Step 1 - Generate a random email
+# @name uuid
+GET {{baseUrl}}/utils/uuid
+
+##### Step 2 - Register with random email
+@email = {{uuid.response.body.$}}
+POST {{baseUrl}}/demo/register
+Authorization: Bearer {{$dotenv API_KEY}}
+Content-Type: application/json
+
+{
+  "email": "{{email}}@example.com",
+  "password": "{{$dotenv ADMIN_PASSWORD}}"
+}
+
 ### 2FA - Reset password
-POST {{baseUrl}}/apps/demo/passwords/reset
+POST {{baseUrl}}/demo/passwords/reset
 Authorization: Bearer {{$dotenv API_KEY}}
 Content-Type: application/json
 
@@ -47,11 +47,11 @@ Content-Type: application/json
 
 ### 2FA - Verify 2FA code
 # Requires sending 2FA request first (code will log)
-POST {{baseUrl}}/apps/demo/passwords/verify
+POST {{baseUrl}}/demo/passwords/verify
 Authorization: Bearer {{$dotenv API_KEY}}
 Content-Type: application/json
 
 {
   "email": "{{$dotenv ADMIN_EMAIL}}",
-  "code": "b48a50"
+  "code": "XXXXXX"
 }

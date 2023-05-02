@@ -11,7 +11,7 @@ async function send({ email, app_id, req }) {
   const data = { app, email, code };
   const expires_at = Date.now() + 1000 * 60 * 5  // +5 minutes
 
-  if (!isBrowserRequest(req)) {
+  if (isBrowserRequest(req)) {
     const result = await service.email.send(data);
     const log = { ...data, status: result.statusCode };
 

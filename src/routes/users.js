@@ -8,7 +8,7 @@ const db = require('../db');
 async function create(req, res, next) {
   const data = req.body;
   const { email } = data;
-  const { id: app_id } = req.params;
+  const { app_id } = req.params;
 
   try {
     await schemas.users.new.validateAsync({ ...data, app_id });
@@ -76,12 +76,12 @@ async function get(req, res, next) {
 }
 
 async function getAll(req, res, next) {
-  const { id } = req.params;
+  const { app_id } = req.params;
 
   try {
-    await schemas.apps.validateAsync({ id });
+    await schemas.apps.validateAsync({ app_id });
 
-    const service = new Service(id);
+    const service = new Service(app_id);
     let users = await service.users.get({ multiple: true });
 
     if (!users || !users.length) {

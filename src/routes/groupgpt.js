@@ -17,7 +17,7 @@ async function init(req, res, next) {
           json_agg(
             row_to_json(gc)::jsonb || jsonb_build_object(
               'messages',
-              COALESCE((SELECT json_agg(row_to_json(gm)) FROM gpt__messages AS gm WHERE gm.conversation_id = gc.id), '[]')
+              COALESCE((SELECT json_agg(row_to_json(gm)) FROM groupgpt__messages AS gm WHERE gm.conversation_id = gc.id), '[]')
             )
           ) AS conversations`
         ),
@@ -25,15 +25,15 @@ async function init(req, res, next) {
       filters: { 'gu.id': req.user.id },
       leftJoins: [
         [
-          'gpt__user_conversations AS guc',
+          'groupgpt__user_conversations AS guc',
           'gu.id', 'guc.user_id'
         ],
         [
-          'gpt__conversations AS gc',
+          'groupgpt__conversations AS gc',
           'guc.conversation_id', 'gc.id'
         ],
         [
-          'gpt__messages AS gm',
+          'groupgpt__messages AS gm',
           'gm.conversation_id', 'guc.conversation_id'
         ]
       ],

@@ -1,7 +1,7 @@
 @baseUrl = http://localhost:8000
 
-### Login as ADMIN (Authentication)
-POST {{baseUrl}}/apps/gpt/login
+### Login as USER (Authentication)
+POST {{baseUrl}}/groupgpt/login
 Authorization: Bearer {{$dotenv API_KEY}}
 Content-Type: application/json
 
@@ -14,5 +14,5 @@ Content-Type: application/json
 ##### One Login is enough to test all endpoints
 
 ### Init (Get all conversations and messages)
-GET {{baseUrl}}/gpt/init
+GET {{baseUrl}}/groupgpt/init
 Authorization: Bearer {{$dotenv API_KEY}}

@@ -1,27 +1,27 @@
 @baseUrl = http://localhost:8000
 
 ### Login as USER (Authentication)
-POST {{baseUrl}}/apps/demo/login
+POST {{baseUrl}}/demo/login
 Authorization: Bearer {{$dotenv API_KEY}}
 Content-Type: application/json
 
 {
-  "email": "{{$dotenv ADMIN_EMAIL}}",
-  "password": "{{$dotenv ADMIN_PASSWORD}}"
+  "email": "demo@tec3org.com",
+  "password": "password"
 }
 
 ##### All of the following require Login above once first
 
 ### Service: Logout (Destroy session)
-POST {{baseUrl}}/apps/demo/logout
+POST {{baseUrl}}/demo/logout
 Authorization: Bearer {{$dotenv API_KEY}}
 
 ### Service: Find user
-GET {{baseUrl}}/apps/demo/users/demo
+GET {{baseUrl}}/demo/users/demo
 Authorization: Bearer {{$dotenv API_KEY}}
 
 ### Service: Edit user
-PATCH {{baseUrl}}/apps/demo/users/tec3
+PATCH {{baseUrl}}/demo/users/demo
 Authorization: Bearer {{$dotenv API_KEY}}
 Content-Type: application/json
 
@@ -30,5 +30,5 @@ Content-Type: application/json
 }
 
 ### Service: Delete user
-DELETE {{baseUrl}}/apps/demo/users/demo
+DELETE {{baseUrl}}/demo/users/demo
 Authorization: Bearer {{$dotenv API_KEY}}

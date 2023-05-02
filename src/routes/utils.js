@@ -4,7 +4,6 @@ const { logger } = require('../config');
 const Services = require('../services');
 
 const { passwords } = new Services();
-const Router = express.Router();
 
 const services = {
   encrypt: passwords.encrypt,

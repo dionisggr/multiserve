@@ -37,6 +37,7 @@ async function get(req, res, next) {
   const criteria = {};
 
   try {
+    await schemas.apps.validateAsync({ app_id });
     await schemas.messages.existing.validateAsync({ message_id });
 
     const service = new Service(app_id);
@@ -71,6 +72,8 @@ async function getAll(req, res, next) {
   const { app_id } = req.params;
 
   try {
+    await schemas.apps.validateAsync({ app_id })
+
     const service = new Service(app_id);
     const messages = await service.messages.get({ multiple: true });
 
@@ -87,9 +90,10 @@ async function getAll(req, res, next) {
 }
 
 async function update(req, res, next) {
+  const { id: message_id, app_id } = req.params;
+  
   try {
-    const { id: message_id, app_id } = req.params;
-
+    await schemas.apps.validateAsync({ app_id })
     await schemas.messages.existing.validateAsync({ message_id, ...req.body });
 
     const service = new Service(app_id);
@@ -113,9 +117,10 @@ async function update(req, res, next) {
 }
 
 async function remove(req, res, next) {
+  const { app_id, id: message_id } = req.params;
+  
   try {
-    const { id: message_id, app_id } = req.params;
-
+    await schemas.apps.validateAsync({ app_id })
     await schemas.messages.existing.validateAsync({ message_id });
 
     const service = new Service(app_id);

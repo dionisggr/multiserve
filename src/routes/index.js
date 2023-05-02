@@ -11,7 +11,7 @@ const utils = require('./utils');
 const secrets = require('./secrets');
 const conversations = require('./conversations');
 const messages = require('./messages');
-const GPT = require('./groupgpt');
+const GroupGPT = require('./groupgpt');
 
 // Definitions
 const public = express.Router();
@@ -46,7 +46,7 @@ authorized
 // General | Apps | Misc
 authenticated
   .post('/:app_id/logout', access.logout)
-  .use('/gpt/init', GPT)
+  .use('/groupgpt', GroupGPT)
   .route('/:app_id/users/:user_id')
     .get(users.get)
     .patch(users.update)

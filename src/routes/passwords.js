@@ -5,7 +5,7 @@ const schemas = require('../schemas');
 
 async function reset(req, res, next) {
   try {
-    const { id: app_id } = req.params;
+    const { app_id } = req.params;
     const { email } = req.body;
 
     await schemas.users.existing.validateAsync({ email });
@@ -30,7 +30,7 @@ async function reset(req, res, next) {
 
 async function verify(req, res, next) {
   try {
-    const { id: app_id } = req.params;
+    const { app_id } = req.params;
     const { email } = req.body;
     req.body.app_id = app_id;
 

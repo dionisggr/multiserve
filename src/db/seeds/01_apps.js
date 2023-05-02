@@ -14,8 +14,8 @@ exports.seed = async function (db) {
       created_at: db.fn.now(),
     },
     {
-      id: 'gpt',
-      name: 'GPT',
+      id: 'groupgpt',
+      name: 'groupgpt',
       created_at: db.fn.now(),
     },
   ]);

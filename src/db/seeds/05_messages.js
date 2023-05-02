@@ -1,4 +1,4 @@
-const apps = ['demo', 'gpt'];
+const apps = ['demo', 'groupgpt'];
 
 exports.seed = async function (db) {
   for (app of apps) {

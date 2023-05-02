@@ -3,7 +3,7 @@ const { ADMIN_EMAIL, ADMIN_PASSWORD } = require('../../config');
 const Service = require('../../services');
 
 const service = new Service();
-const apps = ['demo', 'fhp', 'gpt'];
+const apps = ['demo', 'fhp', 'groupgpt'];
 
 exports.seed = async function (db) {
   const admin_password = await service.passwords.hash(
@@ -47,7 +47,7 @@ exports.seed = async function (db) {
         is_admin: true,
       },
       {
-        id: 'gpt',
+        id: 'groupgpt',
         username: 'gpt',
         email: 'gpt@tec3org.com',
         password: admin_password,
