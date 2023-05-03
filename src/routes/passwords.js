@@ -1,4 +1,4 @@
-const Service = require('../services');
+const Service = require('../services/DB');
 const { customError } = require('../utils');
 const { logger } = require('../config');
 const schemas = require('../schemas');

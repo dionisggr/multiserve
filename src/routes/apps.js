@@ -1,6 +1,6 @@
 const express = require('express');
 const { customError } = require('../utils');
-const Service = require('../services');
+const Service = require('../services/DB');
 const schemas = require('../schemas');
 const { logger } = require('../config');
 

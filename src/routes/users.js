@@ -1,6 +1,6 @@
 const { isBrowserRequest } = require('../utils');
 const { customError } = require('../utils');
-const Service = require('../services');
+const Service = require('../services/DB');
 const { logger } = require('../config');
 const schemas = require('../schemas');
 const db = require('../db');

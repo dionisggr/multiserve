@@ -66,6 +66,7 @@ class CRUD {
       data,
       filters = true,
       multiple = false,
+      andWhere,
       returning = ['*'],
       leftJoin,
       rightJoin,
@@ -78,6 +79,7 @@ class CRUD {
     if (rightJoin) response = response.rightJoin(...rightJoin);
     if (innerJoin) response = response.innerJoin(...innerJoin);
     if (filters) response = response.where(filters)
+    if (andWhere) response = response.andWhere(...andWhere);
     if (returning) response = response.returning(returning)
 
     response = response.then(rows => rows);

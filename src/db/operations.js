@@ -55,16 +55,16 @@ async function createMessages({ db, apps, app }) {
     await db.schema.raw('CREATE EXTENSION IF NOT EXISTS "pgcrypto"');
     await db.schema.dropTableIfExists(tableName);
     await db.schema.createTable(tableName, function (table) {
-        table.uuid('id').primary().defaultTo(db.raw('uuid_generate_v4()'));
-        table.uuid('conversation_id').unsigned().references('id').inTable(`${appName}__conversations`).onDelete('CASCADE');
-        table.uuid('updated_from').unsigned().nullable().references('id').inTable(`${appName}__messages`).onDelete('SET NULL');
-        table.string('content').notNullable();
-        table.string('user_id').unsigned().references('id').inTable(`${appName}__users`).onDelete('CASCADE');
-        table.timestamp('created_at').defaultTo(db.fn.now());
-        table.timestamp('updated_at').defaultTo(db.fn.now());
-        table.timestamp('archived_at');
-      })
-      .catch((error) => logger.error(error, 'Error creating table.'));
+      table.uuid('id').primary().defaultTo(db.raw('uuid_generate_v4()'));
+      table.uuid('conversation_id').unsigned().references('id').inTable(`${appName}__conversations`).onDelete('CASCADE');
+      table.uuid('archived_by').unsigned().nullable().references('id').inTable(`${appName}__messages`).onDelete('SET NULL');
+      table.string('content').notNullable();
+      table.string('user_id').unsigned().references('id').inTable(`${appName}__users`).onDelete('CASCADE');
+      table.timestamp('created_at').defaultTo(db.fn.now());
+      table.timestamp('updated_at').defaultTo(db.fn.now());
+      table.timestamp('archived_at');
+    })
+    .catch((error) => logger.error(error, 'Error creating table.'));
 
     logger.info(`Table ${tableName} created successfully!`);
   }

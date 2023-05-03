@@ -1,21 +1,29 @@
 const express = require('express');
 const uuid = require('uuid');
 const { logger } = require('../config');
-const Services = require('../services');
+const Service = {
+  DB: require('../services/DB'),
+  AI: require('../services/AI'),
+};
 
-const { passwords } = new Services();
-
+const { passwords } = new Service.DB();
+const AI = new Service.AI();
 const services = {
   encrypt: passwords.encrypt,
   encryption: passwords.encrypt,
   hash: passwords.hash,
   hashing: passwords.hash,
   uuid: uuid.v4,
+  gpt: AI.gpt,
 };
 
 async function generate(req, res, next) {
   const { params: { service } } = req;
   const fn = services[service];
+
+  if (service === 'gpt') {
+    return next(customError('Invalid service.', 400));
+  }
 
   try {
     const response = (isAsync(fn)) ? await fn() : fn();

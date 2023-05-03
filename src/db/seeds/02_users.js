@@ -1,6 +1,6 @@
 const uuid = require('uuid');
 const { ADMIN_EMAIL, ADMIN_PASSWORD } = require('../../config');
-const Service = require('../../services');
+const Service = require('../../services/DB');
 
 const service = new Service();
 const apps = ['demo', 'fhp', 'groupgpt'];

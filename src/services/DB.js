@@ -3,7 +3,7 @@ const passwords = require('./passwords');
 const twoFactorAuth = require('./two-factor-auth');
 const email = require('./email');
 
-class Service extends CRUD {
+class DB extends CRUD {
   constructor(app_id, table) {
     super(app_id);
 
@@ -37,12 +37,6 @@ class Service extends CRUD {
 
     return this;
   }
-
-  inTable(name) {
-    this.table = name;
-
-    return this;
-  }
 };
 
-module.exports = Service;
+module.exports = DB;

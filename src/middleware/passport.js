@@ -2,7 +2,7 @@ const LocalStrategy = require('passport-local').Strategy;
 const passport = require('passport');
 const { isBrowserRequest } = require('../utils');
 const schemas = require('../schemas');
-const Service = require('../services');
+const Service = require('../services/DB');
 const { auth, logger } = require('../config');
 
 // Local auth setup

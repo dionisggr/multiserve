@@ -1,5 +1,5 @@
 const { customError } = require('../utils');
-const Service = require('../services');
+const Service = require('../services/DB');
 const { logger } = require('../config');
 const schemas = require('../schemas');
 const db = require('../db');
@@ -75,7 +75,13 @@ async function getAll(req, res, next) {
     await schemas.apps.validateAsync({ app_id })
 
     const service = new Service(app_id);
-    const messages = await service.messages.get({ multiple: true });
+    const criteria = { multiple: true };
+
+    if (Object.keys(req.query).length) {
+      criteria.filters = req.query;
+    }
+
+    const messages = await service.messages.get(criteria);
 
     if (!messages || !messages.length) {
       return next(customError(`Failed to find messages.`, 404));

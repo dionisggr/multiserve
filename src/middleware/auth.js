@@ -1,7 +1,7 @@
 const { NODE_ENV, API_KEY } = require('../config');
 const { customError } = require('../utils');
 const schemas = require('../schemas');
-const Service = require('../services');
+const Service = require('../services/DB');
 
 const errors = {
   authentication: {

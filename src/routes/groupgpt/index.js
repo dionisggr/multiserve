@@ -1,8 +1,9 @@
-const { customError } = require('../../utils');
 const express = require('express');
+const { customError } = require('../../utils');
 const { logger } = require('../../config');
 const db = require('../../db');
-const Service = require('../../services');
+const cache = require('../../services/cache');
+const Service = require('../../services/DB');
 
 const Router = express.Router();
 
@@ -22,7 +23,10 @@ async function init(req, res, next) {
           ) AS conversations`
         ),
       ],
-      filters: { 'gu.id': req.user.id },
+      filters: {
+        'gu.id': req.user.id,
+        'gm.archived_by': null,
+      },
       leftJoins: [
         [
           'groupgpt__user_conversations AS guc',
@@ -38,7 +42,7 @@ async function init(req, res, next) {
         ]
       ],
       groupBy: ['gu.id'],
-      orderBy: ['gc.updated_at DESC'],
+      orderBy: ['gc.created_at DESC'],
       multiple: true,
     });
 
@@ -47,6 +51,17 @@ async function init(req, res, next) {
     }
 
     res.json(conversations);
+
+    conversations.forEach(conversation => {
+      const messages = conversation.messages.map(message => {
+        const role = message.user_id === 'gpt' ? 'assistant' : 'user';
+        const content = message.content;
+
+        return { role, content };
+      });
+
+      cache.upsert(conversation.id, messages);
+    });
   } catch (error) {
     logger.error(error);
 

@@ -54,7 +54,7 @@ const schemas = {
   messages: {
     new: Joi.object({
       conversation_id: Joi.string().guid({ version: 'uuidv4' }).required(),
-      updated_from: Joi.string().guid({ version: 'uuidv4' }),
+      archived_by: Joi.string().guid({ version: 'uuidv4' }),
       content: Joi.string().required(),
       user_id: Joi.string().required(),
     }),
@@ -62,7 +62,7 @@ const schemas = {
       id: Joi.string().guid({ version: 'uuidv4' }),
       message_id: Joi.string().guid({ version: 'uuidv4' }),
       conversation_id: Joi.string().guid({ version: 'uuidv4' }),
-      updated_from: Joi.string().guid({ version: 'uuidv4' }),
+      archived_by: Joi.string().guid({ version: 'uuidv4' }),
       content: Joi.string(),
       user_id: Joi.string(),
     }).xor('id', 'message_id'),

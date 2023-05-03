@@ -11,6 +11,7 @@ const utils = require('./utils');
 const secrets = require('./secrets');
 const conversations = require('./conversations');
 const messages = require('./messages');
+const AI = require('./AI');
 const GroupGPT = require('./groupgpt');
 
 // Definitions
@@ -46,11 +47,17 @@ authorized
 // General | Apps | Misc
 authenticated
   .post('/:app_id/logout', access.logout)
+  .use(AI)
   .use('/groupgpt', GroupGPT)
   .route('/:app_id/users/:user_id')
     .get(users.get)
     .patch(users.update)
     .delete(users.remove)
+    
+authenticated
+  .route('/utils/:service/:value?')
+    .get(utils.generate)
+    .post(utils.transform)
 
 // Conversations
 authenticated
