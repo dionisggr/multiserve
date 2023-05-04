@@ -1,22 +1,27 @@
 <h1 align="center">Tec3 API</h1>
 
 ## Overview
-Tec3 API is a straightforward REST API with authentication written in JavaScript and using Docker, Express, Joi, Knex, Supabase and Passport.
+Tec3 API is a straightforward REST API with authentication written in JavaScript for Node.js backend apps, leveraging Docker, Express, Joi, Knex, Supabase and Passport.
 
-It sets up an Express REST API with Supabase, providing features like Docker containerization, database connection, authentication, error handling, and more. It includes some basic routes for authentication and user creation to kickstart most new projects as well.
+It sets up an Express REST API with Supabase, providing features like Docker containerization, database connection, authentication, error handling, and more. It includes some basic routes for authentication and user creation to simplykickstart most new projects as well.
 
 ## Key Features
 - [**Docker containerization**](https://www.docker.com/resources/what-container/) to enable easy deployment with no need to install PostgreSQL.
 - Session-based authentication provided using [**Passport**](https://www.passportjs.org/).
+- Basic security features provided through [**Helmet**](https://helmetjs.github.io/) and [**Cors**](https://github.com/expressjs/cors).
 - A strong and reliable relational database included with [**PostgreSQL**](https://www.postgresql.org/).
 - A simplified database query builder managed by [**Knex**](https://knexjs.org/).
-- A Straightforward database migration and seeding strategy with [**Knex**](https://knexjs.org/).
+- Straightforward database migration and seeding strategy with [**Knex**](https://knexjs.org/).
 - Custom error handling implemented using [**error-handler**](https://github.com/tec3org/tec3-api/blob/main/src/middleware/error-handler.js).
-- Basic security features provided through [**Helmet**](https://helmetjs.github.io/) and [**Cors**](https://github.com/expressjs/cors).
+- A simple and elegant [**Joi**](https://joi.dev/) validation strategy.
 - Flexible logging implemented with [**pino**](https://github.com/pinojs/pino).
 - Security enhancements thanks to [**bcrypt**](https://github.com/kelektiv/node.bcrypt.js/) hashing and [**crypto**](https://www.npmjs.com/package/crypto-js) encryption.
 - Straightforward email management and delivery through with [SendGrid](https://sendgrid.com/).
-
+- WebSocket implementation for real-time server/client bidirectional communication with [**WS**](https://www.npmjs.com/package/ws).
+- In-memory data structure store used as database, cache and message broker provided by [**Redis**](https://redis.io/).
+- Cron job scheduling and execution for task automation with [**node-cron**](https://www.npmjs.com/package/node-cron).
+- Worry-free RFC-compliant unique ID generation with [**uuid**](https://www.npmjs.com/package/uuid).
+- OpenAI API integration for text, chat image and audio generation with [**OpenAI**](https://beta.openai.com/).
 ---
 
 ## Table of Contents
@@ -152,49 +157,69 @@ You can watch the full API Docs powered by Swagger UI [here](https://tec3-api.up
     <td>Admin-authenticated ENV vars</td>
   </tr>
   <tr>
-    <td><b>/apps</b></td>
+    <td><b>/apps/:id?</b></td>
     <td>GET</td>
-    <td>All apps</td>
+    <td>Apps data</td>
   </tr>
   <tr>
-    <td><b>/apps/:id</b></td>
-    <td>GET</td>
-    <td>Sigle app</td>
-  </tr>
-  <tr>
-    <td><b>/apps/:id/register</b></td>
+    <td><b>/:app_id/register</b></td>
     <td>POST</td>
-    <td>User registration</td>
+    <td>User app registration</td>
   </tr>
   <tr>
-    <td><b>/apps/:id/login</b></td>
+    <td><b>/:app_id/login</b></td>
     <td>POST</td>
-    <td>User login</td>
+    <td>User app login</td>
   </tr>
   <tr>
-    <td><b>/apps/:id/logout</b></td>
+    <td><b>/:app_id/logout</b></td>
     <td>POST</td>
-    <td>User logout</td>
+    <td>User app logout</td>
   </tr>
   <tr>
-    <td><b>/apps/:id/users/:user_id?</b></td>
+    <td><b>/:app_id/users/:user_id?</b></td>
     <td>GET, PATCH, DELETE</td>
-    <td>User data</td>
+    <td>App user data</td>
   </tr>
   <tr>
-    <td><b>/apps/:id/passwords/verify</b></td>
+    <td><b>/:app_id/passwords/reset</b></td>
     <td>POST</td>
-    <td>Password recovery</td>
+    <td>App user password recovery</td>
   </tr>
   <tr>
-    <td><b>/apps/:id/passwords/reset</b></td>
+    <td><b>/:app_id/passwords/verify</b></td>
     <td>POST</td>
-    <td>Password recovery</td>
+    <td>App 2FA code verification</td>
   </tr>
   <tr>
     <td><b>/utils/:service/:value?</b></td>
     <td>GET, POST</td>
     <td>Util services</td>
+  </tr>
+  <tr>
+    <td><b>/gpt/:prompt?</b></td>
+    <td>POST</td>
+    <td>GPT (text-davinci-003) completions</td>
+  </tr>
+  <tr>
+    <td><b>/chatgpt</b></td>
+    <td>POST</td>
+    <td>GPT (gpt-3.5-turbo) chat</td>
+  </tr>
+  <tr>
+    <td><b>/chatgpt4</b></td>
+    <td>POST</td>
+    <td>GPT (gpt-4) chat</td>
+  </tr>
+  <tr>
+    <td><b>/dalle</b></td>
+    <td>POST</td>
+    <td>DALL-E model</td>
+  </tr>
+  <tr>
+    <td><b>/whisper</b></td>
+    <td>POST</td>
+    <td>Whisper model</td>
   </tr>
 </table>
 
@@ -206,47 +231,70 @@ You can watch the full API Docs powered by Swagger UI [here](https://tec3-api.up
 │   ├── ...  # Directory for third-party packages installed by npm
 ├── src/
 │   ├── db/
+│   │   ├── backups/  # (Local) Directory for database backups
+│   │   │   ├── ...  
 │   │   ├── migrations/  # Directory for database migration scripts
+│   │   │   ├── past/  # Directory for migrations already executed
+│   │   │   │   └── ...  ###
 │   │   │   ├── ...  
 │   │   ├── seeds/  # Directory for database seed data
-│   │   │   ├── ...
+│   │   │   ├── past/  # Directory for seeds already executed
+│   │   │   │   └── ...
+│   │   │   ├── ...  
+│   │   ├── backup.sh  # Script for backing up the database
 │   │   ├── index.js  # Main database connection file
-│   │   └── knexfile.js  # Knex configuration file
+│   │   ├── knexfile.js  # Knex configuration file
+│   │   └── operations.js  # General-purpose/Common database operations
 │   ├── middleware/
 │   │   ├── auth.js  # Middleware for authentication
 │   │   ├── error-handler.js  # Middleware for error handling
 │   │   └── passport.js  # Middleware for Passport session-based authentication
 │   ├── routes/
+│   │   ├── grouptgpt/
+│   │   │   ├── index.js  # Main GroupGPT app router file
+│   │   ├── promptwiz/
+│   │   │   ├── index.js  # Main PromptWiz app router file
+│   │   │   ├── instructions.js  # Instruction set for PromptWiz app
 │   │   ├── access.js  # Route handler for post-authentication login/logout
+│   │   ├── AI.js  # Route handler AI (GPT)-related requests
 │   │   ├── apps.js  # Route handler for app requests
 │   │   ├── docs.js  # Route handler for API documentation
 │   │   ├── health.js  # Route handler for health check
 │   │   ├── index.js  # Main router file
+│   │   ├── messages.js  # Route handler for message requests
 │   │   ├── passwords.js  # Route handler for 2FA processes
 │   │   ├── secrets.js  # Route handler for admin-authenticated secrets
 │   │   ├── users.js  # Route handler for user requests
 │   │   └── utils.js  # Route handler for using utility services {hash, encryption, uuid}
 │   ├── services/
-│   │   ├── CRUD.js  # Database service for the general CRUD operations (i.e. utils)
-│   │   ├── index.js  # Database service for generating and verifying passwords
-│   │   ├── passwords.js  # Database service for generating and verifying passwords
-│   │   ├── two-factor-auth.js  # 2FA service processes (email/verification)
-│   │   └── users.js  # Database service for users
+│   │   ├── AI.js  # AI (GPT) service processes
+│   │   ├── backblaze.js  # Cloud file storage service
+│   │   ├── cache.js  # Simple local (volatile) cache service
+│   │   ├── cron.js  # Cron job scheduling and execution service
+│   │   ├── CRUD.js  # General-purpose database service for CRUD operations (utils)
+│   │   ├── DB.js  # Database service for data queries
+│   │   ├── email.js  # Email generation and communication service
+│   │   ├── passwords.js  # Password verification and reset service
+│   │   └── two-factor-auth.js  # 2FA service processes (email/verification)
 │   ├── aliases.sh  # Shell script with aliases for commonly used commands
 │   ├── app.js  # Main application file
 │   ├── config.js  # Main configuration file
 │   ├── docs.yaml  # API documentation file (Swagger UI)
 │   ├── schemas.js  # Data schema validator
-│   ├── utils.js  # Utilities (General purpose)
-│   └── supabase/  # Directory containing Supabase configuration files
-│   │   ├── ...  # Directory for .http files with API endpoints
+│   └── utils.js  # Utilities (General purpose)
+├── supabase/  # Directory containing Supabase configuration files
+│   ├── ...
 ├── test/
-│   ├── ...  # Directory for .http files with API endpoints
+│   ├── http/  # Directory for .http endpoint test files
+│   │   └── ...
+│   ├── ...
+├── whisper/
+│   └── ...  # Directory for placing audio files for Whisper model
 ├── .env  # Environment variables file
 ├── .gitignore  # Git ignore file
 ├── new.env  # Clean environment variables file for new projects
 ├── package-lock.json  # Lock file for npm packages
-├── package.json  # File containing project metadata and npm dependencies
+├── package.json  # Project metadata and npm dependencies
 ├── README.md  # Project documentation file
 └── server.js  # Server entry point file
 ```
@@ -256,14 +304,19 @@ You can watch the full API Docs powered by Swagger UI [here](https://tec3-api.up
 ## Environment Variables
 Rename the `new.env` file to `.env` and add the missing environment variables. If you're authorized, you can find the list of environment variables [here](#environment-variables).
 
-| Name             | Description                        | Default value |
-| ---------------- | ---------------------------------- | ------------- |
-| PORT             | Server host port                   | 8000 |
-| NODE_ENV         | Defines environment                | development | 
-| DEV_DB_URL       | Dev DB connection string           | postgresql://postgres:postgres@localhost:54322/postgres |
-| PROD_DB_URL      | Prod DB connection string          | none |
-| API_KEY          | API Key (Secret)                   | none |
-| ADMIN_PASSWORD   | Admin password                     | none |
+| Name                 | Description                        | Default value |
+| ----------------     | ---------------------------------- | ------------- |
+| PORT                 | Server host port                   | 8000 |
+| NODE_ENV             | Defines environment                | development | 
+| DEV_DB_URL           | Dev DB connection string           | postgresql://postgres:postgres@localhost:54322/postgres |
+| PROD_DB_URL          | Prod DB connection string          | none |
+| API_KEY              | API Key (Secret)                   | none |
+| ADMIN_PASSWORD       | Admin password                     | none |
+| SENDGRID_API_KEY     | Email service API key              | none |
+| BACKBLAZE_APP_ID     | Storage service location           | none |
+| BACKBLAZE_APP_KEY_ID | Storage service authorization      | none |
+| BACKBLAZE_BUCKET_ID  | Storage service target             | none |
+| OPENAI_API_KEY       | OpenAI Authorization key           | none |
 
 ---
 
