@@ -47,7 +47,7 @@ exports.seed = async function (db) {
         is_admin: true,
       },
       {
-        id: 'groupgpt',
+        id: 'gpt',
         username: 'gpt',
         email: 'gpt@tec3org.com',
         password: admin_password,

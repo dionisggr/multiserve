@@ -1,0 +1,18 @@
+@baseUrl = http://localhost:8000
+
+### Login as USER (Authentication)
+POST {{baseUrl}}/groupgpt/login
+Authorization: Bearer {{$dotenv API_KEY}}
+Content-Type: application/json
+
+{
+  "email": "demo@tec3org.com",
+  "password": "password"
+}
+
+##### The following endpoints require an Admin Login first (above)
+##### One Login is enough to test all endpoints
+
+### Init (Get all conversations and messages)
+GET {{baseUrl}}/groupgpt/init
+Authorization: Bearer {{$dotenv API_KEY}}

@@ -17,7 +17,26 @@ async function gpt(req, res, next) {
 
     logger.info({ user_id: req.user.id }, 'Text-Davinci-003 prompted.');
 
-    res.json(response);
+    if (req.query.stream) {
+      await response.data.on('data', (data) => {
+        console.log('received');
+        const lines = data
+          .toString()
+          .split('\n')
+          .filter((line) => line.trim() !== '');
+        for (const line of lines) {
+          const message = line.replace(/^data: /, '');
+
+          if (message.choices[0].finish_reason) {
+            return; // Stream finished
+          }
+
+          console.log(message.choices[0].text);
+        }
+      });
+    } else {
+      res.json(response);
+    }
   } catch (error) {
     next(error);
   }
@@ -49,7 +68,7 @@ async function chatgpt(req, res, next) {
     const data = { conversation_id, content: response, user_id: 'gpt' };
     const message = await DB.messages.create({ data });
 
-    res.json(message);
+    res.json(message.trim());
   } catch (error) {
     next(error);
   }
@@ -81,7 +100,7 @@ async function chatgpt4(req, res, next) {
     const data = { conversation_id, content: response, user_id: 'gpt' };
     const message = await DB.messages.create({ data });
 
-    res.json(message);
+    res.json(message.trim());
   } catch (error) {
     next(error);
   }
@@ -108,15 +127,15 @@ async function dalle(req, res, next) {
 };
 
 async function whisper(req, res, next) {
-  const { URL = req.params.url, file, ...adjustments } = req.body;
-  
+  const { file = req.params.file, ...adjustments } = req.body;
+
   try {
     const AI = new Service.AI(adjustments);
-    const transcript = await AI.whisper({ URL, file });
+    const transcript = await AI.whisper(file);
 
     logger.info({ user_id: req.user.id }, 'Whisper prompted.');
 
-    res.json({ transcript })
+    res.json(transcript)
   } catch (error) {
     next(error);
   }

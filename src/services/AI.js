@@ -3,6 +3,7 @@ const { Configuration, OpenAIApi } = require('openai');
 const { isBrowserRequest } = require('../utils');
 const { OPENAI_API_KEY, logger } = require('../config');
 const cache = require('./cache');
+const WebSocket = require('ws');
 
 class AI {
   constructor(adjustments = {}) {
@@ -10,7 +11,7 @@ class AI {
       conversation_id,
       temperature = 0.7,
       amount = 1,
-      size = '256x256',  // 256, 512, or 1024
+      size = '256x256', // 256, 512, or 1024
     } = adjustments;
 
     this.conversation_id = conversation_id;
@@ -23,19 +24,54 @@ class AI {
     this.OpenAI = new OpenAIApi(
       new Configuration({
         apiKey: OPENAI_API_KEY,
-      }),
+      })
     );
   }
 
-  async gpt(content) {
-    const response = await this.OpenAI.createCompletion({
-      model: "text-davinci-003",
-      prompt: content,
-      max_tokens: 1500,
-      temperature: this.temperature,
-    });
+  async gpt(content, stream = false) {
+    if (stream) {
+      const wss = new WebSocket.Server({ port: 8080 });
 
-    return response;
+      wss.on('connection', async (ws) => {
+        const response = await this.OpenAI.createCompletion(
+          {
+            model: 'text-davinci-003',
+            prompt: content,
+            max_tokens: 1500,
+            temperature: this.temperature,
+            stream: true,
+          },
+          { responseType: 'stream' }
+        );
+
+        response.data.on('data', (data) => {
+          const lines = data
+            .toString()
+            .split('\n')
+            .filter((line) => line.trim() !== '');
+          for (const line of lines) {
+            const message = line.replace(/^data: /, '');
+  
+            if (message.choices[0].finish_reason) {
+              ws.close();
+
+              return; // Stream finished
+            }
+  
+            ws.send(JSON.stringify(message.choices[0].text));
+          }
+        });
+      });
+    } else {
+      const response = await this.OpenAI.createCompletion({
+        model: 'text-davinci-003',
+        prompt: content,
+        max_tokens: 1500,
+        temperature: this.temperature,
+      });
+
+      return response;
+    }
   }
 
   async chatgpt(content) {
@@ -55,26 +91,32 @@ class AI {
     if (this.conversation_id) {
       cache.upsert(this.conversation_id, messages);
 
-      logger.info(`User message cache for conversation: ${this.conversation_id}`);
+      logger.info(
+        `User message cache for conversation: ${this.conversation_id}`
+      );
     }
 
-    const response = (await this.OpenAI.createChatCompletion({
-      model: this.models.chatgpt,
-      temperature: this.temperature,
-      messages,
-    })).data.choices[0].message.content;
+    const response = (
+      await this.OpenAI.createChatCompletion({
+        model: this.models.chatgpt,
+        temperature: this.temperature,
+        messages,
+      })
+    ).data.choices[0].message.content;
 
     if (this.conversation_id) {
-      cache.upsert(
-        this.conversation_id,
-        [...messages, { role: 'assistant', content: response }]
-      );
+      cache.upsert(this.conversation_id, [
+        ...messages,
+        { role: 'assistant', content: response },
+      ]);
 
-      logger.info(`${this.model} response cache for conversation: ${this.conversation_id}`);
+      logger.info(
+        `${this.model} response cache for conversation: ${this.conversation_id}`
+      );
     }
 
     return response;
-  };
+  }
 
   async chatgpt4(content) {
     this.models.chatgpt = 'gpt-4';
@@ -83,7 +125,7 @@ class AI {
   }
 
   async dalle(prompt) {
-    const images = await openai.createImage({
+    const images = await this.OpenAI.createImage({
       prompt,
       n: this.amount,
       size: this.size,
@@ -92,36 +134,13 @@ class AI {
     return images;
   }
 
-  async whisper({ file, URL }) {
-    const target = URL || file;
-    let audio_file;
-  
-    if (URL) {
-      try {
-        audio_file = await fetchRemoteFile(URL);
-      } catch (error) {
-        console.error('Error fetching remote file:', error);
-        return;
-      }
-    } else {
-      try {
-        const directory = 'whisper/';
-        const files = await fs.readdir(directory);
-        const file = files.find((f) => !f.startsWith('.')); // Ignore hidden files (files starting with a dot)
-  
-        if (!file) {
-          console.error('No files found in the whisper/ directory');
-          return;
-        }
-  
-        audio_file = await fs.readFile(path.join(directory, file));
-      } catch (error) {
-        console.error('Error reading local file:', error);
-        return;
-      }
-    }
-  
-    const { text: transcript } = await openai.Audio.transcribe("whisper-1", audio_file);
+  async whisper(file) {
+    const transcript = (
+      await this.OpenAI.createTranscription(
+        fs.createReadStream('whisper/' + file),
+        'whisper-1'
+      )
+    ).data.text;
 
     return transcript;
   }

@@ -19,12 +19,13 @@ const PromptWiz = require('./promptwiz');
 const public = express.Router();
 const authorized = express.Router()
 const authenticated = express.Router()
+const admin = express.Router();
 const authenticate = passport.authenticate('local');
-const admin = express.Router().use(authenticate, auth.admin);
 
 //Auth
 authorized.use(auth.authorization);
 authenticated.use(auth.authorization, auth.authentication);
+admin.use(authenticate, auth.admin);
 
 // Routes
 public
