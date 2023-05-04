@@ -23,7 +23,7 @@ Authorization: Bearer {{$dotenv API_KEY}}
 Content-Type: application/json
 
 {
-  "prompt": "What is the answer to life, the universe and everything?"
+  "prompt": "Generate a full paragraph of lorem ipsum text"
 }
 
 ### Prompt ChatGPT (gpt-3.5-turbo) - Body
@@ -32,7 +32,7 @@ Authorization: Bearer {{$dotenv API_KEY}}
 Content-Type: application/json
 
 {
-  "prompt": "What is the answer to life, the universe and everything?",
+  "prompt": "Generate a full paragraph of lorem ipsum text",
   "app_id": "groupgpt",
   "conversation_id": "bd1151f9-b562-46f2-a607-cd3aaac1c4dd"
 }
@@ -43,7 +43,7 @@ Authorization: Bearer {{$dotenv API_KEY}}
 Content-Type: application/json
 
 {
-  "prompt": "What is the answer to life, the universe and everything?",
+  "prompt": "Generate a full paragraph of lorem ipsum text",
   "app_id": "groupgpt",
   "conversation_id": "bd1151f9-b562-46f2-a607-cd3aaac1c4dd"
 }

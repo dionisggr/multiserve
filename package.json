@@ -51,7 +51,8 @@
     "redis": "^4.6.6",
     "supabase": "^1.50.14",
     "swagger-ui-express": "^4.6.2",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "ws": "^8.13.0"
   },
   "devDependencies": {
     "@sendgrid/mail": "^7.7.0",
