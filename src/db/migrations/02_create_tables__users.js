@@ -1,6 +1,6 @@
 const operations = require('../operations');
 
-const apps = ['demo', 'fhp', 'groupgpt'];
+const apps = ['demo', 'fhp', 'gpteams', 'groupgpt'];
 const tables = apps.map(app => `${app}__users`);
 
 exports.up = async function (db) {

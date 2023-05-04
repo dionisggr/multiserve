@@ -3,7 +3,7 @@ const { ADMIN_EMAIL, ADMIN_PASSWORD } = require('../../config');
 const Service = require('../../services/DB');
 
 const service = new Service();
-const apps = ['demo', 'fhp', 'groupgpt'];
+const apps = ['demo', 'fhp', 'gpteams', 'groupgpt'];
 
 exports.seed = async function (db) {
   const admin_password = await service.passwords.hash(

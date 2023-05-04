@@ -14,8 +14,13 @@ exports.seed = async function (db) {
       created_at: db.fn.now(),
     },
     {
+      id: 'gpteams',
+      name: 'GPTeams',
+      created_at: db.fn.now(),
+    },
+    {
       id: 'groupgpt',
-      name: 'groupgpt',
+      name: 'GroupGPT',
       created_at: db.fn.now(),
     },
   ]);
