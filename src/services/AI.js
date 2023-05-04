@@ -55,7 +55,7 @@ class AI {
             if (message.choices[0].finish_reason) {
               ws.close();
 
-              return; // Stream finished
+              return { stream: "successful" }; // Stream finished
             }
   
             ws.send(JSON.stringify(message.choices[0].text));
@@ -63,12 +63,12 @@ class AI {
         });
       });
     } else {
-      const response = await this.OpenAI.createCompletion({
+      const response = (await this.OpenAI.createCompletion({
         model: 'text-davinci-003',
         prompt: content,
         max_tokens: 1500,
         temperature: this.temperature,
-      });
+      })).data.choices[0].text;
 
       return response;
     }

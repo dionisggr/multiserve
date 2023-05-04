@@ -11,7 +11,7 @@ async function init(req, res, next) {
   const service = new Service('groupgpt');
 
   try {
-    const conversations = await service.users.get({
+    const user = await service.users.get({
       columns: [
         'gu.*',
         db.raw(`
@@ -43,16 +43,15 @@ async function init(req, res, next) {
       ],
       groupBy: ['gu.id'],
       orderBy: ['gc.created_at DESC'],
-      multiple: true,
     });
 
-    if (!conversations || !conversations.length) {
+    if (!user) {
       return next(customError('No conversations found.', 404));
     }
 
-    res.json(conversations);
+    res.json(user);
 
-    conversations.forEach(conversation => {
+    user.conversations.forEach(conversation => {
       const messages = conversation.messages.map(message => {
         const role = message.user_id === 'gpt' ? 'assistant' : 'user';
         const content = message.content;

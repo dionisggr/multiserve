@@ -10,33 +10,15 @@ const Router = express.Router();
 
 async function gpt(req, res, next) {
   const { prompt = req.params.prompt, ...adjustments } = req.body;
+  const { shouldStream } = !!req.query.stream;
   const AI = new Service.AI(adjustments);
 
   try {
-    const response = await AI.gpt(prompt);
+    const response = await AI.gpt(prompt, shouldStream);
 
     logger.info({ user_id: req.user.id }, 'Text-Davinci-003 prompted.');
 
-    if (req.query.stream) {
-      await response.data.on('data', (data) => {
-        console.log('received');
-        const lines = data
-          .toString()
-          .split('\n')
-          .filter((line) => line.trim() !== '');
-        for (const line of lines) {
-          const message = line.replace(/^data: /, '');
-
-          if (message.choices[0].finish_reason) {
-            return; // Stream finished
-          }
-
-          console.log(message.choices[0].text);
-        }
-      });
-    } else {
-      res.json(response);
-    }
+    res.json(response);
   } catch (error) {
     next(error);
   }

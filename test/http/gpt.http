@@ -10,7 +10,7 @@ Content-Type: application/json
   "password": "{{$dotenv ADMIN_PASSWORD}}"
 }
 
-##### The following endpoints require an Admin Login first (above)
+##### The following endpoints require an Admin Login first to any app (above)
 ##### One Login is enough to test all endpoints
 
 ### Prompt GPT (text-davinci-003) - Path

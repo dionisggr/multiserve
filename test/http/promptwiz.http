@@ -13,62 +13,26 @@ Content-Type: application/json
 ##### The following endpoints require an Admin Login first (above)
 ##### One Login is enough to test all endpoints
 
-### Prompt GPT (text-davinci-003) - Path
-POST {{baseUrl}}/gpt/What is the answer to life, the universe and everything?
+### Prompt Enhancer (Paragraph-style) - Path
+POST {{baseUrl}}/promptwiz/paragraph/Find what is the answer to life, the universe and everything
 Authorization: Bearer {{$dotenv API_KEY}}
 
-### Prompt GPT (text-davinci-003) - Body
-POST {{baseUrl}}/gpt
-Authorization: Bearer {{$dotenv API_KEY}}
-
-{
-  "prompt": "What is the answer to life, the universe and everything?"
-}
-
-### Prompt ChatGPT (gpt-3.5-turbo) - Path
-POST {{baseUrl}}/chatgpt/What is the answer to life, the universe and everything?
-Authorization: Bearer {{$dotenv API_KEY}}
-
-### Prompt ChatGPT (gpt-3.5-turbo) - Body
-POST {{baseUrl}}/chatgpt
+### Prompt Enhancer (Paragraph-style) - Body
+POST {{baseUrl}}/promptwiz/paragraph
 Authorization: Bearer {{$dotenv API_KEY}}
 
 {
   "prompt": "What is the answer to life, the universe and everything?"
 }
 
-### Prompt ChatGPT-4 (gpt-4) - Path
-POST {{baseUrl}}/chatgpt4/What is the answer to life, the universe and everything?
+### Prompt Enhancer (Structured-style) - Path
+POST {{baseUrl}}/promptwiz/structured/Find what is the answer to life, the universe and everything
 Authorization: Bearer {{$dotenv API_KEY}}
 
-### Prompt ChatGPT-4 (gpt-4) - Body
-POST {{baseUrl}}/chatgpt4
+### Prompt Enhancer (Structured-style) - Body
+POST {{baseUrl}}/promptwiz/structured
 Authorization: Bearer {{$dotenv API_KEY}}
 
 {
   "prompt": "What is the answer to life, the universe and everything?"
-}
-
-### Prompt DALL-E - Path
-POST {{baseUrl}}/dalle/A Rubiks cube made of ice
-Authorization: Bearer {{$dotenv API_KEY}}
-
-### Prompt DALL-E - Body
-POST {{baseUrl}}/dalle
-Authorization: Bearer {{$dotenv API_KEY}}
-
-{
-  "prompt": "A Rubiks cube made of ice"
-}
-
-### Prompt Whisper - Path
-POST {{baseUrl}}/whisper/https://www.example.com/file.mp3
-Authorization: Bearer {{$dotenv API_KEY}}
-
-### Prompt Whisper - Body
-POST {{baseUrl}}/whisper
-Authorization: Bearer {{$dotenv API_KEY}}
-
-{
-  "prompt": "example.mp3"  // Saved locally to the whisper/ folder in root
 }
