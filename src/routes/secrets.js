@@ -6,6 +6,11 @@ function reveal(req, res) {
     PROD_DB_URL,
     DEV_DB_URL,
     ADMIN_PASSWORD,
+    SENDGRID_API_KEY,
+    BACKBLAZE_APP_ID,
+    BACKBLAZE_APP_KEY_ID,
+    BACKBLAZE_BUCKET_ID,
+    OPENAI_API_KEY,
   } = process.env;
 
   res.set('Content-Type', 'text/plain');
@@ -16,6 +21,11 @@ function reveal(req, res) {
     PROD_DB_URL,
     DEV_DB_URL,
     ADMIN_PASSWORD,
+    SENDGRID_API_KEY,
+    BACKBLAZE_APP_ID,
+    BACKBLAZE_APP_KEY_ID,
+    BACKBLAZE_BUCKET_ID,
+    OPENAI_API_KEY,
   }, null, 2));
 }
 

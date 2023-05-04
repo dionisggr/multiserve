@@ -33,7 +33,7 @@ Content-Type: application/json
 }
 
 ### Get all users
-GET {{baseUrl}}/apps/demo/users
+GET {{baseUrl}}/demo/users
 Authorization: Bearer {{$dotenv API_KEY}}
 Content-Type: application/json
 

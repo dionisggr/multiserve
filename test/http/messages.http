@@ -1,8 +1,7 @@
-### Get all messages
 @baseUrl = http://localhost:8000
 
 ### Login as ADMIN (Authentication)
-POST {{baseUrl}}/apps/demo/login
+POST {{baseUrl}}/demo/login
 Authorization: Bearer {{$dotenv API_KEY}}
 Content-Type: application/json
 

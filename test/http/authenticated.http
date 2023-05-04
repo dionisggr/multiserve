@@ -12,15 +12,15 @@ Content-Type: application/json
 
 ##### All of the following require Login above once first
 
-### Service: Logout (Destroy session)
+### Logout (Destroy session)
 POST {{baseUrl}}/demo/logout
 Authorization: Bearer {{$dotenv API_KEY}}
 
-### Service: Find user
+### Find user
 GET {{baseUrl}}/demo/users/demo
 Authorization: Bearer {{$dotenv API_KEY}}
 
-### Service: Edit user
+### Edit user
 PATCH {{baseUrl}}/demo/users/demo
 Authorization: Bearer {{$dotenv API_KEY}}
 Content-Type: application/json
@@ -29,6 +29,6 @@ Content-Type: application/json
   "username": "masterchiefsensei"
 }
 
-### Service: Delete user
+### Delete user
 DELETE {{baseUrl}}/demo/users/demo
 Authorization: Bearer {{$dotenv API_KEY}}
