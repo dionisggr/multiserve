@@ -13,6 +13,7 @@ const conversations = require('./conversations');
 const messages = require('./messages');
 const AI = require('./AI');
 const GroupGPT = require('./groupgpt');
+const PromptWiz = require('./promptwiz');
 
 // Definitions
 const public = express.Router();
@@ -48,6 +49,7 @@ authorized
 authenticated
   .post('/:app_id/logout', access.logout)
   .use(AI)
+  .use('/promptwiz', PromptWiz)
   .use('/groupgpt', GroupGPT)
   .route('/:app_id/users/:user_id')
     .get(users.get)

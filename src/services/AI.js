@@ -1,13 +1,22 @@
+const fs = require('fs');
 const { Configuration, OpenAIApi } = require('openai');
+const { isBrowserRequest } = require('../utils');
 const { OPENAI_API_KEY, logger } = require('../config');
 const cache = require('./cache');
 
 class AI {
   constructor(adjustments = {}) {
-    const { temperature, conversation_id } = adjustments;
+    const {
+      conversation_id,
+      temperature = 0.7,
+      amount = 1,
+      size = '256x256',  // 256, 512, or 1024
+    } = adjustments;
 
-    this.temperature = temperature || 0.7;
     this.conversation_id = conversation_id;
+    this.temperature = temperature;
+    this.amount = amount;
+    this.size = size;
     this.models = {
       chatgpt: 'gpt-3.5-turbo',
     };
@@ -71,6 +80,50 @@ class AI {
     this.models.chatgpt = 'gpt-4';
 
     this.prompt(content);
+  }
+
+  async dalle(prompt) {
+    const images = await openai.createImage({
+      prompt,
+      n: this.amount,
+      size: this.size,
+    }).data.data.map(({ url }) => url);
+
+    return images;
+  }
+
+  async whisper({ file, URL }) {
+    const target = URL || file;
+    let audio_file;
+  
+    if (URL) {
+      try {
+        audio_file = await fetchRemoteFile(URL);
+      } catch (error) {
+        console.error('Error fetching remote file:', error);
+        return;
+      }
+    } else {
+      try {
+        const directory = 'whisper/';
+        const files = await fs.readdir(directory);
+        const file = files.find((f) => !f.startsWith('.')); // Ignore hidden files (files starting with a dot)
+  
+        if (!file) {
+          console.error('No files found in the whisper/ directory');
+          return;
+        }
+  
+        audio_file = await fs.readFile(path.join(directory, file));
+      } catch (error) {
+        console.error('Error reading local file:', error);
+        return;
+      }
+    }
+  
+    const { text: transcript } = await openai.Audio.transcribe("whisper-1", audio_file);
+
+    return transcript;
   }
 }
 

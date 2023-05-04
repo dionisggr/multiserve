@@ -9,7 +9,7 @@ const Service = {
 const Router = express.Router();
 
 async function gpt(req, res, next) {
-  const { prompt, ...adjustments } = req.body;
+  const { prompt = req.params.prompt, ...adjustments } = req.body;
   const AI = new Service.AI(adjustments);
 
   try {
@@ -87,9 +87,46 @@ async function chatgpt4(req, res, next) {
   }
 };
 
+async function dalle(req, res, next) {
+  const { prompt = req.params.prompt, ...adjustments } = req.body;
+  const { amount } = adjustments;
+  
+  try {
+    const AI = new Service.AI(adjustments);
+    const images = await AI.dalle(prompt);
+
+    logger.info({ user_id: req.user.id }, 'DALL-E prompted.');
+
+    if (amount && amount > 1) {
+      return res.json(images);
+    } else {
+      return res.json(images[0]);
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+async function whisper(req, res, next) {
+  const { URL = req.params.url, file, ...adjustments } = req.body;
+  
+  try {
+    const AI = new Service.AI(adjustments);
+    const transcript = await AI.whisper({ URL, file });
+
+    logger.info({ user_id: req.user.id }, 'Whisper prompted.');
+
+    res.json({ transcript })
+  } catch (error) {
+    next(error);
+  }
+};
+
 Router
-  .post('/gpt', gpt)
   .post('/chatgpt', chatgpt)
-  .post('/chatgpt4', chatgpt4);
+  .post('/chatgpt4', chatgpt4)
+  .post('/gpt/:prompt?', gpt)
+  .post('/dalle/:prompt?', dalle)
+  .post('/whisper/:url?', whisper)
  
 module.exports = Router;
