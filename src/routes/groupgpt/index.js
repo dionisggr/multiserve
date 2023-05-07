@@ -59,7 +59,7 @@ async function init(req, res, next) {
         return { role, content };
       });
 
-      cache.upsert(conversation.id, messages);
+      cache.upsert(conversation.id, { messages });
     });
   } catch (error) {
     logger.error(error);

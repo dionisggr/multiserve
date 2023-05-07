@@ -21,8 +21,8 @@ app.use(
 
 // Middleware
 app.use(
-  helmet(),
-  express.json(config.bodyParser),
+  helmet(config.helmet),
+  express.json(),
   xss(),
   cors(config.cors),
   morgan(config.morgan),

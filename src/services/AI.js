@@ -1,9 +1,11 @@
 const fs = require('fs');
-const { Configuration, OpenAIApi } = require('openai');
-const { isBrowserRequest } = require('../utils');
-const { OPENAI_API_KEY, logger } = require('../config');
-const cache = require('./cache');
 const WebSocket = require('ws');
+const { Configuration, OpenAIApi } = require('openai');
+const { pipeline } = require('stream');
+const { promisify } = require('util');
+const fetch = require('node-fetch');
+const cache = require('./cache');
+const { OPENAI_API_KEY } = require('../config');
 
 class AI {
   constructor(adjustments = {}) {
@@ -51,69 +53,54 @@ class AI {
             .filter((line) => line.trim() !== '');
           for (const line of lines) {
             const message = line.replace(/^data: /, '');
-  
+
             if (message.choices[0].finish_reason) {
               ws.close();
 
-              return { stream: "successful" }; // Stream finished
+              return { stream: 'successful' }; // Stream finished
             }
-  
+
             ws.send(JSON.stringify(message.choices[0].text));
           }
         });
       });
     } else {
-      const response = (await this.OpenAI.createCompletion({
-        model: 'text-davinci-003',
-        prompt: content,
-        max_tokens: 1500,
-        temperature: this.temperature,
-      })).data.choices[0].text;
+      const response = (
+        await this.OpenAI.createCompletion({
+          model: 'text-davinci-003',
+          prompt: content,
+          max_tokens: 1500,
+          temperature: this.temperature,
+        })
+      ).data.choices[0].text;
 
       return response;
     }
   }
 
   async chatgpt(content) {
-    const history = cache.data[this.conversation_id] || [];
+    const history =
+      this.conversation_id in cache.data
+        ? cache.data[this.conversation_id].messages
+        : [{ role: 'user', content }];
+
     const messages = [
       {
         role: 'system',
         content: 'You are a helpful assistant.',
       },
       ...history,
-      {
-        role: 'user',
-        content,
-      },
     ];
 
-    if (this.conversation_id) {
-      cache.upsert(this.conversation_id, messages);
-
-      logger.info(
-        `User message cache for conversation: ${this.conversation_id}`
-      );
-    }
-
-    const response = (
-      await this.OpenAI.createChatCompletion({
+    const response = await this.OpenAI.createChatCompletion(
+      {
         model: this.models.chatgpt,
         temperature: this.temperature,
         messages,
-      })
-    ).data.choices[0].message.content;
-
-    if (this.conversation_id) {
-      cache.upsert(this.conversation_id, [
-        ...messages,
-        { role: 'assistant', content: response },
-      ]);
-
-      logger.info(
-        `${this.model} response cache for conversation: ${this.conversation_id}`
-      );
-    }
+        stream: true,
+      },
+      { responseType: 'stream' }
+    );
 
     return response;
   }
@@ -121,28 +108,62 @@ class AI {
   async chatgpt4(content) {
     this.models.chatgpt = 'gpt-4';
 
-    this.prompt(content);
+    this.chatgpt(content);
   }
 
   async dalle(prompt) {
-    const images = await this.OpenAI.createImage({
+    const images = (await this.OpenAI.createImage({
       prompt,
       n: this.amount,
       size: this.size,
-    }).data.data.map(({ url }) => url);
+    })).data.data[0].url;
 
     return images;
   }
 
-  async whisper(file) {
-    const transcript = (
-      await this.OpenAI.createTranscription(
-        fs.createReadStream('whisper/' + file),
-        'whisper-1'
-      )
-    ).data.text;
+  async whisper({ file, url }) {
+    if (file) {
+      const transcript = (
+        await this.OpenAI.createTranscription(
+          fs.createReadStream('whisper/' + file),
+          'whisper-1'
+        )
+      ).data.text;
 
-    return transcript;
+      return transcript;
+    } else {
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch file from ${url}: ${response.statusText}`
+        );
+      }
+
+      const streamPipeline = promisify(pipeline);
+      const tempFilePath = `temp/${Date.now()}.file`;
+
+      await streamPipeline(response.body, fs.createWriteStream(tempFilePath));
+
+      const transcript = (
+        await this.OpenAI.createTranscription(
+          fs.createReadStream(tempFilePath),
+          'whisper-1'
+        )
+      ).data.text;
+
+      fs.unlink(tempFilePath, (err) => {
+        if (err) {
+          console.error(`Error deleting temporary file ${tempFilePath}:`, err);
+        }
+      });
+
+      return transcript;
+    }
   }
 }
 

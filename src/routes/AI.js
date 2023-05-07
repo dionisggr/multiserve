@@ -89,7 +89,10 @@ async function chatgpt4(req, res, next) {
 };
 
 async function dalle(req, res, next) {
-  const { prompt = req.params.prompt, ...adjustments } = req.body;
+  const {
+    prompt = req.params.prompt || req.body.event?.text,
+    ...adjustments
+  } = req.body;
   const { amount } = adjustments;
   
   try {

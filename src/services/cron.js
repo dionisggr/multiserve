@@ -38,9 +38,9 @@ async function backupDB() {
 function cleanCache() {
   logger.info('Cleaning cache...');
 
-  for (item in cache) {
-    if (cache[item].expires < Date.now()) {
-      delete cache[item];
+  for (id in cache.data) {
+    if (cache.data[id].expires < Date.now()) {
+      delete cache[id];
     }
   }
 

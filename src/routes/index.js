@@ -12,6 +12,7 @@ const secrets = require('./secrets');
 const conversations = require('./conversations');
 const messages = require('./messages');
 const AI = require('./AI');
+const GPTeams = require('./gpteams');
 const GroupGPT = require('./groupgpt');
 const PromptWiz = require('./promptwiz');
 
@@ -35,6 +36,9 @@ public
   .route('/utils/:service/:value?')
     .get(utils.generate)
     .post(utils.transform)
+
+public
+  .use('/gpteams', GPTeams)
 
 authorized
   .get('/secrets', admin, secrets.reveal)

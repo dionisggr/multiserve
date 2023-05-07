@@ -1,0 +1,43 @@
+@baseUrl = http://localhost:8000
+
+##### The following endpoints require an Admin Login first to any app (above)
+##### One Login is enough to test all endpoints
+
+### Health Check
+POST {{baseUrl}}/gpteams
+Authorization: Bearer {{$dotenv API_KEY}}
+Content-Type: application/json
+
+{
+  "challenge": "OK"
+}
+
+### Prompt ChatGPT (gpt-3.5-turbo)
+POST {{baseUrl}}/gpteams
+Authorization: Bearer {{$dotenv API_KEY}}
+Content-Type: application/json
+
+{
+  "event": {
+    "text": "What is love?",
+    "user": "{{$dotenv SLACK_GPTEAMS_ADMIN_ID}}",
+    "thread_ts": "null"
+  },
+  "authorizations": {
+    "is_bot": true
+  }
+}
+
+### Delete App conversations
+POST {{baseUrl}}/gpteams/reset
+Authorization: Bearer {{$dotenv API_KEY}}
+Content-Type: application/json
+
+{
+  "event": {
+    "channel": "{{$dotenv SLACK_GPTEAMS_BOT_CHANNEL}}"
+  },
+  "authorizations": {
+    "is_bot": true
+  }
+}

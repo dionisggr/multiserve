@@ -26,6 +26,7 @@ class CRUD {
       whereIn,
       andWhereNotExists,
       groupBy,
+      orderBy,
     } = adjustments || {};
 
     let response = db(this.table).select(...columns);
@@ -53,6 +54,7 @@ class CRUD {
     if (whereIn) response = response.whereIn(...whereIn);
     if (andWhereNotExists) response = response.andWhereNotExists(...andWhereNotExists);
     if (groupBy) response = response.groupBy(...groupBy);
+    if (orderBy) response = response.orderBy(...orderBy);
 
     response = await response;
 

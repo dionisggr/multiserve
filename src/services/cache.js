@@ -5,13 +5,10 @@ const data = {
   // },
 };
 
-function upsert(id, content, expires) {
-  const defaultExp = Date.now() + 1000 * 60 * 60;  // 1 hour
+function upsert(id, entry) {
+  const expires = Date.now() + 1000 * 60 * 60;  // 1 hour
 
-  data[id] = {
-    expires: expires || defaultExp,
-    content,
-  };
+  data[id] = { ...entry, expires };
 }
 
 module.exports = { data, upsert };
