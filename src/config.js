@@ -18,6 +18,11 @@ const {
   SLACK_GPTEAMS_BOT_ID,
   SLACK_GPTEAMS_BOT_CHANNEL,
 } = process.env;
+
+if (NODE_ENV === 'development') {
+  (async () => await redisClient.connect())();
+}
+
 const auth = {
   sessionSecret: API_KEY,
   usernameField: "email",

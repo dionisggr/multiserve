@@ -53,6 +53,12 @@ You need to set up your development environment before you can do anything.
 - Install Docker Desktop
 - Run Docker Desktop (runs silently)
 
+#### Install [Redis](https://www.docker.com/products/docker-desktop/).
+
+- For OSX, you can use [homebrew](http://brew.sh) | `brew install redis`
+- For Windows, you can use [chocolatey](https://chocolatey.org/) | `choco install redis-64`
+  - Or your preferred method
+
 ### Step 2: Clone the project
 
 ```bash
@@ -105,9 +111,13 @@ If you prefer a fully manual setup, you can follow these steps:
 4. Use [`SQL` queries](https://www.bitdegree.org/learn/sql-commands-list) to manipulate the tables and data to your preference
 
 ### Step 7: Run the server
+- **Redis**: `npm run redis` (`redis-server`)
+  - Separate Terminal instance
 - **Prod**: `npm run start`
 - **Dev**: `npm run dev`
 > `npm run dev` starts a local server on `http://localhost:8000` using `nodemon`, which will watch for any file changes and will restart the server according to these changes.
+
+To turn off Redis, you can run `npm run redis:close` (`redis-cli shutdown`).
 
 ### Step 8: Migrations
 #### To run non-executed migrations up the most recent one:
