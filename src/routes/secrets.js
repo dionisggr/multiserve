@@ -5,12 +5,17 @@ function reveal(req, res) {
     API_KEY,
     PROD_DB_URL,
     DEV_DB_URL,
+    ADMIN_EMAIL,
     ADMIN_PASSWORD,
     SENDGRID_API_KEY,
     BACKBLAZE_APP_ID,
     BACKBLAZE_APP_KEY_ID,
     BACKBLAZE_BUCKET_ID,
     OPENAI_API_KEY,
+    SLACK_GPTEAMS_DM_TOKEN,
+    SLACK_GPTEAMS_BOT_ID,
+    SLACK_GPTEAMS_BOT_CHANNEL,
+    SLACK_GPTEAMS_ADMIN_ID,
   } = process.env;
 
   res.set('Content-Type', 'text/plain');
@@ -20,12 +25,17 @@ function reveal(req, res) {
     API_KEY,
     PROD_DB_URL,
     DEV_DB_URL,
+    ADMIN_EMAIL,
     ADMIN_PASSWORD,
     SENDGRID_API_KEY,
     BACKBLAZE_APP_ID,
     BACKBLAZE_APP_KEY_ID,
     BACKBLAZE_BUCKET_ID,
     OPENAI_API_KEY,
+    SLACK_GPTEAMS_DM_TOKEN,
+    SLACK_GPTEAMS_BOT_ID,
+    SLACK_GPTEAMS_BOT_CHANNEL,
+    SLACK_GPTEAMS_ADMIN_ID,
   }, null, 2));
 }
 
