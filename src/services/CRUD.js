@@ -24,6 +24,7 @@ class CRUD {
       innerJoins,
       whereRaw,
       whereIn,
+      where,
       andWhereNotExists,
       groupBy,
       orderBy,
@@ -50,6 +51,7 @@ class CRUD {
     }
 
     if (filters) response = response.where(filters);
+    if (where) response = response.where(...where)
     if (whereRaw) response = response.whereRaw(...whereRaw);
     if (whereIn) response = response.whereIn(...whereIn);
     if (andWhereNotExists) response = response.andWhereNotExists(...andWhereNotExists);
@@ -68,6 +70,7 @@ class CRUD {
       data,
       filters = true,
       multiple = false,
+      where,
       andWhere,
       returning = ['*'],
       leftJoin,
@@ -81,6 +84,7 @@ class CRUD {
     if (rightJoin) response = response.rightJoin(...rightJoin);
     if (innerJoin) response = response.innerJoin(...innerJoin);
     if (filters) response = response.where(filters)
+    if (where) response = response.where(...where)
     if (andWhere) response = response.andWhere(...andWhere);
     if (returning) response = response.returning(returning)
 

@@ -1,6 +1,5 @@
 const express = require('express');
 const fetch = require('node-fetch');
-const bodyParser = require('body-parser');
 const { customError } = require('../../utils');
 const {
   SLACK_GPTEAMS_DM_TOKEN,
@@ -9,13 +8,14 @@ const {
   logger,
 } = require('../../config');
 const cache = require('../../services/cache');
+const db = require('../../db');
 const Service = {
   AI: require('../../services/AI'),
   DB: require('../../services/DB'),
 };
 
-const Router = express.Router();
-
+const Router = express.Router()
+  
 async function prompt(req, res, next) {
   res.header('X-Slack-No-Retry', 1);
 
@@ -28,22 +28,19 @@ async function prompt(req, res, next) {
   const {
     user: slack_user_id,
     text = null,
-    subtype,
-    channel,
     ts,
     thread_ts = ts,
-  } = req.body.event;
+  } = req.body.event.message || req.body.event;
+  const { channel, subtype, previous_message } = req.body.event;
   const { is_bot } = req.body.authorizations;
 
-  if (subtype === 'bot_add') {
-    return res.sendStatus(200);
-  }
-
-  if (!slack_user_id || slack_user_id === SLACK_GPTEAMS_BOT_ID) {
-    return res.sendStatus(400);
-  }
-
   try {
+    if (subtype === 'bot_add') {
+      return res.sendStatus(200);
+    } else if (!slack_user_id || slack_user_id === SLACK_GPTEAMS_BOT_ID) {
+      return res.sendStatus(400);
+    }
+
     const DB = new Service.DB('gpteams');
     const user = await DB.users.get({ filters: { slack_user_id } });
 
@@ -58,25 +55,17 @@ async function prompt(req, res, next) {
       },
     });
 
-    const { ts: new_ts } = await (
-      await fetch('https://slack.com/api/chat.postMessage', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${SLACK_GPTEAMS_DM_TOKEN}`,
-        },
-        body: JSON.stringify({
-          text: 'Thinking...',
-          channel,
-          thread_ts,
-        }),
-      })
-    ).json();
-
     if (conversation) {
       logger.info({ conversation_id: conversation.id }, 'Conversation found.');
 
       res.sendStatus(202); // Accepted + Processing
+
+      if (subtype === 'message_changed') {
+        await edit({
+          conversation_id: conversation.id,
+          slack_ts: previous_message.ts,
+        });
+      }
 
       if (conversation.id in cache.data) {
         cache.data[conversation.id].messages.push({
@@ -123,19 +112,41 @@ async function prompt(req, res, next) {
 
       res.sendStatus(202); // Accepted + Processing
 
-      const { user_id, content } = await DB.messages.create({
+      const { id, user_id, content } = await DB.messages.create({
         data: {
           content: text,
           conversation_id: conversation.id,
           user_id: user.id,
+          slack_ts: ts,
         },
       });
+
+      logger.info(
+        { message_id: id, user_id: user.id, ts },
+        'Message created.'
+      );
+
       const role = user_id === 'gpt' ? 'assistant' : 'user';
       const message = { role, content };
       const messages = [message];
 
       cache.upsert(conversation.id, { messages });
     }
+
+    const { ts: new_ts } = await (
+      await fetch('https://slack.com/api/chat.postMessage', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${SLACK_GPTEAMS_DM_TOKEN}`,
+        },
+        body: JSON.stringify({
+          text: 'Thinking...',
+          channel,
+          thread_ts,
+        }),
+      })
+    ).json();
 
     const AI = new Service.AI({ conversation_id: conversation.id });
     const response = await AI.chatgpt(text);
@@ -195,13 +206,19 @@ async function prompt(req, res, next) {
       ],
     });
 
-    await DB.messages.create({
+    const message = await DB.messages.create({
       data: {
         content: stream,
         conversation_id: conversation.id,
         user_id: 'gpt',
+        slack_ts: ts,
       },
     });
+
+    logger.info(
+      { message_id: message.id, user_id: 'gpt', ts },
+      'Message created.'
+    );
 
     setTimeout(() => {
       clearInterval(interval);
@@ -213,8 +230,26 @@ async function prompt(req, res, next) {
   }
 }
 
+async function edit({ conversation_id, slack_ts }) {
+  const DB = new Service.DB('gpteams');
+  const message = await DB.messages.get({
+    filters: { conversation_id, slack_ts },
+  });
+
+  await DB.messages.update({
+    data: {
+      archived_by: message.id,
+      archived_at: db.fn.now(),
+    },
+    filters: { conversation_id },
+    where: ['created_at', '>', message.created_at],
+    multiple: true,
+  });
+
+  return message;
+}
+
 async function slash(req, res, next) {
-  console.log('BODY', req.body)
   res.header('X-Slack-No-Retry', 1);
 
   const { challenge } = req.body;
@@ -253,23 +288,23 @@ async function slash(req, res, next) {
         body: JSON.stringify({
           channel,
           blocks: [
-            { "type": "divider" },
+            { type: 'divider' },
             {
-              "type": "section",
-              "text": {
-                "type": "mrkdwn",
-                "text": `DALLE: _${text}_`
-              }
+              type: 'section',
+              text: {
+                type: 'mrkdwn',
+                text: `DALLE: _${text}_`,
+              },
             },
-            { "type": "divider" },
+            { type: 'divider' },
             {
-              "type": "section",
-              "text": {
-                "type": "plain_text",
-                "text": "Thinking..."
-              }
-            }
-          ]
+              type: 'section',
+              text: {
+                type: 'plain_text',
+                text: 'Thinking...',
+              },
+            },
+          ],
         }),
       })
     ).json();
@@ -348,35 +383,35 @@ async function slash(req, res, next) {
     const AI = new Service.AI({ conversation_id: conversation.id });
     const response = await AI[command.slice(1)](text);
 
-    console.log({ response });
-
-    logger.info({ slack_user_id }, `Slack ${command.slice(1).toUpperCase()} Prompted.`);
+    logger.info(
+      { slack_user_id },
+      `Slack ${command.slice(1).toUpperCase()} Prompted.`
+    );
 
     const blocks = [
-      { "type": "divider" },
+      { type: 'divider' },
       {
-        "type": "section",
-        "text": {
-          "type": "mrkdwn",
-          "text": `DALLE: _${text}_`
-        }
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `DALLE: _${text}_`,
+        },
       },
       {
-        "type": "image",
-        "image_url": response,
-        "alt_text": text,
-
-      }
+        type: 'image',
+        image_url: response,
+        alt_text: text,
+      },
     ];
-    const body = (new_ts)
+    const body = new_ts
       ? {
           ts: new_ts,
           channel,
-          blocks
+          blocks,
         }
       : {
           channel: slack_user_id,
-          blocks
+          blocks,
         };
 
     await fetch('https://slack.com/api/chat.update', {
@@ -407,7 +442,7 @@ async function slash(req, res, next) {
 }
 
 Router
-  .post('/dalle', bodyParser.urlencoded({ extended: true }), slash)
+  .post('/dalle', slash)
   .post('/', prompt);
 
 module.exports = Router;

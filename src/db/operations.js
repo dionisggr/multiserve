@@ -63,6 +63,7 @@ async function createMessages({ db, apps, app }) {
       table.uuid('archived_by').unsigned().nullable().references('id').inTable(`${appName}__messages`).onDelete('SET NULL');
       table.specificType('content', 'varchar').notNullable();
       table.string('user_id').unsigned().nullable().references('id').inTable(`${appName}__users`).onDelete('CASCADE');
+      table.string('slack_ts');
       table.timestamp('created_at').defaultTo(db.fn.now());
       table.timestamp('updated_at').defaultTo(db.fn.now());
       table.timestamp('archived_at');

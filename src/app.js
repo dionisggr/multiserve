@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
+const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const config = require('./config');
 const routers = require('./routes');
@@ -8,6 +9,7 @@ const passport = require('./middleware/passport');
 const errorHandler = require('./middleware/error-handler');
 const { xss } = require('express-xss-sanitizer');
 const backupScheduler = require('./services/cron');
+
 
 // Initialize
 const app = express();
@@ -22,7 +24,8 @@ app.use(
 // Middleware
 app.use(
   helmet(config.helmet),
-  express.json(),
+  bodyParser.json(),
+  bodyParser.urlencoded({ extended: true }),
   xss(),
   cors(config.cors),
   morgan(config.morgan),

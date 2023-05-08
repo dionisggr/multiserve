@@ -40,7 +40,7 @@ function getBackupFiles() {
 
   fs.readdir(path, (err, files) => {
     if (err) {
-      console.error(`Error reading directory: ${err}`);
+      logger.error(`Error reading directory: ${err}`);
       return;
     }
 

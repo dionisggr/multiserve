@@ -5,7 +5,7 @@ const { pipeline } = require('stream');
 const { promisify } = require('util');
 const fetch = require('node-fetch');
 const cache = require('./cache');
-const { OPENAI_API_KEY } = require('../config');
+const { OPENAI_API_KEY, logger } = require('../config');
 
 class AI {
   constructor(adjustments = {}) {
@@ -158,7 +158,7 @@ class AI {
 
       fs.unlink(tempFilePath, (err) => {
         if (err) {
-          console.error(`Error deleting temporary file ${tempFilePath}:`, err);
+          logger.error(err, `Error deleting temporary file ${tempFilePath}:`);
         }
       });
 
