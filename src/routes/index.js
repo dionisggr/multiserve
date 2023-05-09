@@ -15,6 +15,7 @@ const AI = require('./AI');
 const GPTeams = require('./gpteams');
 const GroupGPT = require('./groupgpt');
 const PromptWiz = require('./promptwiz');
+const StatusPage = require('./statuspage');
 
 // Definitions
 const public = express.Router();
@@ -30,15 +31,14 @@ admin.use(authenticate, auth.admin);
 
 // Routes
 public
+  .use(GPTeams)
+  .use(StatusPage)
   .use(docs.serve)
   .get('/docs', docs.setup, docs.handler)
   .get(['/', '/favicon.ico'], health)
   .route('/utils/:service/:value?')
     .get(utils.generate)
     .post(utils.transform)
-
-public
-  .use('/gpteams', GPTeams)
 
 authorized
   .get('/secrets', admin, secrets.reveal)

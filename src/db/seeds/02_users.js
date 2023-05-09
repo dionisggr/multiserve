@@ -58,6 +58,14 @@ exports.seed = async function (db) {
         is_admin: false,
       },
       {
+        id: 'gpt4',
+        username: 'gpt4',
+        email: 'gpt4@tec3org.com',
+        slack_user_id: 'U056W5GAN9Z',
+        password: admin_password,
+        is_admin: false,
+      },
+      {
         id: 'demo',
         username: 'demo',
         email: 'demo@tec3org.com',

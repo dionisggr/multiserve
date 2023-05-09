@@ -24,8 +24,8 @@ app.use(
 // Middleware
 app.use(
   helmet(config.helmet),
-  bodyParser.json(),
   bodyParser.urlencoded({ extended: true }),
+  bodyParser.json(),
   xss(),
   cors(config.cors),
   morgan(config.morgan),

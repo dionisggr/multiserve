@@ -1,23 +1,18 @@
-const express = require('express');
 const fetch = require('node-fetch');
-const utils = require('./utils');
-const cache = require('../../services/cache');
-const GPT4 = require('./gpt4');
-const DALLE = require('./dalle');
 const { customError } = require('../../utils');
 const {
-  SLACK_GPTEAMS_DM_TOKEN,
+  SLACK_GPT4TEAMS_DM_TOKEN,
+  SLACK_GPT4TEAMS_BOT_ID,
   SLACK_GPTEAMS_BOT_ID,
   logger,
 } = require('../../config');
+const cache = require('../../services/cache');
 const Service = {
   AI: require('../../services/AI'),
   DB: require('../../services/DB'),
 };
 
-const Router = express.Router();
-
-async function prompt(req, res, next) {
+async function gpt4(req, res, next) {
   res.header('X-Slack-No-Retry', 1);
 
   const { challenge } = req.body;
@@ -30,19 +25,17 @@ async function prompt(req, res, next) {
     user: slack_user_id = null,
     text = null,
     channel,
+    channel_type,
     type,
     subtype,
     previous_message,
     ts = null,
-    thread_ts = null,
+    thread_ts = ts,
   } = req.body.event;
   const { is_bot } = req.body.authorizations;
 
-  console.log({ slack_user_id })
   try {
-    if (!slack_user_id || (slack_user_id === SLACK_GPTEAMS_BOT_ID)) {
-      return res.sendStatus(400);
-    }
+    console.log({ path: req.path, slack_user_id, type, subtype })
 
     const DB = new Service.DB('gpteams');
     const user = await DB.users.get({ filters: { slack_user_id } });
@@ -53,18 +46,22 @@ async function prompt(req, res, next) {
 
     let conversation = await DB.conversations.get({
       filters: {
-        slack_ts: thread_ts || ts,
+        slack_ts: thread_ts,
         slack_channel: channel,
       },
     });
 
+    if (type !== 'app_mention' || (thread_ts !== ts && type === 'message')) {
+      return res.sendStatus(400);
+    }
+
+    res.sendStatus(202);
+
     if (conversation) {
       logger.info({ conversation_id: conversation.id }, 'Conversation found.');
 
-      res.sendStatus(202); // Accepted + Processing
-
       if (subtype === 'message_changed') {
-        await utils.archive({
+        await edit({
           conversation_id: conversation.id,
           slack_ts: previous_message.ts,
         });
@@ -85,20 +82,20 @@ async function prompt(req, res, next) {
             })
           ).map((msg) => {
             const { content, user_id } = msg;
-            const role = user_id === 'gpt' ? 'assistant' : 'user';
+            const role = user_id === 'gpt4' ? 'assistant' : 'user';
 
             return { role, content };
           }) || [];
 
         logger.info(
-          { [conversation.id]: messages.length, thread_ts: thread_ts || ts },
+          { [conversation.id]: messages.length, thread_ts },
           'Messages in conversation.'
         );
 
         cache.upsert(conversation.id, { messages });
       }
     } else {
-      if (type !== 'app_mention' || !slack_user_id) {
+      if (![type, subtype].some(val => val === 'app_mention')) {
         return res.sendStatus(400);
       }
 
@@ -107,17 +104,17 @@ async function prompt(req, res, next) {
           title: 'GPTeams Conversation',
           created_by: user.id,
           type: is_bot ? 'single' : 'group',
-          slack_ts: thread_ts || ts,
+          slack_ts: thread_ts,
           slack_channel: channel,
         },
       });
 
       logger.info(
-        { conversation_id: conversation.id, thread_ts: thread_ts || ts },
+        { conversation_id: conversation.id, thread_ts },
         'Conversation created.'
       );
 
-      res.sendStatus(202); // Accepted + Processing
+      res.end();
 
       const { id, user_id, content } = await DB.messages.create({
         data: {
@@ -130,7 +127,7 @@ async function prompt(req, res, next) {
 
       logger.info({ message_id: id, user_id: user.id, ts }, 'Message created.');
 
-      const role = user_id === 'gpt' ? 'assistant' : 'user';
+      const role = user_id === 'gpt4' ? 'assistant' : 'user';
       const message = { role, content };
       const messages = [message];
 
@@ -142,18 +139,18 @@ async function prompt(req, res, next) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${SLACK_GPTEAMS_DM_TOKEN}`,
+          Authorization: `Bearer ${SLACK_GPT4TEAMS_DM_TOKEN}`,
         },
         body: JSON.stringify({
           text: 'Thinking...',
           channel,
-          thread_ts: thread_ts || ts,
+          thread_ts,
         }),
       })
     ).json();
 
     const AI = new Service.AI({ conversation_id: conversation.id });
-    const response = await AI.chatgpt(text);
+    const response = await AI.chatgpt4(text)
     
     logger.info({ slack_user_id }, 'Slack ChatGPT Prompted.');
     
@@ -171,7 +168,7 @@ async function prompt(req, res, next) {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${SLACK_GPTEAMS_DM_TOKEN}`,
+            Authorization: `Bearer ${SLACK_GPT4TEAMS_DM_TOKEN}`,
           },
           body: JSON.stringify(body),
         });
@@ -215,13 +212,13 @@ async function prompt(req, res, next) {
       data: {
         content: stream,
         conversation_id: conversation.id,
-        user_id: 'gpt',
+        user_id: 'gpt4',
         slack_ts: ts,
       },
     });
 
     logger.info(
-      { message_id: message.id, user_id: 'gpt', ts },
+      { message_id: message.id, user_id: 'gpt4', ts },
       'Message created.'
     );
 
@@ -235,9 +232,4 @@ async function prompt(req, res, next) {
   }
 }
 
-Router
-  .post('/gpteams', prompt)
-  .post('/gpt4teams', GPT4)
-  .post('/dalle', DALLE)
-
-module.exports = Router;
+module.exports = gpt4;

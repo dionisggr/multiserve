@@ -106,9 +106,30 @@ class AI {
   }
 
   async chatgpt4(content) {
-    this.models.chatgpt = 'gpt-4';
+    const history =
+      this.conversation_id in cache.data
+        ? cache.data[this.conversation_id].messages
+        : [{ role: 'user', content }];
 
-    this.chatgpt(content);
+    const messages = [
+      {
+        role: 'system',
+        content: 'You are a helpful assistant.',
+      },
+      ...history,
+    ];
+
+    const response = await this.OpenAI.createChatCompletion(
+      {
+        model: 'gpt-4',
+        temperature: this.temperature,
+        messages,
+        stream: true,
+      },
+      { responseType: 'stream' }
+    );
+
+    return response;
   }
 
   async dalle(prompt) {

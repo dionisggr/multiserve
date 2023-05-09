@@ -1,9 +1,9 @@
-const express = require('express');
 const fetch = require('node-fetch');
 const { customError } = require('../../utils');
 const {
   SLACK_GPTEAMS_DM_TOKEN,
   SLACK_GPTEAMS_BOT_ID,
+  SLACK_GPTEAMS_BOT_CHANNEL,
   logger,
 } = require('../../config');
 const cache = require('../../services/cache');
@@ -12,9 +12,7 @@ const Service = {
   DB: require('../../services/DB'),
 };
 
-const Router = express.Router();
-
-async function prompt(req, res, next) {
+async function dalle(req, res, next) {
   res.header('X-Slack-No-Retry', 1);
 
   const { challenge } = req.body;
@@ -24,18 +22,12 @@ async function prompt(req, res, next) {
   }
 
   const {
-    user: slack_user_id = null,
-    text = null,
-    subtype,
-    channel,
-    ts,
-    thread_ts = ts,
-  } = req.body.event;
-  const { is_bot } = req.body.authorizations;
-
-  if (subtype === 'bot_add') {
-    return res.sendStatus(200);
-  }
+    text,
+    trigger_id,
+    command,
+    channel_id: channel,
+    user_id: slack_user_id,
+  } = req.body;
 
   if (!slack_user_id || slack_user_id === SLACK_GPTEAMS_BOT_ID) {
     return res.sendStatus(400);
@@ -49,9 +41,40 @@ async function prompt(req, res, next) {
       return next(customError('User not found.', 404));
     }
 
+    const { ts: new_ts } = await (
+      await fetch('https://slack.com/api/chat.postMessage', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${SLACK_GPTEAMS_DM_TOKEN}`,
+        },
+        body: JSON.stringify({
+          channel,
+          blocks: [
+            { type: 'divider' },
+            {
+              type: 'section',
+              text: {
+                type: 'mrkdwn',
+                text: `DALLE: _${text}_`,
+              },
+            },
+            { type: 'divider' },
+            {
+              type: 'section',
+              text: {
+                type: 'plain_text',
+                text: 'Thinking...',
+              },
+            },
+          ],
+        }),
+      })
+    ).json();
+
     let conversation = await DB.conversations.get({
       filters: {
-        slack_ts: thread_ts,
+        slack_ts: trigger_id,
         slack_channel: channel,
       },
     });
@@ -59,7 +82,7 @@ async function prompt(req, res, next) {
     if (conversation) {
       logger.info({ conversation_id: conversation.id }, 'Conversation found.');
 
-      res.sendStatus(202); // Accepted + Processing
+      res.end();
 
       if (conversation.id in cache.data) {
         cache.data[conversation.id].messages.push({
@@ -82,7 +105,7 @@ async function prompt(req, res, next) {
           }) || [];
 
         logger.info(
-          { [conversation.id]: messages.length, thread_ts },
+          { [conversation.id]: messages.length, trigger_id },
           'Messages in conversation.'
         );
 
@@ -93,18 +116,18 @@ async function prompt(req, res, next) {
         data: {
           title: 'GPTeams Conversation',
           created_by: user.id,
-          type: is_bot ? 'single' : 'group',
-          slack_ts: thread_ts,
+          type: channel === SLACK_GPTEAMS_BOT_CHANNEL ? 'single' : 'group',
+          slack_ts: trigger_id,
           slack_channel: channel,
         },
       });
 
       logger.info(
-        { conversation_id: conversation.id, thread_ts },
+        { conversation_id: conversation.id, trigger_id },
         'Conversation created.'
       );
 
-      res.sendStatus(202); // Accepted + Processing
+      res.end();
 
       const { user_id, content } = await DB.messages.create({
         data: {
@@ -121,78 +144,64 @@ async function prompt(req, res, next) {
     }
 
     const AI = new Service.AI({ conversation_id: conversation.id });
-    const { ts: new_ts } = await (await fetch(
-      'https://slack.com/api/chat.postMessage',
+    const response = await AI[command.slice(1)](text);
+
+    logger.info(
+      { slack_user_id },
+      `Slack ${command.slice(1).toUpperCase()} Prompted.`
+    );
+
+    const blocks = [
+      { type: 'divider' },
       {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${SLACK_GPTEAMS_DM_TOKEN}`,
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `DALLE: _${text}_`,
         },
-        body: JSON.stringify({
-          text: 'Thinking...',
+      },
+      {
+        type: 'image',
+        image_url: response,
+        alt_text: text,
+      },
+    ];
+    const body = new_ts
+      ? {
+          ts: new_ts,
           channel,
-          thread_ts,
-        }),
-      }
-    )).json();
-
-    const response = await AI.chatgpt(text);
-
-    logger.info({ slack_user_id }, 'Slack ChatGPT Prompted.');
-
-    let responseText = '';
-
-    response.data.on('data', async (data) => {
-      const lines = data
-        .toString()
-        .split('\n')
-        .filter((line) => line.trim() !== '');
-      
-      for (const line of lines) {
-        const message = line.replace(/^data: /, '');
-
-        if (message === '[DONE]') {
-          return; // Stream finished
+          blocks,
         }
+      : {
+          channel: slack_user_id,
+          blocks,
+        };
 
-        try {
-          const parsed = JSON.parse(message);
-
-          responseText += parsed.choices[0].delta.content;
-
-          await fetch('https://slack.com/api/chat.update', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${SLACK_GPTEAMS_DM_TOKEN}`,
-            },
-            body: JSON.stringify({
-              text: responseText,
-              channel,
-              ts: new_ts,
-            }),
-          });
-        } catch (error) {
-          // Ignore
-        }
-      }
+    await fetch('https://slack.com/api/chat.update', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${SLACK_GPTEAMS_DM_TOKEN}`,
+      },
+      body: JSON.stringify(body),
+    });
+    cache.upsert(conversation.id, {
+      messages: [
+        ...cache.data[conversation.id].messages,
+        { role: 'assistant', content: response },
+      ],
     });
 
     await DB.messages.create({
       data: {
-        content: responseText,
+        content: response,
         conversation_id: conversation.id,
         user_id: 'gpt',
       },
     });
   } catch (error) {
-    logger.error(error, 'Error: Could not prompt ChatGPT from Slack.');
-
-    next(error);
+    logger.error(error, 'Error prompting from Slack.');
   }
 }
 
-Router.post('/', prompt);
-
-module.exports = Router;
+module.exports = dalle;

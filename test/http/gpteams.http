@@ -20,7 +20,7 @@ Content-Type: application/json
 {
   "event": {
     "text": "What is love?",
-    "user": "{{$dotenv SLACK_GPTEAMS_ADMIN_ID}}",
+    "user": "{{$dotenv SLACK_GPTEAMS_DIO_ID}}",
     "thread_ts": "null"
   },
   "authorizations": {
