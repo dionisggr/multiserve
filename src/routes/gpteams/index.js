@@ -8,6 +8,7 @@ const { customError } = require('../../utils');
 const {
   SLACK_GPTEAMS_DM_TOKEN,
   SLACK_GPTEAMS_BOT_ID,
+  SLACK_GPTEAMS_BOT_CHANNEL,
   logger,
 } = require('../../config');
 const Service = {
@@ -16,6 +17,7 @@ const Service = {
 };
 
 const Router = express.Router();
+const local = {};
 
 async function prompt(req, res, next) {
   res.header('X-Slack-No-Retry', 1);
@@ -35,20 +37,19 @@ async function prompt(req, res, next) {
     previous_message,
     ts = null,
     thread_ts = null,
-  } = req.body.event;
+  } = req.body.event || req.body;
   const { is_bot } = req.body.authorizations;
 
-  console.log({ slack_user_id })
-  try {
-    if (!slack_user_id || (slack_user_id === SLACK_GPTEAMS_BOT_ID)) {
-      return res.sendStatus(400);
-    }
+  if (!slack_user_id || slack_user_id === SLACK_GPTEAMS_BOT_ID) {
+    return res.sendStatus(400);
+  }
 
+  try {
     const DB = new Service.DB('gpteams');
     const user = await DB.users.get({ filters: { slack_user_id } });
 
     if (!user) {
-      return next(customError('User not found.', 404));
+      return res.sendStatus(404);
     }
 
     let conversation = await DB.conversations.get({
@@ -98,9 +99,11 @@ async function prompt(req, res, next) {
         cache.upsert(conversation.id, { messages });
       }
     } else {
-      if (type !== 'app_mention' || !slack_user_id) {
+      if (type !== 'app_mention' && channel !== SLACK_GPTEAMS_BOT_CHANNEL) {
         return res.sendStatus(400);
       }
+
+      res.sendStatus(202); // Accepted + Processing
 
       conversation = await DB.conversations.create({
         data: {
@@ -116,8 +119,6 @@ async function prompt(req, res, next) {
         { conversation_id: conversation.id, thread_ts: thread_ts || ts },
         'Conversation created.'
       );
-
-      res.sendStatus(202); // Accepted + Processing
 
       const { id, user_id, content } = await DB.messages.create({
         data: {
@@ -154,9 +155,9 @@ async function prompt(req, res, next) {
 
     const AI = new Service.AI({ conversation_id: conversation.id });
     const response = await AI.chatgpt(text);
-    
+
     logger.info({ slack_user_id }, 'Slack ChatGPT Prompted.');
-    
+
     let stream = '';
 
     const interval = setInterval(async () => {
@@ -228,6 +229,8 @@ async function prompt(req, res, next) {
     setTimeout(() => {
       clearInterval(interval);
 
+      delete local[thread_ts || ts];
+
       logger.info('Streaming stopped.');
     }, 3500);
   } catch (error) {
@@ -235,9 +238,6 @@ async function prompt(req, res, next) {
   }
 }
 
-Router
-  .post('/gpteams', prompt)
-  .post('/gpt4teams', GPT4)
-  .post('/dalle', DALLE)
+Router.post('/gpteams', prompt).post('/gpt4teams', GPT4).post('/dalle', DALLE);
 
 module.exports = Router;
