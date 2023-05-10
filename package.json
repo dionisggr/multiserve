@@ -25,8 +25,8 @@
     "db:stop": "npx supabase stop",
     "db:reset": "npx supabase db reset",
     "db:backup": "src/db/backup/index.sh",
-    "setup": "npm run db:pull && npm run db:start && npm run reset && source src/aliases.sh",
-    "setup:aliases": "source src/aliases.sh"
+    "setup": "npm run db:pull && npm run db:start && npm run reset && source aliases.sh",
+    "setup:aliases": "source aliases.sh"
   },
   "dependencies": {
     "backblaze-b2": "^1.7.0",

@@ -100,7 +100,7 @@ If you prefer a more granular step-by-step approach, you can follow these steps:
 2. Start the Supabase start: `npm run db:start`
 3. Create the database tables: `npm run migrations`
 4. Seed the database: `npm run seeds`
-4. Set up terminal alises: `source src/aliases.sh`
+4. Set up terminal alises: `source aliases.sh`
 
 ### Step 6-C: Setup (Control the matrix)
 If you prefer a fully manual setup, you can follow these steps:
@@ -286,7 +286,6 @@ You can watch the full API Docs powered by Swagger UI [here](https://tec3-api.up
 │   │   ├── email.js  # Email generation and communication service
 │   │   ├── passwords.js  # Password verification and reset service
 │   │   └── two-factor-auth.js  # 2FA service processes (email/verification)
-│   ├── aliases.sh  # Shell script with aliases for commonly used commands
 │   ├── app.js  # Main application file
 │   ├── config.js  # Main configuration file
 │   ├── docs.yaml  # API documentation file (Swagger UI)
@@ -302,6 +301,7 @@ You can watch the full API Docs powered by Swagger UI [here](https://tec3-api.up
 │   └── ...  # Directory for placing audio files for Whisper model
 ├── .env  # Environment variables file
 ├── .gitignore  # Git ignore file
+├── aliases.sh  # Shell script with aliases for commonly used commands
 ├── new.env  # Clean environment variables file for new projects
 ├── package-lock.json  # Lock file for npm packages
 ├── package.json  # Project metadata and npm dependencies

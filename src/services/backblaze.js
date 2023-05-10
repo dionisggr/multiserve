@@ -22,14 +22,14 @@ async function upload(path, fileName) {
     const { uploadUrl, authorizationToken } = response.data;
 
     await b2.uploadFile({
-      uploadUrl,
+      data: file,
       uploadAuthToken: authorizationToken,
+      uploadUrl,
       fileName,
       bucketId,
-      data: file,
     });
 
-    logger.info(response, 'File uploaded successfully!');
+    logger.info(`DB file upload success: ${response.status === 200}`);
   } catch (error) {
     logger.error(error, 'Error uploading DB backup file.');
   }
@@ -51,7 +51,5 @@ function getBackupFiles() {
     return backupFiles;
   });
 }
-
-upload('src/db/backups/', 'backup_2023-05-10_04-51-06.sql')
 
 module.exports = { upload, getBackupFiles };
