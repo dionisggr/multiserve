@@ -7,7 +7,7 @@
   "author": "",
   "license": "MIT",
   "scripts": {
-    "start": "node server.js",
+    "start": "node server.js --omit=dev",
     "dev": "nodemon server.js",
     "redis": "redis-server",
     "redis:close": "redis-cli shutdown",
