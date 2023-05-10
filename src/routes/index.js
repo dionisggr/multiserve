@@ -15,7 +15,7 @@ const AI = require('./AI');
 const GPTeams = require('./gpteams');
 const GroupGPT = require('./groupgpt');
 const PromptWiz = require('./promptwiz');
-const StatusPage = require('./statuspage');
+const StatusPage = require('./gpteams/incidents');
 
 // Definitions
 const public = express.Router();

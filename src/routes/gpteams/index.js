@@ -235,6 +235,9 @@ async function prompt(req, res, next) {
   }
 }
 
-Router.post('/gpteams', prompt).post('/gpt4teams', GPT4).post('/dalle', DALLE);
+Router
+  .post('/gpteams', prompt)
+  .post('/gpt4teams', GPT4)
+  .post('/dalle', DALLE);
 
 module.exports = Router;
