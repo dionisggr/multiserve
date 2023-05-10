@@ -14,7 +14,7 @@ function start() {
 async function backupDB() {
   logger.info('Creating DB backup file...');
 
-  exec('src/db/backup.sh', (error, stdout, stderr) => {
+  exec('source src/db/backup.sh', (error, stdout, stderr) => {
     if (error) {
       logger.error(error, 'Error creating DB backfup file.');
 
@@ -29,7 +29,7 @@ async function backupDB() {
   logger.info('Uploading DB backup file...');
 
   for (const name of files) {
-    await backblaze.upload('src/db/', name);
+    await backblaze.upload('src/db/backups/', name);
   }
 
   logger.info('DB backup file uploaded successfully!');

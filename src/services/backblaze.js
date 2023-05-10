@@ -36,7 +36,7 @@ async function upload(path, fileName) {
 }
 
 function getBackupFiles() {
-  const path = 'src/db/';
+  const path = 'src/db/backups/';
 
   fs.readdir(path, (err, files) => {
     if (err) {
@@ -51,5 +51,7 @@ function getBackupFiles() {
     return backupFiles;
   });
 }
+
+upload('src/db/backups/', 'backup_2023-05-10_04-51-06.sql')
 
 module.exports = { upload, getBackupFiles };
