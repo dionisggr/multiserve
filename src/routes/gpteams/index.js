@@ -17,7 +17,6 @@ const Service = {
 };
 
 const Router = express.Router();
-const local = {};
 
 async function prompt(req, res, next) {
   res.header('X-Slack-No-Retry', 1);
@@ -228,8 +227,6 @@ async function prompt(req, res, next) {
 
     setTimeout(() => {
       clearInterval(interval);
-
-      delete local[thread_ts || ts];
 
       logger.info('Streaming stopped.');
     }, 3500);
