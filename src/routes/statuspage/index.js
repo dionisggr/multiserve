@@ -7,6 +7,7 @@ const {
   STATUSPAGE_TEC3_API_ID,
   STATUSPAGE_GPTEAMS_ID,
   STATUSPAGE_API_KEY,
+  STATUSPAGE_URL,
 } = require('../../config');
 
 const Router = express.Router();
@@ -68,7 +69,7 @@ async function incidents(req, res, next) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          text: `Incident ID: ${result.id}`,
+          text: `Incident ID: ${result.id}\n<${STATUSPAGE_URL}|Update Status>`,
           channel,
         }),
       });

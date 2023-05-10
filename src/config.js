@@ -26,6 +26,7 @@ const {
   STATUSPAGE_TEC3_API_ID,
   STATUSPAGE_GPTEAMS_ID,
   STATUSPAGE_API_KEY,
+  STATUSPAGE_URL,
 } = process.env;
 
 if (NODE_ENV === 'development') {
@@ -104,6 +105,7 @@ module.exports = {
   STATUSPAGE_TEC3_API_ID,
   STATUSPAGE_GPTEAMS_ID,
   STATUSPAGE_API_KEY,
+  STATUSPAGE_URL,
   sessionData,
   helmet,
   morgan,
