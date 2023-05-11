@@ -20,7 +20,7 @@ const installed = [
     block_id: 'gpteams_description',
     text: {
       type: 'mrkdwn',
-      text: 'GPTeams is powered by OpenAI and ChatGPT, cutting-edge AI technologies designed to assist you in various tasks. Please note that the usage of these services is token-cost based, meaning you will need an OpenAI API Key to access them.',
+      text: 'GPTeams is powered by OpenAI and ChatGPT, cutting-edge AI technologies designed to assist you in various tasks.\n\nPlease note that the usage of these services is token-cost based, meaning you will need an OpenAI API Key to access them.',
     },
   },
   {
@@ -40,32 +40,16 @@ const installed = [
     },
   },
   {
-    type: 'input',
-    block_id: 'api_key_input',
-    label: {
-      type: 'plain_text',
-      text: 'OpenAI API Key',
-    },
-    element: {
-      type: 'plain_text_input',
-      action_id: 'api_key',
-      placeholder: {
-        type: 'plain_text',
-        text: 'Enter your API key here',
-      },
-    },
-  },
-  {
     type: 'actions',
-    block_id: 'register',
+    block_id: 'enter_api_key',
     elements: [
       {
         type: 'button',
         text: {
           type: 'plain_text',
-          text: 'Submit',
+          text: 'Enter API Key',
         },
-        action_id: 'register',
+        action_id: 'openai_api_key_modal',
       },
     ],
   },
@@ -77,7 +61,7 @@ const installed = [
     elements: [
       {
         type: 'mrkdwn',
-        text: 'Developed by Tec3, LLC :computer:',
+        text: 'Developed by Tec3, LLC  :computer:',
       },
       {
         type: 'mrkdwn',
@@ -86,6 +70,47 @@ const installed = [
     ],
   },
 ];
+
+const key = {
+  type: "modal",
+  callback_id: "openai_api_key_modal",
+  title: {
+    type: "plain_text",
+    text: "Enter API Key"
+  },
+  blocks: [
+    {
+      type: "input",
+      block_id: "api_key_input",
+      label: {
+        type: "plain_text",
+        text: "OpenAI API Key"
+      },
+      element: {
+        type: "plain_text_input",
+        action_id: "api_key",
+        placeholder: {
+          type: "plain_text",
+          text: "Enter your API key here"
+        },
+      }
+    }
+  ],
+  submit: {
+    type: "plain_text",
+    text: "Submit"
+  }
+};
+
+const clear = {
+  response_action: "clear",
+  type: "modal",
+  title: {
+    type: "plain_text",
+    text: "Enter API Key"
+  },
+  blocks: [],
+};
 
 const registered = [
   {
@@ -124,6 +149,20 @@ const registered = [
     },
   },
   {
+    type: "actions",
+    block_id: "enter_api_key",
+    elements: [
+      {
+        type: "button",
+        text: {
+          type: "plain_text",
+          text: "Clear API Key"
+        },
+        action_id: "clear_api_key"
+      },
+    ]
+  },
+  {
     type: 'section',
     block_id: 'whitespace_2',
     text: {
@@ -149,4 +188,4 @@ const registered = [
   },
 ];
 
-module.exports = { installed, registered };
+module.exports = { installed, key, clear, registered };

@@ -143,7 +143,10 @@ async function dalle(req, res, next) {
       cache.upsert(conversation.id, { messages });
     }
 
-    const AI = new Service.AI({ conversation_id: conversation.id });
+    const AI = new Service.AI({
+      openai_api_key: user.openai_api_key,
+      conversation_id: conversation.id
+    });
     const response = await AI[command.slice(1)](text);
 
     logger.info(

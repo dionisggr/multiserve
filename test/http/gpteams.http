@@ -31,7 +31,7 @@ Content-Type: application/json
 ### Danger Zone ###
 ##### Do not execute these endpoints unless you know what you are doing
 
-### Set Home Page (All Users)
+### Set Home Page
 ##### Change the "user_id" to yours (see .env file)
 POST https://slack.com/api/views.publish
 Authorization: Bearer {{$dotenv SLACK_GPTEAMS_DM_TOKEN}}
@@ -39,7 +39,7 @@ Content-Type: application/json
 
 {
   "user_id": "{{$dotenv SLACK_GPTEAMS_DIO_ID}}",
-  "view": {
+  "view":   {
     "type":"home",
     "blocks": [
       {
@@ -63,7 +63,7 @@ Content-Type: application/json
         "block_id": "gpteams_description",
         "text": {
           "type": "mrkdwn",
-          "text": "GPTeams is powered by OpenAI and ChatGPT, cutting-edge AI technologies designed to assist you in various tasks. Please note that the usage of these services is token-cost based, meaning you will need an OpenAI API Key to access them."
+          "text": "GPTeams is powered by OpenAI and ChatGPT, cutting-edge AI technologies designed to assist you in various tasks.\n\nPlease note that the usage of these services is token-cost based, meaning you will need an OpenAI API Key to access them."
         }
       },
       {
@@ -83,6 +83,144 @@ Content-Type: application/json
         }
       },
       {
+        "type": "actions",
+        "block_id": "enter_api_key",
+        "elements": [
+          {
+            "type": "button",
+            "text": {
+              "type": "plain_text",
+              "text": "Enter API Key"
+            },
+            "action_id": "openai_api_key_modal"
+          },
+        ]
+      },
+      {
+        "type": "divider"
+      },
+      {
+        "type": "context",
+        "elements": [
+          {
+            "type": "mrkdwn",
+            "text": "Developed by Tec3, LLC  :computer:"
+          },
+          {
+            "type": "mrkdwn",
+            "text": "<https://www.tec3org.com|Visit our website>"
+          }
+        ]
+      },
+    ]
+  } 
+}
+
+###
+
+POST https://slack.com/api/views.publish
+Authorization: Bearer {{$dotenv SLACK_GPTEAMS_DM_TOKEN}}
+Content-Type: application/json
+
+{
+  "user_id": "{{$dotenv SLACK_GPTEAMS_DIO_ID}}",
+  "view":   {
+    "type":"home",
+    "blocks": [
+      {
+        "type": "section",
+        "block_id": "thanks",
+        "text": {
+          "type": "mrkdwn",
+          "text": " *Thank you for trying GPTeams!*"
+        }
+      },
+      {
+        "type": "divider"
+      },
+      {
+        "type": "section",
+        "block_id": "whitespace_1",
+        "text": {
+          "type": "mrkdwn",
+          "text": " "
+        }
+      },
+      {
+        "type": "section",
+        "block_id": "welcome_section",
+        "text": {
+          "type": "mrkdwn",
+          "text": "*OpenAI API Key*"
+        }
+      },
+      {
+        "type": "section",
+        "block_id": "api_key_successs",
+        "text": {
+          "type": "mrkdwn",
+          "text": ":white_check_mark: *Successfully added!*"
+        }
+      },
+      {
+        "type": "actions",
+        "block_id": "enter_api_key",
+        "elements": [
+          {
+            "type": "button",
+            "text": {
+              "type": "plain_text",
+              "text": "Clear API Key"
+            },
+            "action_id": "clear_api_key"
+          },
+        ]
+      },
+      {
+        "type": "section",
+        "block_id": "whitespace_2",
+        "text": {
+          "type": "mrkdwn",
+          "text": " "
+        }
+      },
+      {
+        "type": "section",
+        "block_id": "getting_started",
+        "text": {
+          "type": "mrkdwn",
+          "text": "*Getting Started:*"
+        }
+      },
+      {
+        "type": "section",
+        "block_id": "getting_started_instructions",
+        "text": {
+          "type": "mrkdwn",
+          "text": "1. Visit the *GPTeams* channel or add it to an existing channel.\n2. *@GPTeams* to any conversation to begin its context.\n3. Once called, *GPTeams* will respond to every new thread message below it.\n4. Message *GPTeams* directly for private context conversations.\n5. Visit the *About* section for usage of slash commands.\n6. For feedback or direct feature requests, email us at tec3org@gmail.com! "
+        }
+      }
+    ]
+  } 
+}
+
+###
+
+POST https://slack.com/api/views.publish
+Authorization: Bearer {{$dotenv SLACK_GPTEAMS_DM_TOKEN}}
+Content-Type: application/json
+
+{
+  "user_id": "{{$dotenv SLACK_GPTEAMS_DIO_ID}}",
+  "view":  {
+    "type": "modal",
+    "callback_id": "openai_api_key_modal",
+    "title": {
+      "type": "plain_text",
+      "text": "Enter API Key"
+    },
+    "blocks": [
+      {
         "type": "input",
         "block_id": "api_key_input",
         "label": {
@@ -95,39 +233,32 @@ Content-Type: application/json
           "placeholder": {
             "type": "plain_text",
             "text": "Enter your API key here"
-          }
-        }
-      },
-      {
-        "type": "actions",
-        "block_id": "submit_api_key",
-        "elements": [
-          {
-            "type": "button",
-            "text": {
-              "type": "plain_text",
-              "text": "Submit"
-            },
-            "action_id": "submit_api_key"
-          }
-        ]
-      },
-      {
-        "type": "divider"
-      },
-      {
-        "type": "context",
-        "elements": [
-          {
-            "type": "mrkdwn",
-            "text": "Developed by Tec3, LLC :computer:"
           },
-          {
-            "type": "mrkdwn",
-            "text": "<http://www.tec3llc.com|Visit our website>"
-          }
-        ]
+        }
       }
-    ]
-  }
+    ],
+    "submit": {
+      "type": "plain_text",
+      "text": "Submit"
+    }
+}
+}
+
+###
+
+POST https://slack.com/api/views.update
+Authorization: Bearer {{$dotenv SLACK_GPTEAMS_DM_TOKEN}}
+Content-Type: application/json
+
+{
+  "view_id": "V057C0DGF5Z",
+
+  "view":   {
+    "type":"modal",
+    "title": {
+      "type": "plain_text",
+      "text": "Enter API Key"
+    },
+    "blocks": []
+  } 
 }

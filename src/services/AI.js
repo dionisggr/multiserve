@@ -5,12 +5,13 @@ const { pipeline } = require('stream');
 const { promisify } = require('util');
 const fetch = require('node-fetch');
 const cache = require('./cache');
-const { OPENAI_API_KEY, logger } = require('../config');
+const { logger } = require('../config');
 
 class AI {
   constructor(adjustments = {}) {
     const {
       conversation_id,
+      openai_api_key,
       temperature = 0.7,
       amount = 1,
       size = '256x256', // 256, 512, or 1024
@@ -23,9 +24,10 @@ class AI {
     this.models = {
       chatgpt: 'gpt-3.5-turbo',
     };
+    this.openai_api_key = openai_api_key;
     this.OpenAI = new OpenAIApi(
       new Configuration({
-        apiKey: OPENAI_API_KEY,
+        apiKey: this.openai_api_key,
       })
     );
   }

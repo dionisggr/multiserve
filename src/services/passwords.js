@@ -17,12 +17,30 @@ async function hash(password) {
   return hashed;
 }
 
-function encrypt(password) {
-  if (!password) password = randomWord();
+function encrypt(value, secret) {
+  if (!value) value = randomWord();
 
-  const encrypted = crypto.createHash('sha256').update(password).digest('hex');
+  let encrypted;
+
+  if (secret) {
+    const iv = crypto.randomBytes(16); // Generate a random initialization vector
+    const cipher = crypto.createCipheriv('aes256', secret, iv);
+    let encrypted = cipher.update(value, 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+
+    return iv.toString('hex') + encrypted; // Prepend the IV to the encrypted value
+  } else {
+    encrypted = crypto.createHash('sha256').update(value).digest('hex');
+  }
   
   return encrypted;
+}
+
+function decrypt(value, secret) {
+  const decipher = crypto.createDecipheriv('aes256', secret, '');
+  const decrypted = decipher.update(value, 'hex', 'utf8') + decipher.final('utf8');
+
+  return decrypted;
 }
 
 function validate({ client: clientEncrypted, server: serverHashed }) {
@@ -31,4 +49,4 @@ function validate({ client: clientEncrypted, server: serverHashed }) {
   return isMatch;
 }
 
-module.exports = { hash, encrypt, validate };
+module.exports = { hash, encrypt, decrypt, validate };

@@ -1,6 +1,7 @@
 const express = require('express');
 const fetch = require('node-fetch');
 const utils = require('./utils');
+const passwords = require('../../services/passwords');
 const cache = require('../../services/cache');
 const GPT4 = require('./gpt4');
 const DALLE = require('./dalle');
@@ -37,18 +38,14 @@ async function prompt(req, res, next) {
     ts = null,
     thread_ts = null,
   } = req.body.event || req.body;
-  const { is_bot } = req.body.authorizations;
-
-  if (['app_home_opened', 'block_actions'].includes(type)) {
-    return home.init(req, res, next);
-  }
-
-  if (type === 'app_uninstalled') {
-    return home.uninstall(slack_user_id);
-  }
+  const { is_bot } = req.body.authorizations || {};
 
   if (!slack_user_id || slack_user_id === SLACK_GPTEAMS_BOT_ID) {
     return res.sendStatus(400);
+  }
+
+  if (['app_home_opened', 'app_uninstalled', 'block_actions'].includes(type)) {
+    return res.sendStatus(202);  // Accepted + Processing
   }
 
   try {
@@ -57,6 +54,23 @@ async function prompt(req, res, next) {
 
     if (!user) {
       return res.sendStatus(404);
+    }
+    
+    if (!user.openai_api_key) {
+      await fetch('https://slack.com/api/chat.postEphemeral', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${SLACK_GPTEAMS_DM_TOKEN}`,
+        },
+        body: JSON.stringify({
+          text: 'Please add your OpenAI API Key in the GPTeams "Home" tab first.',
+          user: user.slack_user_id,
+          channel,
+        }),
+      });
+
+      return res.sendStatus(400);
     }
 
     let conversation = await DB.conversations.get({
@@ -69,7 +83,7 @@ async function prompt(req, res, next) {
     if (conversation) {
       logger.info({ conversation_id: conversation.id }, 'Conversation found.');
 
-      res.sendStatus(202); // Accepted + Processing
+      res.sendStatus(202);  // Accepted + Processing
 
       if (subtype === 'message_changed') {
         await utils.archive({
@@ -160,7 +174,11 @@ async function prompt(req, res, next) {
       })
     ).json();
 
-    const AI = new Service.AI({ conversation_id: conversation.id });
+    
+    const AI = new Service.AI({
+      openai_api_key: user.openai_api_key,
+      conversation_id: conversation.id,
+    });
     const response = await AI.chatgpt(text);
 
     logger.info({ slack_user_id }, 'Slack ChatGPT Prompted.');
@@ -240,11 +258,14 @@ async function prompt(req, res, next) {
     }, 3500);
   } catch (error) {
     logger.error(error, 'Error: Could not prompt ChatGPT from Slack.');
+
+    next(error);
   }
 }
 
 Router
   .post('/gpteams', prompt)
+  .post('/gpteams/home', home)
   .post('/gpt4teams', GPT4)
   .post('/dalle', DALLE);
 

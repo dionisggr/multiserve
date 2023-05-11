@@ -9,14 +9,16 @@ async function createUsers({ db, app, apps }) {
     await db.schema.createTable(tableName, function (table) {
         table.string('id').primary().defaultTo(db.raw('uuid_generate_v4()'));
         table.string('username').unique();
-        table.string('password').notNullable();
+        table.string('password');
         table.string('first_name');
         table.string('last_name');
         table.date('DOB');
-        table.string('email').notNullable().unique();
+        table.string('email').unique();
         table.string('phone').unique();
         table.string('avatar').unique();
         table.string('slack_user_id').unique();
+        table.string('slack_team_id').unique();
+        table.string('openai_api_key').unique();
         table.boolean('is_admin').notNullable().defaultTo(false);
         table.timestamp('created_at').defaultTo(db.fn.now());
         table.timestamp('updated_at').defaultTo(db.fn.now());

@@ -35,8 +35,6 @@ async function gpt4(req, res, next) {
   const { is_bot } = req.body.authorizations;
 
   try {
-    console.log({ path: req.path, slack_user_id, type, subtype })
-
     const DB = new Service.DB('gpteams');
     const user = await DB.users.get({ filters: { slack_user_id } });
 
@@ -149,7 +147,10 @@ async function gpt4(req, res, next) {
       })
     ).json();
 
-    const AI = new Service.AI({ conversation_id: conversation.id });
+    const AI = new Service.AI({
+      openai_api_key: user.openai_api_key,
+      conversation_id: conversation.id
+    });
     const response = await AI.chatgpt4(text)
     
     logger.info({ slack_user_id }, 'Slack ChatGPT Prompted.');
