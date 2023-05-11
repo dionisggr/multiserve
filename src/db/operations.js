@@ -17,8 +17,8 @@ async function createUsers({ db, app, apps }) {
         table.string('phone').unique();
         table.string('avatar').unique();
         table.string('slack_user_id').unique();
-        table.string('slack_team_id').unique();
-        table.string('openai_api_key').unique();
+        table.string('slack_team_id');
+        table.string('openai_api_key');
         table.boolean('is_admin').notNullable().defaultTo(false);
         table.timestamp('created_at').defaultTo(db.fn.now());
         table.timestamp('updated_at').defaultTo(db.fn.now());
