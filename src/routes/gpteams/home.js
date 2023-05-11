@@ -24,13 +24,27 @@ async function init(req, res, next) {
       return await register({ slack_user_id, openai_api_key });
     }
 
+    const existing = await service.users.get({ filters: { slack_user_id } });
+
     if (action_id === 'openai_api_key_modal') {
+      if (existing.openai_api_key) {
+        const body = {
+          user_id: slack_user_id,
+          view: {
+            type: 'home',
+            blocks: layouts.registered,
+          },
+        };
+
+        res.sendStatus(200);
+
+        return await sendToSlack({ body });
+      }
+
       await modal({ trigger_id, view: layouts.key, user_id: slack_user_id });
 
       return res.sendStatus(200);
     }
-
-    const existing = await service.users.get({ filters: { slack_user_id } });
 
     if (!existing) {
       await service.users.create({ data: { slack_user_id} });
