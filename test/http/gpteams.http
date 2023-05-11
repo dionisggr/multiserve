@@ -32,15 +32,56 @@ Content-Type: application/json
 ##### Do not execute these endpoints unless you know what you are doing
 
 ### Set Home Page (All Users)
+##### Change the "user_id" to yours (see .env file)
 POST https://slack.com/api/views.publish
 Authorization: Bearer {{$dotenv SLACK_GPTEAMS_DM_TOKEN}}
 Content-Type: application/json
 
 {
-  "user_id": "{{$dotenv SLACK_GPTEAMS_DIO_ID}}",  // Change to yours
+  "user_id": "{{$dotenv SLACK_GPTEAMS_DIO_ID}}",
   "view": {
     "type":"home",
     "blocks": [
+      {
+        "type": "section",
+        "block_id": "welcome_section",
+        "text": {
+          "type": "mrkdwn",
+          "text": ":wave:  *Welcome to GPTeams!*"
+        }
+      },
+      {
+        "type": "section",
+        "block_id": "whitespace_1",
+        "text": {
+          "type": "mrkdwn",
+          "text": " "
+        }
+      },
+      {
+        "type": "section",
+        "block_id": "gpteams_description",
+        "text": {
+          "type": "mrkdwn",
+          "text": "GPTeams is powered by OpenAI and ChatGPT, cutting-edge AI technologies designed to assist you in various tasks. Please note that the usage of these services is token-cost based, meaning you will need an OpenAI API Key to access them."
+        }
+      },
+      {
+        "type": "section",
+        "block_id": "whitespace_2",
+        "text": {
+          "type": "mrkdwn",
+          "text": " "
+        }
+      },
+      {
+        "type": "section",
+        "block_id": "api_key_info",
+        "text": {
+          "type": "mrkdwn",
+          "text": "If you don't have an OpenAI API Key, you can create one by visiting: <https://platform.openai.com/account/api-keys|https://platform.openai.com/account/api-keys>"
+        }
+      },
       {
         "type": "input",
         "block_id": "api_key_input",
@@ -68,6 +109,22 @@ Content-Type: application/json
               "text": "Submit"
             },
             "action_id": "submit_api_key"
+          }
+        ]
+      },
+      {
+        "type": "divider"
+      },
+      {
+        "type": "context",
+        "elements": [
+          {
+            "type": "mrkdwn",
+            "text": "Developed by Tec3, LLC :computer:"
+          },
+          {
+            "type": "mrkdwn",
+            "text": "<http://www.tec3llc.com|Visit our website>"
           }
         ]
       }

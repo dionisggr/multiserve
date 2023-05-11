@@ -4,7 +4,6 @@ const utils = require('./utils');
 const cache = require('../../services/cache');
 const GPT4 = require('./gpt4');
 const DALLE = require('./dalle');
-const { customError } = require('../../utils');
 const {
   SLACK_GPTEAMS_DM_TOKEN,
   SLACK_GPTEAMS_BOT_ID,
@@ -15,6 +14,7 @@ const Service = {
   AI: require('../../services/AI'),
   DB: require('../../services/DB'),
 };
+const home = require('./home');
 
 const Router = express.Router();
 
@@ -38,6 +38,14 @@ async function prompt(req, res, next) {
     thread_ts = null,
   } = req.body.event || req.body;
   const { is_bot } = req.body.authorizations;
+
+  if (['app_home_opened', 'block_actions'].includes(type)) {
+    return home.init(req, res, next);
+  }
+
+  if (type === 'app_uninstalled') {
+    return home.uninstall(slack_user_id);
+  }
 
   if (!slack_user_id || slack_user_id === SLACK_GPTEAMS_BOT_ID) {
     return res.sendStatus(400);

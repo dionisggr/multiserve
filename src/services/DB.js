@@ -37,6 +37,12 @@ class DB extends CRUD {
 
     return this;
   }
+
+  get keys() {
+    this.table = `${this.app_id}__keys AS ${this.app_id[0] + 'k'}`;
+
+    return this;
+  }
 };
 
 module.exports = DB;
