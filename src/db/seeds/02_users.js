@@ -1,6 +1,10 @@
 const uuid = require('uuid');
-const { ADMIN_EMAIL, ADMIN_PASSWORD } = require('../../config');
 const Service = require('../../services/DB');
+const {
+  ADMIN_EMAIL,
+  ADMIN_PASSWORD,
+  OPENAI_API_KEY
+} = require('../../config');
 
 const service = new Service();
 const apps = ['demo', 'fhp', 'gpteams', 'groupgpt'];
@@ -23,6 +27,7 @@ exports.seed = async function (db) {
         username: 'tec3',
         email: ADMIN_EMAIL,
         password: admin_password,
+        openai_api_key: OPENAI_API_KEY,
         is_admin: true,
       },
       {
@@ -31,6 +36,7 @@ exports.seed = async function (db) {
         email: 'dionisggr@gmail.com',
         slack_user_id: 'U038FD2070X',
         password: admin_password,
+        openai_api_key: OPENAI_API_KEY,
         is_admin: true,
       },
       {
@@ -39,6 +45,7 @@ exports.seed = async function (db) {
         email: 'lile7886@gmail.com',
         slack_user_id: 'U03AW9H3QFM',
         password: admin_password,
+        openai_api_key: OPENAI_API_KEY,
         is_admin: true,
       },
       {
@@ -47,6 +54,7 @@ exports.seed = async function (db) {
         email: 'briancarter340@gmail.com',
         slack_user_id: 'U038Z9GQG6R',
         password: admin_password,
+        openai_api_key: OPENAI_API_KEY,
         is_admin: true,
       },
       {
@@ -55,6 +63,7 @@ exports.seed = async function (db) {
         email: 'gpt@tec3org.com',
         slack_user_id: 'U0563TVRQKG',
         password: admin_password,
+        openai_api_key: OPENAI_API_KEY,
         is_admin: false,
       },
       {
@@ -63,6 +72,7 @@ exports.seed = async function (db) {
         email: 'gpt4@tec3org.com',
         slack_user_id: 'U056W5GAN9Z',
         password: admin_password,
+        openai_api_key: OPENAI_API_KEY,
         is_admin: false,
       },
       {
@@ -70,6 +80,7 @@ exports.seed = async function (db) {
         username: 'demo',
         email: 'demo@tec3org.com',
         password: demo_password,
+        openai_api_key: OPENAI_API_KEY,
         is_admin: false,
       },
     ]);
