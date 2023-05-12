@@ -56,7 +56,10 @@ async function prompt(req, res, next) {
       return res.sendStatus(404);
     }
     
-    if (!user.openai_api_key) {
+    if (
+      (type !== 'app_mention' || channel === SLACK_GPTEAMS_BOT_CHANNEL)
+      && !user.openai_api_key
+    ) {
       await fetch('https://slack.com/api/chat.postEphemeral', {
         method: 'POST',
         headers: {

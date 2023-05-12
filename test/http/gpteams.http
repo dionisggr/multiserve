@@ -38,7 +38,7 @@ Authorization: Bearer {{$dotenv SLACK_GPTEAMS_DM_TOKEN}}
 Content-Type: application/json
 
 {
-  "user_id": "{{$dotenv SLACK_GPTEAMS_DIO_ID}}",
+  "user_id": "{{$dotenv SLACK_GPTEAMS_LILI_ID}}",
   "view":   {
     "type":"home",
     "blocks": [
