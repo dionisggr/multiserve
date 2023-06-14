@@ -4,9 +4,9 @@ const instructions = require('./instructions');
 const routes = { AI: require('../AI') };
 
 const Router = express.Router()
-  .post('/prompt/:format?', prompt);
+  .post('/enhance/:format?', enhance);
 
-async function prompt(req, res, next) {
+async function enhance(req, res, next) {
   const { format = 'paragraph' } = req.params;
   const { prompt } = req.body;
 

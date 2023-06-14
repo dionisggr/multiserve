@@ -5,7 +5,7 @@ const tableName = 'organizations';
 exports.up = async function (db) {
   await db.schema.dropTableIfExists(tableName);
   await db.schema.createTable(tableName, function (table) {
-    table.string('id').primary().unique();
+    table.string('id').primary();
     table.string('name').unique();
     table.string("created_at").notNullable().defaultTo(db.fn.now());
     table.string('archived_at').unique();
