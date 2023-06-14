@@ -74,7 +74,7 @@ admin
   .get('/secrets', secrets.reveal)
   .get('/:app_id/users', users.getAll)
   .use('/apps', express.Router()
-    .get('/', apps.getAll)
-    .get('/:id', apps.get))
+    .get('/:id', apps.get)
+    .get('/', apps.getAll))
 
 module.exports = { public, authorized, authenticated, admin };

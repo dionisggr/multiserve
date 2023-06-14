@@ -92,7 +92,6 @@ async function reauthorize(req, res, next) {
 }
 
 async function logout(req, res, next) {
-  console.log('runs');
   try {
     const token = req.get('Authorization')?.split(' ')[1];
     const { user_id, app_id } = jwt.verify(token, JWT_ACCESS_SECRET);

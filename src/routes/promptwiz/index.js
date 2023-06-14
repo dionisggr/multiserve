@@ -1,28 +1,23 @@
 const express = require('express');
-const Service = require('../../services/AI');
-const { logger } = require('../../utils');
+const { customError, logger } = require('../../utils');
 const instructions = require('./instructions');
+const routes = { AI: require('../AI') };
 
-const Router = express.Router();
+const Router = express.Router()
+  .post('/prompt/:format?', prompt);
 
-async function enhance(req, res, next) {
-  const { format } = req.params;
-  const { prompt = req.params.prompt, ...adjustments } = req.body;
-  
-  try {
-    const AI = new Service(adjustments);
-    const instruction = instructions[format];
-    const enhanced = await AI.gpt(instruction + prompt);
+async function prompt(req, res, next) {
+  const { format = 'paragraph' } = req.params;
+  const { prompt } = req.body;
 
-    logger.info({ user_id: req.user.id }, 'PromptWiz prompted.');
-
-    res.json({ prompt: enhanced });
-  } catch (error) {
-    next(error);
+  if (['dalle', 'whisper'].includes(req.query.model.toLowerCase())) {
+    return next(customError('Invalid model.', 400));
   }
-}
 
-Router
-  .post('/:format/:prompt?', enhance)
+  req.body.prompt = instructions[format] + prompt;
+
+  logger.info({ user_id: req.user.id }, 'PromptWiz prompted.');
+  routes.AI.chatgpt(req, res, next);
+}
 
 module.exports = Router;

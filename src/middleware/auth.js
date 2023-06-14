@@ -26,7 +26,6 @@ function user(req, res, next) {
 };
 
 async function admin(req, res, next) {
-  console.log('runs')
   const token = req.get('Authorization')?.split(' ')[1];
   const { email, password } = req.body;
 

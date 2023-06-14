@@ -3,8 +3,6 @@ const { logger } = require('../../utils');
 const tableName = 'apps';
 
 exports.up = async function (db) {
-  console.log('runs')
-  
   await db.schema.dropTableIfExists(tableName);
   await db.schema.createTable(tableName, function (table) {
     table.string('id').primary().unique();
