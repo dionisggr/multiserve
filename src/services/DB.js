@@ -43,6 +43,12 @@ class DB extends CRUD {
 
     return this;
   }
+
+  get refreshTokens() {
+    this.table = `${this.app_id}__refresh_tokens AS ${this.app_id[0] + 'rt'}`;
+
+    return this;
+  }
 };
 
 module.exports = DB;

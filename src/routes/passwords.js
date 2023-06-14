@@ -1,6 +1,6 @@
 const Service = require('../services/DB');
 const { customError } = require('../utils');
-const { logger } = require('../config');
+const { logger } = require('../utils');
 const schemas = require('../schemas');
 
 async function reset(req, res, next) {
@@ -8,7 +8,7 @@ async function reset(req, res, next) {
     const { app_id } = req.params;
     const { email } = req.body;
 
-    await schemas.users.existing.validateAsync({ email });
+    await schemas.users.validateAsync({ email });
     await schemas.apps.validateAsync({ app_id });
   
     const service = new Service(app_id);
@@ -34,7 +34,7 @@ async function verify(req, res, next) {
     const { email } = req.body;
     req.body.app_id = app_id;
 
-    await schemas.users.existing.validateAsync({ email });
+    await schemas.users.validateAsync({ email });
     await schemas.apps.validateAsync({ app_id });
 
     const service = new Service(app_id);

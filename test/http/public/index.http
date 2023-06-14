@@ -30,9 +30,6 @@ content-type: application/json
 ### Service: Generate random encryption
 GET {{baseUrl}}/utils/encryption
 
-### Service: Encrypt value (Param)
-POST {{baseUrl}}/utils/encrypt/:value
-
 ### Service: Encrypt values (Body)
 POST {{baseUrl}}/utils/encryption
 content-type: application/json

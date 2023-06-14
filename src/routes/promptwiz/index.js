@@ -1,6 +1,6 @@
 const express = require('express');
 const Service = require('../../services/AI');
-const { logger } = require('../../config');
+const { logger } = require('../../utils');
 const instructions = require('./instructions');
 
 const Router = express.Router();

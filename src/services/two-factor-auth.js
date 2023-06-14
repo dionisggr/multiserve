@@ -1,5 +1,5 @@
 const uuid = require('uuid');
-const { logger } = require('../config');
+const { logger } = require('../utils');
 const { customError, isBrowserRequest } = require('../utils');
 const service = { email: require('./email') };
 

@@ -1,10 +1,8 @@
 const { logger } = require('../../utils');
 
-const tableName = 'apps';
+const tableName = 'organizations';
 
 exports.up = async function (db) {
-  console.log('runs')
-  
   await db.schema.dropTableIfExists(tableName);
   await db.schema.createTable(tableName, function (table) {
     table.string('id').primary().unique();
@@ -12,6 +10,7 @@ exports.up = async function (db) {
     table.string("created_at").notNullable().defaultTo(db.fn.now());
     table.string('archived_at').unique();
     table.string('logo').unique();
+    table.string('app_id').references('id').inTable('apps').onDelete('CASCADE');
   }).catch(error => logger.error(error, 'Error creating table.'))
 
   logger.info(`Table ${tableName} created successfully!`);

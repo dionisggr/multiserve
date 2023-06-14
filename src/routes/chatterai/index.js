@@ -1,6 +1,6 @@
 const express = require('express');
 const { customError } = require('../../utils');
-const { logger } = require('../../config');
+const { logger } = require('../../utils');
 const db = require('../../db');
 const cache = require('../../services/cache');
 const Service = require('../../services/DB');

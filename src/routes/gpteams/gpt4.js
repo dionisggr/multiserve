@@ -4,8 +4,8 @@ const {
   SLACK_GPT4TEAMS_DM_TOKEN,
   SLACK_GPT4TEAMS_BOT_ID,
   SLACK_GPTEAMS_BOT_ID,
-  logger,
 } = require('../../config');
+const { logger } = require('../../utils');
 const cache = require('../../services/cache');
 const Service = {
   AI: require('../../services/AI'),

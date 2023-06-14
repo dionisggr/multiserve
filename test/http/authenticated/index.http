@@ -1,6 +1,7 @@
 @baseUrl = http://localhost:8000
 
 ### Login as USER (Authentication)
+# @name login
 POST {{baseUrl}}/demo/login
 Authorization: Bearer {{$dotenv API_KEY}}
 Content-Type: application/json
@@ -10,19 +11,21 @@ Content-Type: application/json
   "password": "password"
 }
 
-##### All of the following require Login above once first
+### Token definition
+@token = {{login.response.body.accessToken.$}}
+#####
 
-### Logout (Destroy session)
-POST {{baseUrl}}/demo/logout
-Authorization: Bearer {{$dotenv API_KEY}}
+
+##### The following endpoints require Login first (above)
+
 
 ### Find user
 GET {{baseUrl}}/demo/users/demo
-Authorization: Bearer {{$dotenv API_KEY}}
+Authorization: Bearer {{token}}
 
 ### Edit user
 PATCH {{baseUrl}}/demo/users/demo
-Authorization: Bearer {{$dotenv API_KEY}}
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -30,5 +33,10 @@ Content-Type: application/json
 }
 
 ### Delete user
+##### Will require re-seeding to get the user back
 DELETE {{baseUrl}}/demo/users/demo
-Authorization: Bearer {{$dotenv API_KEY}}
+Authorization: Bearer {{token}}
+
+### Logout
+POST {{baseUrl}}/demo/logout
+Authorization: Bearer {{token}}

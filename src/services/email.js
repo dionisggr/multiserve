@@ -1,4 +1,5 @@
-const { ADMIN_EMAIL, SENDGRID_API_KEY, logger } = require('../config');
+const { ADMIN_EMAIL, SENDGRID_API_KEY } = require('../config');
+const { logger } = require('../utils');
 
 async function send({ app, email, code }) {
   const sendgrid = require('@sendgrid/mail');

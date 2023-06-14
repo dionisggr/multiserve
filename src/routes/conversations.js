@@ -1,23 +1,24 @@
 const { customError } = require('../utils');
 const Service = require('../services/DB');
-const { logger } = require('../config');
+const { logger } = require('../utils');
 const schemas = require('../schemas');
 const db = require('../db');
 
 async function create(req, res, next) {
+  const { user_id } = req.auth;
   const { app_id } = req.params;
   const data = req.body;
 
   try {
-    await schemas.conversations.new.validateAsync(data);
+    await schemas.conversations.new.validateAsync(
+      { ...data, app_id }
+    );
+
+    data.created_by = user_id;
 
     const service = new Service(app_id);
     const conversation = await service.conversations.create({ data });
-    const user_id = req.isAuthenticated() && req.user.id;
-    const response = {
-      conversation_id: conversation.id,
-      user_id
-    };
+    const response = { conversation };
 
     logger.info(response, 'Conversation successfully created.');
 
@@ -28,21 +29,22 @@ async function create(req, res, next) {
 }
 
 async function get(req, res, next) {
-  const { app_id, id: conversation_id } = req.params;
+  const { organization_id, user_id } = req.auth;
+  const { conversation_id, app_id } = req.params;
 
   try {
-    await schemas.conversations.existing.validateAsync({ conversation_id });
+    await schemas.conversations.existing.validateAsync(
+      { conversation_id, app_id }
+    );
 
-    const service = new Service(app_id);
-    const conversation = await service.conversations.get({ filters: { id: conversation_id } });
+    const conversation = await db(`${app_id}__conversations`)
+      .where({ id: conversation_id, created_by: user_id })
+      .orWhere({ id: conversation_id, organization_id })
+      .first();
 
     if (!conversation) {
-      return next(customError(`Failed to find conversation: ${conversation_id}`, 404));
-    }
-
-    if (!req.user.is_admin && req.user.id !== conversation.created_by) {
       return next(
-        customError(`Unauthorized conversation (${conversation_id}) request from ${req.user.id}.`, 404)
+        customError(`Failed to find conversation: ${conversation_id}`, 404)
       );
     }
 
@@ -55,29 +57,25 @@ async function get(req, res, next) {
 }
 
 async function getAll(req, res, next) {
+  const { organization_id, user_id } = req.auth;
   const { app_id } = req.params;
 
   try {
-
-    const service = new Service(app_id);
-    const conversations = await service.conversations.get({ multiple: true });
-
-    if (!conversations || !conversations.length) {
-      return next(customError(`Failed to find users.`, 404));
+    await schemas.apps.validateAsync({ app_id });
+    
+    const filters = (organization_id) 
+      ? { organization_id }
+      : { created_by: user_id };
+    const conversations = await db(`${app_id}__conversations`)
+      .where(filters)
+    
+    if (conversations.length) {
+      logger.info(conversations.map(({ id }) => id),
+        'Conversations found.'
+      );
+    } else {
+      logger.info('No conversations found.');
     }
-
-    if (!req.user.is_admin) {
-      if (!conversations.some(({ created_by }) => created_by === req.user.id)) {
-        return next(
-          customError(
-            `Unauthorized message (${message_id}) request from ${req.user.id}.`,
-            404
-          )
-        );
-      }
-    }
-
-    logger.info(conversations, 'Conversations found.');
 
     return res.json(conversations);
   } catch (error) {
@@ -86,16 +84,26 @@ async function getAll(req, res, next) {
 }
 
 async function update(req, res, next) {
-  try {
-    const { app_id, id: conversation_id } = req.params;
+  const { user_id } = req.auth;
+  const { conversation_id, app_id } = req.params;
 
-    await schemas.conversations.existing.validateAsync({ conversation_id, ...req.body });
+  try {
+    await schemas.conversations.existing.validateAsync(
+      { conversation_id, app_id, ...req.body }
+    );
 
     const service = new Service(app_id);
-    const data = { ...req.body, updated_at: db.fn.now() };
+
     const conversation = await service.conversations.update({
-      filters: { id: conversation_id }, data,
+      filters: { id: conversation_id, created_by: user_id },
+      data: { ...req.body, updated_at: db.fn.now() },
     });
+
+    if (!conversation) {
+      return next(
+        customError(`Could not update conversation: ${conversation_id}`, 404)
+      );
+    }
 
     logger.info({ ...req.params, ...req.body }, 'Conversation updated.');
 
@@ -106,21 +114,31 @@ async function update(req, res, next) {
 }
 
 async function remove(req, res, next) {
+  const { user_id } = req.auth;
+  const { conversation_id, app_id } = req.params;
+  
   try {
-    const { app_id, id: conversation_id } = req.params;
-
-    await schemas.conversations.existing.validateAsync({ conversation_id });
+    await schemas.conversations.existing.validateAsync(
+      { conversation_id, app_id }
+    );
 
     const service = new Service(app_id);
     const conversation = await service.conversations.get({
-      filters: { id: conversation_id }
+      filters: { id: conversation_id, created_by: user_id }
     });
 
     if (!conversation) {
-      return next(customError(`Conversation does not exist: ${conversation_id}`, 404));
+      return next(
+        customError(`Conversation does not exist: ${conversation_id}`, 404)
+      );
     }
 
-    await service.conversations.remove({ filters: { id: conversation_id } });
+    await service.conversations.remove({
+      filters: {
+        id: conversation_id,
+        created_by: user_id
+      }
+    });
 
     logger.info(conversation, 'Conversation deleted permanently.');
 

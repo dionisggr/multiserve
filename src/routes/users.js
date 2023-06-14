@@ -1,17 +1,16 @@
 const { isBrowserRequest } = require('../utils');
-const { customError } = require('../utils');
+const { customError, logger } = require('../utils');
 const Service = require('../services/DB');
-const { logger } = require('../config');
 const schemas = require('../schemas');
 const db = require('../db');
 
 async function create(req, res, next) {
+  const { app_id } = req.params;
   const data = req.body;
   const { email } = data;
-  const { app_id } = req.params;
 
   try {
-    await schemas.users.new.validateAsync({ ...data, app_id });
+    await schemas.signup.validateAsync({ ...data, app_id });
 
     const service = new Service(app_id);
     const isDuplicate = await service.users.get({ filters: { email } });
@@ -39,9 +38,13 @@ async function create(req, res, next) {
 
     logger.info({ id: user.id, email, app_id }, 'User successfully registered to app.');
 
-    return res.status(201).json(user);
+    if (req.path.includes('/signup')) {
+      return next();
+    }
+    
+    res.status(201).json(user);
   } catch (error) {
-    return next(error)
+    next(error)
   }
 }
 
@@ -49,7 +52,7 @@ async function get(req, res, next) {
   const { user_id, app_id } = req.params;
 
   try {
-    await schemas.users.existing.validateAsync({ user_id });
+    await schemas.users.validateAsync({ user_id });
     await schemas.apps.validateAsync({ app_id });
 
     const service = new Service(app_id);
@@ -59,9 +62,9 @@ async function get(req, res, next) {
       return next(customError(`Failed to find user: ${user_id}`, 404));
     }
 
-    if (!req.user.is_admin && req.user.id !== user_id) {
+    if (!req.auth.is_admin && req.auth.user_id !== user_id) {
       return next(
-        customError(`Unauthorized user request from ${user_id} for ${user.id}.`, 404)
+        customError(`Unauthorized user request from ${user_id} for ${user.id}.`, 400)
       );
     }
 
@@ -100,13 +103,16 @@ async function getAll(req, res, next) {
 
 async function update(req, res, next) {
   try {
-    const { user_id, app_id } = req.params;
+    const { user_id } = req.auth;
+    const { app_id } = req.params;
 
-    await schemas.users.existing.validateAsync({ user_id, ...req.body });
+    await schemas.users.validateAsync({ user_id, ...req.body });
     await schemas.apps.validateAsync({ app_id });
 
+    console.log({ body: req.body})
+
     const service = new Service(app_id);
-    const data = { ...req.body, updated_at: db.fn.now() };
+    const data = { updated_at: db.fn.now() };
     const user = await service.users.update({
       filters: { id: user_id },
       data,
@@ -126,13 +132,14 @@ async function remove(req, res, next) {
   try {
     const { user_id, app_id } = req.params;
 
-    await schemas.users.existing.validateAsync({ user_id });
+    await schemas.users.validateAsync({ user_id });
     await schemas.apps.validateAsync({ app_id });
 
     const service = new Service(app_id);
     const user = await service.users.get({ filters: { id: user_id } })
 
     await service.users.remove({ filters: { id: user_id } });
+    await service.refreshTokens.remove({ filters: { user_id } });
 
     logger.info(user, 'User deleted permanently.');
 

@@ -1,9 +1,5 @@
 require("dotenv").config();
 
-const session = require('express-session');
-const RedisStore = require('connect-redis').default;
-const redisClient = require('redis').createClient();
-
 const {
   PORT,
   NODE_ENV,
@@ -12,8 +8,8 @@ const {
   PROD_DB_URL,
   ADMIN_EMAIL,
   ADMIN_PASSWORD,
-  SENDGRID_API_KEY,
   OPENAI_API_KEY,
+  SENDGRID_API_KEY,
   SLACK_GPTEAMS_DM_TOKEN,
   SLACK_GPTEAMS_ADMIN_TOKEN,
   SLACK_GPTEAMS_BOT_ID,
@@ -26,40 +22,14 @@ const {
   STATUSPAGE_GPTEAMS_ID,
   STATUSPAGE_API_KEY,
   STATUSPAGE_URL,
+  JWT_ACCESS_SECRET,
+  JWT_REFRESH_SECRET,
 } = process.env;
-
-if (NODE_ENV === 'development') {
-  (async () => await redisClient.connect())();
-}
-
-const auth = {
-  sessionSecret: API_KEY,
-  usernameField: "email",
-  passwordField: "password",
-  cookieMaxAge: 3600000, // 1 hour,
-};
-const sessionData = session({
-  store: new RedisStore({ client: redisClient }),
-  secret: API_KEY,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: NODE_ENV === "production",
-    maxAge: auth.cookieMaxAge,
-  },
-});
-const logger = require("pino")({
-  transport: {
-    target: 'pino-pretty',
-    options: {
-      colorize: true,
-    }
-  },
-});
 const cors = {
   origin: [
     "http://localhost:3000",
     "https://*.vercel.app",
+    "https://*.railway.app",
   ],
   credentials: true,
 };
@@ -67,20 +37,20 @@ const helmet = {
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      imgSrc: ["'self'", "img.example.com"],
-      scriptSrc: ["'self'", "scripts.example.com"],
     },
   },
-  expectCt: true,
-  frameguard: { action: 'deny' },
+  hsts: {
+    maxAge: 60 * 60 * 24 * 365,
+    includeSubDomains: true,
+    preload: true
+  },
   hidePoweredBy: true,
-  hsts: { maxAge: 60 * 60 * 24 * 365, includeSubDomains: true, preload: true },
-  ieNoOpen: true,
   noSniff: true,
-  referrerPolicy: { policy: 'same-origin' },
   xssFilter: true,
 }
-const morgan = (NODE_ENV === 'production') ? 'tiny' : 'common';
+const morgan = (NODE_ENV === 'production')
+  ? 'tiny'
+  : 'common';
 
 module.exports = {
   PORT,
@@ -90,8 +60,8 @@ module.exports = {
   PROD_DB_URL,
   ADMIN_EMAIL,
   ADMIN_PASSWORD,
-  SENDGRID_API_KEY,
   OPENAI_API_KEY,
+  SENDGRID_API_KEY,
   SLACK_GPTEAMS_DM_TOKEN,
   SLACK_GPTEAMS_ADMIN_TOKEN,
   SLACK_GPTEAMS_BOT_ID,
@@ -104,10 +74,9 @@ module.exports = {
   STATUSPAGE_GPTEAMS_ID,
   STATUSPAGE_API_KEY,
   STATUSPAGE_URL,
-  sessionData,
+  JWT_ACCESS_SECRET,
+  JWT_REFRESH_SECRET,
   helmet,
   morgan,
   cors,
-  logger,
-  auth,
 };

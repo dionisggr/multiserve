@@ -9,8 +9,8 @@ const {
   SLACK_GPTEAMS_DM_TOKEN,
   SLACK_GPTEAMS_BOT_ID,
   SLACK_GPTEAMS_BOT_CHANNEL,
-  logger,
 } = require('../../config');
+const { logger } = require('../../utils');
 const Service = {
   AI: require('../../services/AI'),
   DB: require('../../services/DB'),

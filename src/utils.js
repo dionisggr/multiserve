@@ -1,3 +1,14 @@
+const pino = require("pino");
+
+const logger = pino({
+  transport: {
+    target: 'pino-pretty',
+    options: {
+      colorize: true,
+    }
+  },
+});
+
 function isBrowserRequest(req) {
   const userAgent = req.headers && req.headers['user-agent'];
   const localRuntimes = ['PostmanRuntime', 'axios', 'vscode-restclient'];
@@ -23,4 +34,5 @@ module.exports = {
   isBrowserRequest,
   isAdminRequest,
   customError,
+  logger,
 };

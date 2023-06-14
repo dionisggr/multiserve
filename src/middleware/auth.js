@@ -1,64 +1,53 @@
-const { NODE_ENV, API_KEY } = require('../config');
+const jwt = require('jsonwebtoken');
+const { API_KEY, JWT_ACCESS_SECRET } = require('../config');
 const { customError } = require('../utils');
-const schemas = require('../schemas');
-const Service = require('../services/DB');
+const db = require('../db');
 
-const errors = {
-  authentication: {
-    development: 'Missing or incorrect credentials, or expired session.',
-    production: 'Authentication failed.',
-  },
-  authorization: {
-    development: 'Missing or invalid API Key.',
-    production: 'Unauthorized access.',
+function app(req, res, next) {
+  const apiKey = req.get('Authorization')?.split(' ')[1];
+
+  if (req.path === 'login' && (!apiKey || apiKey !== API_KEY)) {
+    return next(customError('Missing or invalid API key.', 401));
   }
-};
 
-const session = {
-  minutesLeft: async ({ cookie }) => {
-    const currentTime = new Date().getTime();
-    const expirationTime = cookie._expires && new Date(cookie._expires).getTime();
-    const diff = (currentTime - expirationTime) / (1000 * 60);
-
-    return diff;
-  }
+  next();
 }
 
-function authorization(req, res, next) {
-  const auth = req.get('Authorization');
+function user(req, res, next) {
+  const token = req.get('Authorization')?.split(' ')[1];
 
-  if (!auth || !auth.includes(API_KEY)) {
-    return next(customError(errors.authorization[NODE_ENV], 401));
+  try {
+    req.auth = jwt.verify(token, JWT_ACCESS_SECRET);
+
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
+async function admin(req, res, next) {
+  console.log('runs')
+  const token = req.get('Authorization')?.split(' ')[1];
+  const { email, password } = req.body;
+
+  if (token) {
+    req.auth = jwt.decode(token, JWT_ACCESS_SECRET);
+
+    if (!req.auth?.is_admin) {
+      return next(customError('Unauthorized admin access.', 401));
+    }
+  }  else if (email && password) {
+    const user = await db(`${app_id}__users`).where({ email }).first();
+    const match = user && await bcrypt.compare(password, user.password);
+
+    if (!match) {
+      return next(customError('Missing or invalid credentials.', 401));
+    }
+  } else {
+    return next(customError('Missing or invalid admin token or credentials.', 401));
   }
 
   next();
 };
 
-async function authentication(req, res, next) {
-  if (!req.isAuthenticated()) {
-    return next(customError(errors.authentication[NODE_ENV], 401));
-  }
-
-  if (session.minutesLeft(req.session) < 30) {
-    await req.session.regenerate();
-  }
-
-  next();
-};
-
-function admin(req, res, next) {
-  const { user: authenticated } = req;
-
-  if (!authenticated.is_admin) {
-    return next(customError(errors.authentication[NODE_ENV], 401));
-  }
-
-  next();
-};
-
-module.exports = {
-  session,
-  admin,
-  authorization,
-  authentication,
-};
+module.exports = { app, user, admin };

@@ -4,8 +4,8 @@ const {
   BACKBLAZE_APPLICATION_KEY_ID,
   BACKBLAZE_APPLICATION_KEY,
   BACKBLAZE_BUCKET_ID,
-  logger,
 } = require('../config');
+const { logger } = require('../utils');
 
 const b2 = new B2({
   applicationKeyId: BACKBLAZE_APPLICATION_KEY_ID,

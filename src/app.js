@@ -1,33 +1,25 @@
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
+const { xss } = require('express-xss-sanitizer');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const config = require('./config');
 const routers = require('./routes');
-const passport = require('./middleware/passport');
-const errorHandler = require('./middleware/error-handler');
-const { xss } = require('express-xss-sanitizer');
-const backupScheduler = require('./services/cron');
+const middleware = {
+  errorHandler: require('./middleware/error-handler'),
+};
 
-
-// Initialize
+// Initialize app
 const app = express();
-
-// Session-based authentication
-app.use(
-  config.sessionData,
-  passport.initialize(),
-  passport.session(),
-);
 
 // Middleware
 app.use(
   helmet(config.helmet),
+  cors(config.cors),
   bodyParser.urlencoded({ extended: true }),
   bodyParser.json(),
   xss(),
-  cors(config.cors),
   morgan(config.morgan),
 );
 
@@ -35,11 +27,9 @@ app.use(
 app.use(routers.public);
 app.use(routers.authorized);
 app.use(routers.authenticated);
+app.use(routers.admin)
 
 // Error handling
-app.use(errorHandler);
-
-// Backup handler
-backupScheduler.start();
+app.use(middleware.errorHandler);
 
 module.exports = app;

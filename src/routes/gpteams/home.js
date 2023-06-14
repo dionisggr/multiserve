@@ -3,7 +3,7 @@ const fetch = require('node-fetch');
 const layouts = require('./layouts');
 const { customError } = require('../../utils');
 const passwords = require('../../services/passwords');
-const { logger } = require('../../config');
+const { logger } = require('../../utils');
 const { SLACK_GPTEAMS_DM_TOKEN } = require('../../config');
 
 async function init(req, res, next) {

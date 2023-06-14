@@ -1,0 +1,34 @@
+@baseUrl = http://localhost:8000
+
+### Login as USER (Authentication)
+# @name login
+POST {{baseUrl}}/demo/login
+Authorization: Bearer {{$dotenv API_KEY}}
+Content-Type: application/json
+
+{
+  "email": "demo@tec3org.com",
+  "password": "password"
+}
+
+### Token definition
+@accessToken = {{login.response.body.accessToken.$}}
+@refreshToken = {{login.response.body.refreshToken.$}}
+
+### Reauthorize (Re-Authentication)
+POST {{baseUrl}}/demo/reauthorize
+Authorization: Bearer {{refreshToken}}
+
+### Logout
+POST {{baseUrl}}/demo/logout
+Authorization: Bearer {{accessToken}}
+
+### Sign-Up (Create user)
+POST {{baseUrl}}/demo/signup
+Authorization: Bearer {{$dotenv API_KEY}}
+Content-Type: application/json
+
+{
+  "email": "{{$guid}}@example.com",
+  "password": "password"
+}

@@ -1,8 +1,7 @@
-const express = require('express');
 const { customError } = require('../utils');
 const Service = require('../services/DB');
 const schemas = require('../schemas');
-const { logger } = require('../config');
+const { logger } = require('../utils');
 
 async function get(req, res, next) {
   const { id } = req.params;

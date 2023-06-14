@@ -1,6 +1,6 @@
 const cron = require('node-cron');
 const { exec } = require('child_process');
-const { logger } = require('../config');
+const { logger } = require('../utils');
 const backblaze = require('./backblaze');
 const cache = require('./cache');
 

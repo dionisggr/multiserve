@@ -9,10 +9,8 @@ function randomWord() {
 }
 
 async function hash(password) {
-  if (!password) password = randomWord();
-
   const saltRounds = 10;
-  const hashed = await bcrypt.hash(password, saltRounds);
+  const hashed = await bcrypt.hash(password || randomWord(), saltRounds);
 
   return hashed;
 }
@@ -43,8 +41,8 @@ function decrypt(value, secret) {
   return decrypted;
 }
 
-function validate({ client: clientEncrypted, server: serverHashed }) {
-  const isMatch = bcrypt.compare(clientEncrypted, serverHashed);
+async function validate({ client: clientEncrypted, server: serverHashed }) {
+  const isMatch = await bcrypt.compare(clientEncrypted, serverHashed);
 
   return isMatch;
 }

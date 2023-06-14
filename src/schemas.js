@@ -1,72 +1,90 @@
 const Joi = require('joi');
 
+// Common
+const uuid = Joi.string().guid({ version: 'uuidv4' });
+const id = Joi.alternatives().try(uuid, Joi.string());
+const email = Joi.string().email();
+const username = Joi.string();
+const password = Joi.string().min(8).max(64);
+const app_id = Joi.string().required();
+const is_archived = Joi.boolean();
+const created_at = Joi.date().iso();
+const updated_at = Joi.date().iso();
+const lastLogin = Joi.date().iso();
+const is_admin = Joi.boolean();
+
 const schemas = {
-  users: {
-    new: Joi.object({
-      email: Joi.string().email().required(),
-      password: Joi.string().min(8).max(64).required(),
-      app_id: Joi.string().required(),
-    }),
-    existing: Joi.object({
-      id: Joi.alternatives().try(
-        Joi.string().guid({ version: 'uuidv4' }),
-        Joi.string()
-      ),
-      user_id: Joi.alternatives().try(
-        Joi.string().guid({ version: 'uuidv4' }),
-        Joi.string()
-      ),
-      username: Joi.string().allow(null),
-      email: Joi.string().email(),
-      password: Joi.string().min(8).max(64),
-      is_admin: Joi.boolean(),
-      created_at: Joi.date().iso(),
-      updated_at: Joi.date().iso(),
-      last_login: Joi.date().iso(),
-      avatar: Joi.string()
-        .allow(null)
-        .uri({ scheme: ['http', 'https'] }),
-    }).xor('id', 'user_id', 'email'),
-  },
+  login: Joi.object({ 
+    email,
+    username,
+    password: password.required(),
+    app_id: app_id.required(),
+  }).xor('username', 'email'),
+  signup: Joi.object({
+    username: username,
+    email: email.required(),
+    password: password.required(),
+    app_id: app_id.required(),
+    first_name: Joi.string().min(2).max(64),
+    last_name: Joi.string().min(2).max(64),
+    avatar: Joi.string().uri({ scheme: ['http', 'https'] }),
+    is_admin,
+  }),
   apps: Joi.object({
-    id: Joi.string(),
-    app_id: Joi.string(),
     name: Joi.string(),
-    is_archived: Joi.boolean(),
-    created_at: Joi.date().iso(),
-    updated_at: Joi.date().iso(),
+    id,
+    app_id,
+    is_archived,
+    created_at,
+    updated_at,
   }).xor('id', 'app_id'),
+  users: Joi.object({
+    avatar: Joi.string().uri({ scheme: ['http', 'https'] }),
+    user_id: id,
+    id,
+    username,
+    email,
+    password,
+    is_admin,
+    created_at,
+    updated_at,
+    lastLogin,
+  }).xor('id', 'user_id', 'email'),
   conversations: {
     new: Joi.object({
-      title: Joi.string().required(),
-      created_by: Joi.string().required(),
+      title: Joi.string(),
+      type: Joi.string().valid('single', 'group'),
+      app_id: app_id.required(),
+      created_by: id,
     }),
     existing: Joi.object({
-      id: Joi.string().guid({ version: 'uuidv4' }),
-      conversation_id: Joi.string().guid({ version: 'uuidv4' }),
       title: Joi.string(),
-      created_by: Joi.string(),
-      type: Joi.string().valid('single', 'group'),
-      updated_at: Joi.date().iso(),
       archived_at: Joi.date().iso(),
+      app_id: app_id.required(),
+      conversation_id: id,
+      created_by: id,
+      id,
+      updated_at,
     }).xor('id', 'conversation_id'),
   },
   messages: {
     new: Joi.object({
-      conversation_id: Joi.string().guid({ version: 'uuidv4' }).required(),
-      archived_by: Joi.string().guid({ version: 'uuidv4' }),
       content: Joi.string().required(),
-      user_id: Joi.string().required(),
+      conversation_id: id.required(),
+      user_id: id.required(),
+      app_id: app_id.required(),
     }),
     existing: Joi.object({
-      id: Joi.string().guid({ version: 'uuidv4' }),
-      message_id: Joi.string().guid({ version: 'uuidv4' }),
-      conversation_id: Joi.string().guid({ version: 'uuidv4' }),
-      archived_by: Joi.string().guid({ version: 'uuidv4' }),
       content: Joi.string(),
-      user_id: Joi.string(),
+      archived_at: Joi.date().iso(),
+      app_id: app_id.required(),
+      conversation_id: id,
+      user_id: id,
+      message_id: id,
+      id,
+      updated_at,
     }).xor('id', 'message_id'),
-  },
+  }
 };
 
 module.exports = schemas;

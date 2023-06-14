@@ -1,16 +1,10 @@
-const passport = require('../middleware/passport');
 const db = require("../db");
 
 async function healthCheck(req, res, next) {
   try {
     const dbQuery = await db.raw('SELECT 1+1 as result');
-    const hasStrategies = passport._strategies && Object.keys(passport._strategies).length > 0;
-    const hasSerializationFunctions =
-      typeof passport.serializeUser === 'function' &&
-      typeof passport.deserializeUser === 'function';
     const health = {
       API: diagnose(true),
-      auth: diagnose(hasStrategies && hasSerializationFunctions),
       database: diagnose(dbQuery && dbQuery.rows && dbQuery.rows[0].result === 2),
     }
     const isHealthy = (Object.values(health)).every(val => val === diagnose(true));

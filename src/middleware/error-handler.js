@@ -1,4 +1,4 @@
-const { logger } = require('../config');
+const { logger } = require('../utils');
 
 function errorHandler(error, req, res, next) {
   const message = error.message || 'Internal Server Error';

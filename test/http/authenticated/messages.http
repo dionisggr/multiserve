@@ -1,0 +1,51 @@
+@baseUrl = http://localhost:8000
+
+### Login as USER (Authentication)
+# @name login
+POST {{baseUrl}}/demo/login
+Authorization: Bearer {{$dotenv API_KEY}}
+Content-Type: application/json
+
+{
+  "email": "demo@tec3org.com",
+  "password": "password"
+}
+
+### Token definition
+@token = {{login.response.body.accessToken.$}}
+#####
+
+
+##### The following endpoints require Login first (above)
+
+
+### Get all messages
+GET {{baseUrl}}/demo/conversations/bd1151f9-b562-46f2-a607-cd3aaac1c4dd/messages
+Authorization: Bearer {{token}}
+
+### Get message by ID
+GET {{baseUrl}}/demo/conversations/bd1151f9-b562-46f2-a607-cd3aaac1c4dd/messages/1dbcb23d-ad11-48dc-9076-6fef3d51fe25
+Authorization: Bearer {{token}}
+
+### Create message
+POST {{baseUrl}}/demo/conversations/bd1151f9-b562-46f2-a607-cd3aaac1c4dd/messages
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "content": "New Content"
+}
+
+### Update message
+PATCH {{baseUrl}}/demo/conversations/bd1151f9-b562-46f2-a607-cd3aaac1c4dd/messages/1dbcb23d-ad11-48dc-9076-6fef3d51fe25
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "content": "New Content"
+}
+
+### Delete message
+DELETE {{baseUrl}}/demo/conversations/bd1151f9-b562-46f2-a607-cd3aaac1c4dd/messages/1dbcb23d-ad11-48dc-9076-6fef3d51fe25
+Authorization: Bearer {{token}}
+Content-Type: application/json

@@ -1,93 +1,94 @@
 const { customError } = require('../utils');
 const Service = require('../services/DB');
-const { logger } = require('../config');
+const { logger } = require('../utils');
 const schemas = require('../schemas');
 const db = require('../db');
 
 async function create(req, res, next) {
-  const data = req.body;
-  const { app_id } = req.params;
+  const { user_id } = req.auth;
+  const { conversation_id, app_id } = req.params;
+  const data = { ...req.body, conversation_id, user_id };
 
   try {
-    await schemas.apps.validateAsync({ app_id })
-    await schemas.conversations.existing.validateAsync({
-      id: data.conversation_id
-    });
-    await schemas.messages.new.validateAsync(data);
+    await schemas.conversations.existing.validateAsync(
+      { conversation_id, app_id }
+    );
+    await schemas.messages.new.validateAsync(
+      { ...data, app_id }
+    );
 
     const service = new Service(app_id);
     const message = await service.messages.create({ data });
-    const user_id = req.user.id;
-    const response = {
-      ...data,
-      message_id: message.id,
-      user_id
-    };
 
-    logger.info(response, 'Message successfully created.');
+    logger.info(message, 'Message successfully created.');
 
-    return res.status(201).json(response);
+    return res.status(201).json(message);
   } catch (error) {
     return next(error);
   }
 }
 
 async function get(req, res, next) {
-  const { id: message_id, app_id } = req.params;
-  const criteria = {};
+  const { user_id, organization_id } = req.auth;
+  const { message_id, conversation_id, app_id } = req.params;
 
   try {
-    await schemas.apps.validateAsync({ app_id });
-    await schemas.messages.existing.validateAsync({ message_id });
+    await schemas.messages.existing.validateAsync(
+      { message_id, conversation_id, app_id }
+    );
+
+    const filters = { id: message_id, conversation_id };
+
+    if (organization_id) {
+      filters.organization_id = organization_id;
+    } else {
+      filters.user_id = user_id;
+    }
 
     const service = new Service(app_id);
-    const result = await service.messages.get({ filters: { id: message_id } });
+    const message = await service.messages.get({ filters });
 
-    if (!result) {
-      return next(customError(`Failed to find message(s): ${message_id}`, 404));
+    if (!message) {
+      return next(
+        customError(`Failed to find message(s): ${message_id}`, 404)
+      );
     }
 
-    if (!req.user.is_admin) {
-      const messages = criteria.multiple ? result : [result];
+    logger.info(message, 'Message found.');
 
-      if (!messages.some(({ user_id }) => user_id === req.user.id)) {
-        return next(
-          customError(
-            `Unauthorized message (${message_id}) request from ${req.user.id}.`,
-            404
-          )
-        );
-      }
-    }
-
-    logger.info(result, 'Message(s) found.');
-
-    return res.json(result);
+    return res.json(message);
   } catch (error) {
     return next(error);
   }
 }
 
 async function getAll(req, res, next) {
-  const { app_id } = req.params;
+  const { user_id, organization_id } = req.auth;
+  const { conversation_id, app_id } = req.params;
 
   try {
-    await schemas.apps.validateAsync({ app_id })
+    await schemas.conversations.existing.validateAsync(
+      { conversation_id, app_id }
+    );
+    
+    const filters = { conversation_id };
+
+    if (organization_id) {
+      filters.organization_id = organization_id;
+    } else {
+      filters.user_id = user_id;
+    }
 
     const service = new Service(app_id);
-    const criteria = { multiple: true };
+    const messages = await db(service.messages.table).where(filters)
 
-    if (Object.keys(req.query).length) {
-      criteria.filters = req.query;
+    console.log(messages);
+
+    if (messages.length) {
+      logger.info(messages.map(({ id }) => id), 'Messages found.');
+    } else {
+      logger.info('No messages found.');
     }
-
-    const messages = await service.messages.get(criteria);
-
-    if (!messages || !messages.length) {
-      return next(customError(`Failed to find messages.`, 404));
-    }
-
-    logger.info(messages, 'Messages found.');
 
     return res.json(messages);
   } catch (error) {
@@ -96,16 +97,20 @@ async function getAll(req, res, next) {
 }
 
 async function update(req, res, next) {
-  const { id: message_id, app_id } = req.params;
+  const { user_id } = req.auth;
+  const { message_id, conversation_id, app_id } = req.params;
   
   try {
-    await schemas.apps.validateAsync({ app_id })
-    await schemas.messages.existing.validateAsync({ message_id, ...req.body });
+    const data = { ...req.body, updated_at: new Date().toISOString() };
+
+    await schemas.messages.existing.validateAsync(
+      { message_id, conversation_id, app_id, ...data }
+    );
 
     const service = new Service(app_id);
-    const data = { ...req.body, updated_at: db.fn.now() };
     const message = await service.messages.update({
-      filters: { id: message_id }, data,
+      data,
+      filters: { id: message_id, conversation_id, user_id },
     });
 
     if (!message) {
@@ -123,16 +128,18 @@ async function update(req, res, next) {
 }
 
 async function remove(req, res, next) {
-  const { app_id, id: message_id } = req.params;
+  const { user_id } = req.auth;
+  const { message_id, conversation_id, app_id } = req.params;
   
   try {
-    await schemas.apps.validateAsync({ app_id })
-    await schemas.messages.existing.validateAsync({ message_id });
+    const filters = { id: message_id, conversation_id, user_id };
+
+    await schemas.messages.existing.validateAsync(
+      { ...filters, conversation_id, app_id }
+    );
 
     const service = new Service(app_id);
-    const message = await service.messages.get({
-      filters: { id: message_id },
-    });
+    const message = await service.messages.get({ filters });
 
     if (!message) {
       return next(
