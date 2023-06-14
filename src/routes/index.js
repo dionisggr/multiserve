@@ -76,6 +76,5 @@ admin
   .use('/apps', express.Router()
     .get('/', apps.getAll)
     .get('/:id', apps.get))
-    
 
 module.exports = { public, authorized, authenticated, admin };
