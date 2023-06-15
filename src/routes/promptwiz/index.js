@@ -10,7 +10,7 @@ async function enhance(req, res, next) {
   const { format = 'paragraph' } = req.params;
   const { prompt } = req.body;
 
-  if (['dalle', 'whisper'].includes(req.query.model.toLowerCase())) {
+  if (!req.query.model.toLowerCase().includes('chatgpt')) {
     return next(customError('Invalid model.', 400));
   }
 
