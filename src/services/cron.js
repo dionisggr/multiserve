@@ -2,11 +2,9 @@ const cron = require('node-cron');
 const { exec } = require('child_process');
 const { logger } = require('../utils');
 const backblaze = require('./backblaze');
-const cache = require('./cache');
 
 function start() {
   cron.schedule('0 1 * * *', backupDB);  // Daily at 1:00 AM
-  cron.schedule('0 * * * *', cleanCache);  // Hourly
   
   logger.info('Backup scheduler started.');
 }
@@ -33,18 +31,6 @@ async function backupDB() {
   }
 
   logger.info('DB backup file uploaded successfully!');
-}
-
-function cleanCache() {
-  logger.info('Cleaning cache...');
-
-  for (id in cache.data) {
-    if (cache.data[id].expires < Date.now()) {
-      delete cache[id];
-    }
-  }
-
-  logger.info('Cache cleaned successfully!');
 }
 
 module.exports = { start };

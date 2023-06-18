@@ -2,7 +2,6 @@ const express = require('express');
 const { customError } = require('../../utils');
 const { logger } = require('../../utils');
 const db = require('../../db');
-const cache = require('../../services/cache');
 const Service = require('../../services/DB');
 
 const Router = express.Router();
@@ -50,17 +49,6 @@ async function init(req, res, next) {
     }
 
     res.json(user);
-
-    user.conversations.forEach(conversation => {
-      const messages = conversation.messages.map(message => {
-        const role = message.user_id === 'gpt' ? 'assistant' : 'user';
-        const content = message.content;
-
-        return { role, content };
-      });
-
-      cache.upsert(conversation.id, { messages });
-    });
   } catch (error) {
     logger.error(error);
 

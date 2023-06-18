@@ -6,7 +6,6 @@ const {
   SLACK_GPTEAMS_BOT_CHANNEL,
 } = require('../../config');
 const { logger } = require('../../utils');
-const cache = require('../../services/cache');
 const Service = {
   AI: require('../../services/AI'),
   DB: require('../../services/DB'),
@@ -84,33 +83,24 @@ async function dalle(req, res, next) {
 
       res.end();
 
-      if (conversation.id in cache.data) {
-        cache.data[conversation.id].messages.push({
-          role: 'user',
-          content: text,
-        });
-      } else {
-        const messages =
-          (
-            await DB.messages.get({
-              filters: { conversation_id: conversation.id, archived_by: null },
-              orderBy: ['created_at', 'desc'],
-              multiple: true,
-            })
-          ).map((msg) => {
-            const { content, user_id } = msg;
-            const role = user_id === 'gpt' ? 'assistant' : 'user';
+      const messages =
+        (
+          await DB.messages.get({
+            filters: { conversation_id: conversation.id, archived_by: null },
+            orderBy: ['created_at', 'desc'],
+            multiple: true,
+          })
+        ).map((msg) => {
+          const { content, user_id } = msg;
+          const role = user_id === 'gpt' ? 'assistant' : 'user';
 
-            return { role, content };
-          }) || [];
+          return { role, content };
+        }) || [];
 
-        logger.info(
-          { [conversation.id]: messages.length, trigger_id },
-          'Messages in conversation.'
-        );
-
-        cache.upsert(conversation.id, { messages });
-      }
+      logger.info(
+        { [conversation.id]: messages.length, trigger_id },
+        'Messages in conversation.'
+      );
     } else {
       conversation = await DB.conversations.create({
         data: {
@@ -138,9 +128,6 @@ async function dalle(req, res, next) {
       });
       const role = user_id === 'gpt' ? 'assistant' : 'user';
       const message = { role, content };
-      const messages = [message];
-
-      cache.upsert(conversation.id, { messages });
     }
 
     const AI = new Service.AI({
@@ -187,12 +174,6 @@ async function dalle(req, res, next) {
         Authorization: `Bearer ${SLACK_GPTEAMS_DM_TOKEN}`,
       },
       body: JSON.stringify(body),
-    });
-    cache.upsert(conversation.id, {
-      messages: [
-        ...cache.data[conversation.id].messages,
-        { role: 'assistant', content: response },
-      ],
     });
 
     await DB.messages.create({

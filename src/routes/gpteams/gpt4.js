@@ -6,7 +6,6 @@ const {
   SLACK_GPTEAMS_BOT_ID,
 } = require('../../config');
 const { logger } = require('../../utils');
-const cache = require('../../services/cache');
 const Service = {
   AI: require('../../services/AI'),
   DB: require('../../services/DB'),
@@ -65,33 +64,24 @@ async function gpt4(req, res, next) {
         });
       }
 
-      if (conversation.id in cache.data) {
-        cache.data[conversation.id].messages.push({
-          role: 'user',
-          content: text,
-        });
-      } else {
-        const messages =
-          (
-            await DB.messages.get({
-              filters: { conversation_id: conversation.id, archived_by: null },
-              orderBy: ['created_at', 'desc'],
-              multiple: true,
-            })
-          ).map((msg) => {
-            const { content, user_id } = msg;
-            const role = user_id === 'gpt4' ? 'assistant' : 'user';
+      const messages =
+        (
+          await DB.messages.get({
+            filters: { conversation_id: conversation.id, archived_by: null },
+            orderBy: ['created_at', 'desc'],
+            multiple: true,
+          })
+        ).map((msg) => {
+          const { content, user_id } = msg;
+          const role = user_id === 'gpt4' ? 'assistant' : 'user';
 
-            return { role, content };
-          }) || [];
+          return { role, content };
+        }) || [];
 
-        logger.info(
-          { [conversation.id]: messages.length, thread_ts },
-          'Messages in conversation.'
-        );
-
-        cache.upsert(conversation.id, { messages });
-      }
+      logger.info(
+        { [conversation.id]: messages.length, thread_ts },
+        'Messages in conversation.'
+      );
     } else {
       if (![type, subtype].some(val => val === 'app_mention')) {
         return res.sendStatus(400);
@@ -128,8 +118,6 @@ async function gpt4(req, res, next) {
       const role = user_id === 'gpt4' ? 'assistant' : 'user';
       const message = { role, content };
       const messages = [message];
-
-      cache.upsert(conversation.id, { messages });
     }
 
     const { ts: new_ts } = await (
@@ -198,13 +186,6 @@ async function gpt4(req, res, next) {
           }
         }
       });
-    });
-
-    cache.upsert(conversation.id, {
-      messages: [
-        ...cache.data[conversation.id].messages,
-        { role: 'assistant', content: stream },
-      ],
     });
 
     const message = await DB.messages.create({
