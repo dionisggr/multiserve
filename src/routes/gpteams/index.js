@@ -184,8 +184,6 @@ async function prompt(req, res, next) {
     });
     const response = await AI.chatgpt(text);
 
-    logger.info({ slack_user_id }, 'Slack ChatGPT Prompted.');
-
     let stream = '';
 
     const interval = setInterval(async () => {

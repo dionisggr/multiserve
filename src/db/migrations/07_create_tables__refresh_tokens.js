@@ -1,7 +1,7 @@
 const { logger } = require('../../utils');
 const operations = require('../operations');
 
-const apps = ['demo'];
+const apps = ['demo', 'promptwiz'];
 const tables = apps.map((app) => `${app}__refresh_tokens`);
 
 exports.up = async function (db) {

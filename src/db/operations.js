@@ -36,7 +36,7 @@ async function createConversations({ db, apps, app }) {
     await db.schema.dropTableIfExists(tableName);
     await db.schema.createTable(tableName, function (table) {
         table.uuid('id').primary().defaultTo(db.raw('uuid_generate_v4()'));
-        table.string('title').notNullable();
+        table.string('title');
         table.string('created_by').references('id').inTable(`${appName}__users`).onDelete('CASCADE');
         table.string('organization_id').references('id').inTable('organizations').onDelete('CASCADE');
         table.enum('type', ['single', 'group']).defaultTo('single');
@@ -64,7 +64,7 @@ async function createMessages({ db, apps, app }) {
       table.string('organization_id').nullable().references('id').inTable('organizations').onDelete('CASCADE');
       table.specificType('content', 'varchar').notNullable();
       table.timestamp('created_at').defaultTo(db.fn.now());
-      table.timestamp('updated_at').defaultTo(db.fn.now());
+      table.timestamp('updated_at');
       table.timestamp('archived_at');
     })
     .catch((error) => logger.error(error, 'Error creating table.'));

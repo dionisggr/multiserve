@@ -1,7 +1,7 @@
 const { logger } = require('../../utils');
 const operations = require('../operations');
 
-const apps = ['demo'];
+const apps = ['demo', 'promptwiz'];
 
 exports.up = async function (db) {
   for (const app of apps) {
@@ -10,8 +10,8 @@ exports.up = async function (db) {
     await db.schema.dropTableIfExists(tableName);
     await db.schema.createTable(tableName, function (table) {
       table.string('openai_api_key', 255).primary();
-      table.string('organization_id').references('id').inTable('organizations').onDelete('CASCADE');
       table.string('user_id').references('id').inTable(`${app}__users`).onDelete('CASCADE');
+      table.string('organization_id').references('id').inTable('organizations').onDelete('CASCADE');
     })
       .catch((error) => logger.error(error, 'Error creating table.'));
 

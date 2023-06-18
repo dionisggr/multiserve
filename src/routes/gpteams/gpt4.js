@@ -153,8 +153,6 @@ async function gpt4(req, res, next) {
     });
     const response = await AI.chatgpt4(text)
     
-    logger.info({ slack_user_id }, 'Slack ChatGPT Prompted.');
-    
     let stream = '';
 
     const interval = setInterval(async () => {

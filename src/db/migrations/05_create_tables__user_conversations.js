@@ -1,6 +1,6 @@
 const operations = require('../operations');
 
-const apps = ['demo'];
+const apps = ['demo', 'promptwiz'];
 const tables = apps.map(app => `${app}__user_conversations`);
 
 exports.up = async function (db) {

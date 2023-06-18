@@ -5,6 +5,7 @@ const uuid = Joi.string().guid({ version: 'uuidv4' });
 const id = Joi.alternatives().try(uuid, Joi.string());
 const email = Joi.string().email();
 const username = Joi.string();
+const name = Joi.string().min(2).max(64);
 const password = Joi.string().min(8).max(64);
 const app_id = Joi.string();
 const is_archived = Joi.boolean();
@@ -12,6 +13,7 @@ const created_at = Joi.date().iso();
 const updated_at = Joi.date().iso();
 const lastLogin = Joi.date().iso();
 const is_admin = Joi.boolean();
+const avatar = Joi.string().pattern(/^data:(.*?);base64,(.*)$/);  // base64 encoded image
 
 const schemas = {
   login: Joi.object({ 
@@ -25,9 +27,9 @@ const schemas = {
     email: email.required(),
     password: password.required(),
     app_id: app_id.required(),
-    first_name: Joi.string().min(2).max(64),
-    last_name: Joi.string().min(2).max(64),
-    avatar: Joi.string().uri({ scheme: ['http', 'https'] }),
+    first_name: name,
+    last_name: name,
+    avatar,
     is_admin,
   }),
   apps: Joi.object({
@@ -39,7 +41,9 @@ const schemas = {
     updated_at,
   }).xor('id', 'app_id'),
   users: Joi.object({
-    avatar: Joi.string().uri({ scheme: ['http', 'https'] }),
+    first_name: name,
+    last_name: name,
+    avatar,
     user_id: id,
     id,
     username,
@@ -70,9 +74,9 @@ const schemas = {
   messages: {
     new: Joi.object({
       content: Joi.string().required(),
-      conversation_id: id.required(),
       user_id: id.required(),
       app_id: app_id.required(),
+      conversation_id: id,
     }),
     existing: Joi.object({
       content: Joi.string(),

@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const db = require('../db');
-const { customError, logger } = require('../utils');
-const { NODE_ENV, JWT_ACCESS_SECRET, JWT_REFRESH_SECRET } = require('../config');
+const { customError, isBrowserRequest, logger } = require('../utils');
+const { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET } = require('../config');
 const passwords = require('../services/passwords');
 
 async function login(req, res, next) {
@@ -14,13 +14,15 @@ async function login(req, res, next) {
       .first();
     const match = user && await passwords.validate({
       server: user.password,
-      client: (NODE_ENV === 'production')
+      client: (isBrowserRequest(req))
         ? password
         : passwords.encrypt(password),
     });
 
     if (!match) {
-      return next(customError('Missing or invalid credentials.', 401))
+      return next(
+        customError('Missing or invalid credentials.', 401)
+      )
     }
 
     const payload = {
@@ -42,8 +44,10 @@ async function login(req, res, next) {
       .insert({ user_id: user.id, token: refreshToken });
 
     logger.info(payload, 'Login successful');
-      
-    return res.json({ accessToken, refreshToken });
+    
+    delete user.password;
+    
+    return res.json({ user, accessToken, refreshToken });
   } catch (error) {
     next(error);
   }
@@ -61,7 +65,7 @@ async function reauthorize(req, res, next) {
   try {
     payload = jwt.verify(refreshToken, JWT_REFRESH_SECRET);
   } catch (error) {
-    const { user_id, app_id} = jwt.decode(refreshToken);
+    const { user_id, app_id } = jwt.decode(refreshToken) || {};
 
     if (user_id && app_id) {
       await db(`${app_id}__refresh_tokens`)
@@ -108,4 +112,20 @@ async function logout(req, res, next) {
   }
 }
 
-module.exports = { login, reauthorize, logout };
+async function check(req, res, next) {
+  const token = req.get('Authorization')?.split(' ')[1];
+
+  if (!token) {
+    return next(customError('Missing access token.', 401));
+  }
+
+  try {
+    jwt.verify(token, JWT_ACCESS_SECRET);
+
+    res.sendStatus(200);
+  } catch (error) {
+    next(error);
+  }
+}
+
+module.exports = { login, reauthorize, logout, check };

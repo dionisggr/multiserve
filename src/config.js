@@ -8,7 +8,7 @@ const {
   PROD_DB_URL,
   ADMIN_EMAIL,
   ADMIN_PASSWORD,
-  OPENAI_API_KEY,
+  PROMPTWIZ_OPENAI_API_KEY,
   SENDGRID_API_KEY,
   SLACK_GPTEAMS_DM_TOKEN,
   SLACK_GPTEAMS_ADMIN_TOKEN,
@@ -27,9 +27,10 @@ const {
 } = process.env;
 const cors = {
   origin: [
-    "http://localhost:3000",
-    "https://*.vercel.app",
-    "https://*.railway.app",
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'https://*.vercel.app',
+    'https://*.railway.app',
   ],
   credentials: true,
 };
@@ -60,7 +61,7 @@ module.exports = {
   PROD_DB_URL,
   ADMIN_EMAIL,
   ADMIN_PASSWORD,
-  OPENAI_API_KEY,
+  PROMPTWIZ_OPENAI_API_KEY,
   SENDGRID_API_KEY,
   SLACK_GPTEAMS_DM_TOKEN,
   SLACK_GPTEAMS_ADMIN_TOKEN,

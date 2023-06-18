@@ -6,9 +6,9 @@ exports.up = async function (db) {
   await db.schema.dropTableIfExists(tableName);
   await db.schema.createTable(tableName, function (table) {
     table.string('id').primary();
-    table.string('name').unique();
-    table.string("created_at").notNullable().defaultTo(db.fn.now());
-    table.string('archived_at').unique();
+    table.string('name');
+    table.string("created_at").defaultTo(db.fn.now());
+    table.string('archived_at').defaultTo(db.fn.now());
     table.string('logo').unique();
     table.string('app_id').references('id').inTable('apps').onDelete('CASCADE');
   }).catch(error => logger.error(error, 'Error creating table.'))

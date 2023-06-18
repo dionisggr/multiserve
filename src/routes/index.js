@@ -8,7 +8,7 @@ const utils = require('./utils');
 const secrets = require('./secrets');
 const conversations = require('./conversations');
 const messages = require('./messages');
-const AI = require('./AI');
+const { Router: AI } = require('./AI');
 const GPTeams = require('./gpteams');
 const ChatterAI = require('./chatterai');
 const PromptWiz = require('./promptwiz');
@@ -34,6 +34,7 @@ public
 authorized
   .use('/:app_id',
     express.Router({ mergeParams: true })
+      .get('/auth-check', auth.check)
       .post('/login', auth.login)
       .post('/reauthorize', auth.reauthorize)
       .post('/signup', users.create, auth.login)
@@ -62,8 +63,6 @@ authenticated
             .get('/', messages.get)
             .patch('/', messages.update)
             .delete('/', messages.remove))))))
-
-authenticated
   .use(AI)
   .use('/statuspage', StatusPage)
   .use('/promptwiz', PromptWiz)

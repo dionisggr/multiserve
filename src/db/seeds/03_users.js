@@ -2,8 +2,8 @@ const Service = require('../../services/DB');
 const { ADMIN_EMAIL, ADMIN_PASSWORD } = require('../../config');
 
 const service = new Service();
-const apps = ['demo'];
-const chat_apps = ['demo'];
+const chat_apps = ['demo', 'promptwiz'];
+const apps = [...chat_apps];
 
 exports.seed = async function (db) {
   const admin_password = await service.passwords.hash(

@@ -7,8 +7,8 @@ const Service = require('../services/AI');
 
 const Router = express.Router()
   .post('/chatgpt', chatgpt)
-  .post('/dalle/:prompt?', dalle)
-  .post('/whisper/:url?', whisper);
+  .post('/dalle', dalle)
+  .post('/whisper', whisper);
 
 async function chatgpt(req, res, next) {
   try {
@@ -18,7 +18,7 @@ async function chatgpt(req, res, next) {
       ...adjustments
     } = req.body;
     const { user_id, app_id } = req.auth;
-    const isStream = req.query.stream.toLowerCase() === 'true';
+    const isStream = req.query.stream?.toLowerCase() === 'true';
     const response = {};
 
     if (conversation_id) {
@@ -26,10 +26,10 @@ async function chatgpt(req, res, next) {
         { conversation_id, user_id, app_id }
       );
 
-      const history = await db(`${app_id}__conversation_messages`)
+      const history = await db(`${app_id}__messages`)
         .where({ conversation_id, app_id })
         .orderBy('created_at', 'asc');
-      const message = await db(`${app_id}__conversation_messages`)
+      const message = await db(`${app_id}__messages`)
         .insert({ content: prompt, conversation_id, user_id })
         .returning('*')[0];
       
@@ -37,17 +37,21 @@ async function chatgpt(req, res, next) {
       Object.assign(response, { message });
     }
 
-    const openai_api_key = await db('openai_api_keys')
-      .where({ user_id, app_id })
-      .first();
+    const { openai_api_key } = await db(`${app_id}__openai_api_keys`)
+      .select('openai_api_key')
+      .where({ user_id }).first();
   
     Object.assign(adjustments, { openai_api_key, stream: isStream });
 
-    const AI = new Service.AI(adjustments);
+    const AI = new Service(adjustments);
     const result = await AI.chatgpt(prompt);
 
-    logger.info({ user_id }, 'ChatGPT prompted.');
-
+    if (conversation_id) {
+      await db(`${app_id}__messages`)
+        .insert({ content: result, conversation_id, user_id })
+        .returning('*');
+    }
+    
     if (isStream) {
       res.sendStatus(202);
     } else {
@@ -55,6 +59,8 @@ async function chatgpt(req, res, next) {
 
       res.json(response);
     }
+
+    return result;
   } catch (error) {
     next(error);
   }
@@ -107,4 +113,4 @@ async function whisper(req, res, next) {
   }
 };
 
-module.exports = Router;
+module.exports = { Router, chatgpt };

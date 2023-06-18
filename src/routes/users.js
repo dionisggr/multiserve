@@ -22,9 +22,10 @@ async function create(req, res, next) {
     }
 
     let user = await service.users.get({ filters: { email } });
+    let encrypted;
 
     if (!user) {
-      const encrypted = (isBrowserRequest(req))
+      encrypted = (isBrowserRequest(req))
         ? data.password
         : service.passwords.encrypt(data.password);
       const password = await service.passwords.hash(encrypted);
@@ -39,6 +40,8 @@ async function create(req, res, next) {
     logger.info({ id: user.id, email, app_id }, 'User successfully registered to app.');
 
     if (req.path.includes('/signup')) {
+      req.body = { email, password: encrypted };
+      
       return next();
     }
     
@@ -108,8 +111,6 @@ async function update(req, res, next) {
 
     await schemas.users.validateAsync({ user_id, ...req.body });
     await schemas.apps.validateAsync({ app_id });
-
-    console.log({ body: req.body})
 
     const service = new Service(app_id);
     const data = { updated_at: db.fn.now() };
