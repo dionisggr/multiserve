@@ -108,20 +108,29 @@ async function update(req, res, next) {
   try {
     const { user_id } = req.auth;
     const { app_id } = req.params;
+    const { data } = req.body;
+    data.updated_at = new Date().toISOString();
 
-    await schemas.users.validateAsync({ user_id, ...req.body });
+    await schemas.users.validateAsync(
+      { user_id, ...data }
+    );
     await schemas.apps.validateAsync({ app_id });
 
-    const service = new Service(app_id);
-    const data = { updated_at: db.fn.now() };
-    const user = await service.users.update({
-      filters: { id: user_id },
-      data,
-    });
+    if (data.password) {
+      const service = new Service(app_id);
+      data.password = await service.passwords.hash(data.password);
+    }
+
+    const user = await db(`${app_id}__users`)
+      .update(data)
+      .where({ id: user_id })
+      .returning('*')
+    
+    console.log({ user })
 
     delete user.password;
 
-    logger.info({ ...req.params, ...req.body }, 'User updated.');
+    logger.info({ ...req.params, ...data }, 'User updated.');
 
     return res.json(user);
   } catch (error) {

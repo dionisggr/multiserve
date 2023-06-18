@@ -12,13 +12,17 @@ async function reset(req, res, next) {
     await schemas.apps.validateAsync({ app_id });
   
     const service = new Service(app_id);
-    const user = await service.users.get({ filters: { email } });
+    const user = await service.users.get(
+      { filters: { email } }
+    );
 
     if (!user) {
       throw new Error('User not found');
     }
 
-    const code = await service.twoFactorAuth.send({ email, app_id, req });
+    const code = await service.twoFactorAuth.send(
+      { email, app_id, req }
+    );
 
     if (code) logger.info({ code }, '2FA code generated.')
 

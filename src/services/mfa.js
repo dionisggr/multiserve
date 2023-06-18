@@ -15,7 +15,7 @@ async function send({ email, app_id, req }) {
     const result = await service.email.send(data);
     const log = { ...data, status: result.statusCode };
 
-    logger.info(log, 'Message sent: %s')
+    logger.info(log, 'Message sent.')
   }
   
   Object.assign(req.session, { email, app_id, code, expires_at });

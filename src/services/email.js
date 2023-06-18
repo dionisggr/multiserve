@@ -10,7 +10,7 @@ async function send({ app, email, code }) {
     to: email,
     from: ADMIN_EMAIL,
     subject: `Your One-Time Code for ${app}`,
-    text: `Hello from ${app}!\n\nYour one-time code is: ${code}\n\nIt expires in 5 minutes!\n\nBest regards,\nTec3 team`,
+    text: generateMessage({ app, code }),
   };
   const response = (await sendgrid.send(msg))[0];
   const log = { app, email, code, status: response.statusCode };
@@ -18,6 +18,21 @@ async function send({ app, email, code }) {
   logger.info(log, 'Message sent: %s');
 
   return response;
+};
+
+function generateMessage({ app, code }) {
+  return `Dear ${app} User,
+
+We appreciate your efforts to keep your account secure. We have generated a one-time verification code for you.
+
+Your one-time verification code is: ${code}
+
+Please note that for your security, this code will expire in 5 minutes. If you didn't request this code or it expires before you have a chance to use it, please request a new code through our app.
+
+We are committed to providing you with the best service and security. If you have any questions or need further assistance, feel free to contact us.
+
+Best Regards,
+Tec3 Team`;
 };
 
 module.exports = { send };

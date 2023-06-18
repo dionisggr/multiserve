@@ -1,6 +1,6 @@
 const CRUD = require('./CRUD');
 const passwords = require('./passwords');
-const twoFactorAuth = require('./two-factor-auth');
+const twoFactorAuth = require('./mfa');
 const email = require('./email');
 
 class DB extends CRUD {
