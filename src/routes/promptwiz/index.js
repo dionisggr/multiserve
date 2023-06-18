@@ -5,7 +5,8 @@ const db = require('../../db');
 const routes = { ChatGPT: require('../AI').chatgpt };
 
 const Router = express.Router()
-  .get('/prompts', prompts)
+  .get('/prompts', getPrompts)
+  .post('/prompts', createPrompt)
   .post('/enhance/:format?', enhance)
   .patch('/prompts/:id', title)
   .delete('/prompts/:id', remove);
@@ -31,12 +32,14 @@ async function enhance(req, res, next) {
   }
 }
 
-async function prompts(req, res, next) {
+async function getPrompts(req, res, next) {
   const promptList = await db('promptwiz__prompts')
     .where({ 'user_id': req.auth.user_id })
     .orderBy('created_at', 'desc');
   
   logger.info({ user_id: req.auth.user_id }, 'PromptWiz prompts retrieved.')
+
+  console.log({ promptList })
 
   res.json(promptList);
 }
@@ -51,6 +54,27 @@ async function remove(req, res, next) {
     logger.info({ user_id }, 'PromptWiz prompt deleted.');
 
     res.sendStatus(200);
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function createPrompt(req, res, next) {
+  const { user_id } = req.auth;
+  const {
+    prompt,
+    title = 'New prompt',
+    model = 'chatgpt',
+  } = req.body;
+
+  try {
+    const [id] = await db('promptwiz__prompts')
+      .insert({ prompt, title, model, user_id })
+      .returning('id');
+
+    logger.info({ user_id }, 'PromptWiz prompt created.');
+
+    res.json({ id });
   } catch (error) {
     next(error);
   }
