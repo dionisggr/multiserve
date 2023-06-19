@@ -1,7 +1,12 @@
+const jwt = require('jsonwebtoken');
 const Service = require('../services/DB');
-const { customError } = require('../utils');
-const { logger } = require('../utils');
+const { JWT_ACCESS_SECRET } = require('../config');
+const { customError, logger } = require('../utils');
 const schemas = require('../schemas');
+const db = require('../db');
+const routes = {
+  login: require('./auth').login,
+}
 
 async function reset(req, res, next) {
   try {
@@ -17,43 +22,60 @@ async function reset(req, res, next) {
     );
 
     if (!user) {
-      throw new Error('User not found');
+      return next(customError('User not found.', 404));
     }
 
     const code = await service.twoFactorAuth.send(
       { email, app_id, req }
     );
 
-    if (code) logger.info({ code }, '2FA code generated.')
+    if (!code) {
+      return next(customError('Unable to send 2FA code.', 500));
+    }
 
-    return res.sendStatus(200);
+    logger.info({ email, app_id, code }, '2FA code generated.');
+
+    await service.mfa.create({
+      data: { code, email: user.email }
+    })
+
+    const token = jwt.sign(
+      { email, app_id, code },
+      JWT_ACCESS_SECRET,
+      { expiresIn: '5m' }
+    );
+
+    res.json({ token })
   } catch(error) {
     return next(error);
   }
 };
 
-async function verify(req, res, next) {
+async function mfa(req, res, next) {
   try {
     const { app_id } = req.params;
-    const { email } = req.body;
-    req.body.app_id = app_id;
+    const { code } = req.body;
+    const { email } = req.auth;
 
-    await schemas.users.validateAsync({ email });
     await schemas.apps.validateAsync({ app_id });
 
-    const service = new Service(app_id);
-    const user = await service.users.get({ filters: { email } });
+    const exists = await db(`${app_id}__mfa`)
+      .where({ email, code })
+      .first();
     
-    if (!user) {
-      return next(customError('User not found.', 404));
+    console.log({ exists })
+    
+    if (!exists) {
+      return next(customError('Invalid 2FA code.', 400));
     }
-    
-    service.twoFactorAuth.validate(req);
 
-    return res.sendStatus(200);
+    req.body.email = email;
+    req.isMFA = true;
+
+    await routes.login(req, res, next);
   } catch (error) {
     return next(error);
   }
 };
 
-module.exports = { reset, verify };
+module.exports = { reset, mfa };

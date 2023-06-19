@@ -49,6 +49,12 @@ class DB extends CRUD {
 
     return this;
   }
+
+  get mfa() {
+    this.table = `${this.app_id}__mfa AS ${this.app_id[0] + 'mfa'}`;
+
+    return this;
+  }
 };
 
 module.exports = DB;

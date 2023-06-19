@@ -5,10 +5,14 @@ const db = require('../db');
 
 function app(req, res, next) {
   const apiKey = req.get('Authorization')?.split(' ')[1];
+  const isAuthRoute = [
+    /^\/login$/,
+    /^\/.*\/password\/reset$/,
+  ].some(routeRegex => routeRegex.test(req.path));
 
-  if (req.path === 'login' && (!apiKey || apiKey !== API_KEY)) {
+  if (isAuthRoute && apiKey !== API_KEY) {
     return next(customError('Missing or invalid API key.', 401));
-  }
+}
 
   next();
 }

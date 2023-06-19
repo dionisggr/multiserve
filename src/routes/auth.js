@@ -12,17 +12,20 @@ async function login(req, res, next) {
     const user = await db(`${app_id}__users`)
       .where((username) ? { username } : { email })
       .first();
-    const match = user && await passwords.validate({
-      server: user.password,
-      client: (isBrowserRequest(req))
-        ? password
-        : passwords.encrypt(password),
-    });
-
-    if (!match) {
-      return next(
-        customError('Missing or invalid credentials.', 401)
-      )
+    
+    if (!req.isMFA) {
+      const match = user && await passwords.validate({
+        server: user.password,
+        client: (isBrowserRequest(req))
+          ? password
+          : passwords.encrypt(password),
+      });
+  
+      if (!match) {
+        return next(
+          customError('Missing or invalid credentials.', 401)
+        )
+      }
     }
 
     const payload = {
@@ -45,9 +48,15 @@ async function login(req, res, next) {
 
     logger.info(payload, 'Login successful');
     
-    delete user.password;
-    
-    return res.json({ user, accessToken, refreshToken });
+    const auth = { token: accessToken, refreshToken };
+
+    if (req.isMFA) {
+      auth.mfa = { user_id: user.id, email: user.email };
+    } else {
+      auth.user = payload;
+    }
+
+    return res.json(auth);
   } catch (error) {
     next(error);
   }

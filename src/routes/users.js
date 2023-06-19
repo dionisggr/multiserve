@@ -116,18 +116,19 @@ async function update(req, res, next) {
     );
     await schemas.apps.validateAsync({ app_id });
 
+    console.log(data.password)
+
     if (data.password) {
       const service = new Service(app_id);
       data.password = await service.passwords.hash(data.password);
     }
 
+    console.log({ user_id, data })
     const user = await db(`${app_id}__users`)
       .update(data)
       .where({ id: user_id })
       .returning('*')
     
-    console.log({ user })
-
     delete user.password;
 
     logger.info({ ...req.params, ...data }, 'User updated.');

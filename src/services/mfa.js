@@ -12,13 +12,12 @@ async function send({ email, app_id, req }) {
   const expires_at = Date.now() + 1000 * 60 * 5  // +5 minutes
 
   if (isBrowserRequest(req)) {
-    const result = await service.email.send(data);
+    // const result = await service.email.send(data);
+    const result = {};
     const log = { ...data, status: result.statusCode };
 
     logger.info(log, 'Message sent.')
   }
-  
-  Object.assign(req.session, { email, app_id, code, expires_at });
 
   return code;
 };

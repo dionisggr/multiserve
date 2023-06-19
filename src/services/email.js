@@ -13,9 +13,6 @@ async function send({ app, email, code }) {
     text: generateMessage({ app, code }),
   };
   const response = (await sendgrid.send(msg))[0];
-  const log = { app, email, code, status: response.statusCode };
-
-  logger.info(log, 'Message sent: %s');
 
   return response;
 };

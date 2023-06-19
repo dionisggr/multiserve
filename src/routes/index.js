@@ -32,17 +32,17 @@ public
       .post(utils.transform)
     
 authorized
-  .use('/:app_id',
-    express.Router({ mergeParams: true })
-      .get('/auth-check', auth.check)
-      .post('/login', auth.login)
-      .post('/reauthorize', auth.reauthorize)
-      .post('/signup', users.create, auth.login)
-      .post('/passwords/reset', passwords.reset)
-      .post('/passwords/verify', passwords.verify))
+  .use('/:app_id', express.Router({ mergeParams: true })
+    .get('/auth-check', auth.check)
+    .post('/login', auth.login)
+    .post('/reauthorize', auth.reauthorize)
+    .post('/signup', users.create, auth.login)
+    .use('/passwords', express.Router({ mergeParams: true })
+      .post('/reset', passwords.reset)))
 
 authenticated
   .use('/:app_id', express.Router({ mergeParams: true })
+    .post('/passwords/mfa', passwords.mfa)
     .post('/logout', auth.logout)
     .use('/users/:user_id', express.Router({ mergeParams: true })
       .get('/', users.get)
