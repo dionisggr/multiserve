@@ -29,6 +29,7 @@ async function login(req, res, next) {
     }
 
     const payload = {
+      id: user.id,
       user_id: user.id,
       username: user.username,
       email: user.email,

@@ -68,7 +68,6 @@ exports.seed = async function (db) {
         password: demo_password,
         is_admin: false,
         organization_id: 'tec3',
-        openai_api_key: openai_api_keys[app] || null
       },
     ]);
   };

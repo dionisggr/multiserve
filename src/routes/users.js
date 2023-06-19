@@ -123,11 +123,12 @@ async function update(req, res, next) {
       data.password = await service.passwords.hash(data.password);
     }
 
-    console.log({ user_id, data })
     const user = await db(`${app_id}__users`)
       .update(data)
       .where({ id: user_id })
       .returning('*')
+    
+    console.log({ user })
     
     delete user.password;
 
