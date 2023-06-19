@@ -48,7 +48,11 @@ async function login(req, res, next) {
 
     logger.info(payload, 'Login successful');
     
-    const auth = { token: accessToken, refreshToken };
+    const auth = {
+      token: accessToken,
+      refreshToken,
+      hasOpenAIApiKey: !!user.openai_api_key
+    };
 
     if (req.isMFA) {
       auth.mfa = { user_id: user.id, email: user.email };

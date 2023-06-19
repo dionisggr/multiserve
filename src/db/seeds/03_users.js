@@ -1,9 +1,16 @@
 const Service = require('../../services/DB');
-const { ADMIN_EMAIL, ADMIN_PASSWORD } = require('../../config');
+const {
+  ADMIN_EMAIL,
+  ADMIN_PASSWORD,
+  PROMPTWIZ_OPENAI_API_KEY
+} = require('../../config');
 
 const service = new Service();
 const chat_apps = ['demo', 'promptwiz'];
 const apps = [...chat_apps];
+const openai_api_keys = {
+  'promptwiz': PROMPTWIZ_OPENAI_API_KEY,
+}
 
 exports.seed = async function (db) {
   const admin_password = await service.passwords.hash(
@@ -25,6 +32,7 @@ exports.seed = async function (db) {
         password: admin_password,
         is_admin: true,
         organization_id: 'tec3',
+        openai_api_key: openai_api_keys[app] || null
       },
       {
         id: 'dio',
@@ -33,6 +41,7 @@ exports.seed = async function (db) {
         password: admin_password,
         is_admin: true,
         organization_id: 'tec3',
+        openai_api_key: openai_api_keys[app] || null
       },
       {
         id: 'lili',
@@ -41,6 +50,7 @@ exports.seed = async function (db) {
         password: admin_password,
         is_admin: true,
         organization_id: 'tec3',
+        openai_api_key: openai_api_keys[app] || null
       },
       {
         id: 'doug',
@@ -49,6 +59,7 @@ exports.seed = async function (db) {
         password: admin_password,
         is_admin: true,
         organization_id: 'tec3',
+        openai_api_key: openai_api_keys[app] || null
       },
       {
         id: 'demo',
@@ -57,6 +68,7 @@ exports.seed = async function (db) {
         password: demo_password,
         is_admin: false,
         organization_id: 'tec3',
+        openai_api_key: openai_api_keys[app] || null
       },
     ]);
   };

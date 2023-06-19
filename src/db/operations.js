@@ -16,6 +16,7 @@ async function createUsers({ db, app, apps }) {
       table.string('email').unique();
       table.string('phone').unique();
       table.string('avatar').unique();
+      table.string('openai_api_key');
       table.string('organization_id').references('id').inTable('organizations').onDelete('CASCADE');
       table.boolean('is_admin').notNullable().defaultTo(false);
       table.timestamp('created_at').defaultTo(db.fn.now());
