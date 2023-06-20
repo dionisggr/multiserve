@@ -16,7 +16,7 @@ It sets up an Express REST API with Supabase, providing features like Docker con
 - A simple and elegant [**Joi**](https://joi.dev/) validation strategy.
 - Flexible logging implemented with [**pino**](https://github.com/pinojs/pino).
 - Security enhancements thanks to [**bcrypt**](https://github.com/kelektiv/node.bcrypt.js/) hashing and [**crypto**](https://www.npmjs.com/package/crypto-js) encryption.
-- Straightforward email management and delivery through with [SendGrid](https://sendgrid.com/).
+- Straightforward email management and delivery through with [Mailgun](https://www.mailgun.com/).
 - WebSocket implementation for real-time server/client bidirectional communication with [**WS**](https://www.npmjs.com/package/ws).
 - In-memory data structure store used as database, cache and message broker provided by [**Redis**](https://redis.io/).
 - Cron job scheduling and execution for task automation with [**node-cron**](https://www.npmjs.com/package/node-cron).
