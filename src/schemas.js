@@ -23,14 +23,19 @@ const schemas = {
     app_id: app_id.required(),
   }).xor('username', 'email'),
   signup: Joi.object({
-    username: username,
-    email: email.required(),
     password: password.required(),
     app_id: app_id.required(),
+    id: id,
+    email: email,
+    username: username,
     first_name: name,
     last_name: name,
     avatar,
     is_admin,
+  }).xor('id', 'email'),
+  google: Joi.object({
+    credential: Joi.string().required(),
+    app_id: app_id.required(),
   }),
   apps: Joi.object({
     name: Joi.string(),

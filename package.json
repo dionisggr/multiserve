@@ -38,6 +38,7 @@
     "express-session": "^1.17.3",
     "express-xss-sanitizer": "^1.1.6",
     "fs": "^0.0.1-security",
+    "google-auth-library": "^8.8.0",
     "helmet": "^6.1.5",
     "joi": "^17.9.1",
     "js-yaml": "^4.1.0",

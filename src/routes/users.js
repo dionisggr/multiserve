@@ -13,15 +13,14 @@ async function create(req, res, next) {
     await schemas.signup.validateAsync({ ...data, app_id });
 
     const service = new Service(app_id);
-    const isDuplicate = await service.users.get({ filters: { email } });
+    const user = await service.users.get({ filters: { email } });
 
-    if (isDuplicate) {
+    if (user) {
       return next(
         customError(`User (${email}) already registered to app: ${app_id}`, 409)
       );
     }
 
-    let user = await service.users.get({ filters: { email } });
     let encrypted;
 
     if (!user) {
@@ -65,15 +64,11 @@ async function get(req, res, next) {
       return next(customError(`Failed to find user: ${user_id}`, 404));
     }
 
-    if (!req.auth.is_admin && req.auth.user_id !== user_id) {
-      return next(
-        customError(`Unauthorized user request from ${user_id} for ${user.id}.`, 400)
-      );
+    if (user) {
+      delete user.password;
+
+      logger.info(user, 'User found.');
     }
-
-    delete user.password;
-
-    logger.info(user, 'User found.');
     
     return res.json(user);
   } catch (error) {

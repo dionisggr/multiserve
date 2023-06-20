@@ -24,6 +24,8 @@ const {
   STATUSPAGE_URL,
   JWT_ACCESS_SECRET,
   JWT_REFRESH_SECRET,
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
 } = process.env;
 const cors = {
   origin: [
@@ -77,6 +79,8 @@ module.exports = {
   STATUSPAGE_URL,
   JWT_ACCESS_SECRET,
   JWT_REFRESH_SECRET,
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
   helmet,
   morgan,
   cors,

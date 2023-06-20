@@ -33,10 +33,12 @@ public
     
 authorized
   .use('/:app_id', express.Router({ mergeParams: true })
+    .get('/users/:user_id', users.get)
     .get('/auth-check', auth.check)
     .post('/login', auth.login)
     .post('/reauthorize', auth.reauthorize)
     .post('/signup', users.create, auth.login)
+    .post('/google', auth.google)
     .use('/passwords', express.Router({ mergeParams: true })
       .post('/reset', passwords.reset)))
 
@@ -45,7 +47,6 @@ authenticated
     .post('/passwords/mfa', passwords.mfa)
     .post('/logout', auth.logout)
     .use('/users/:user_id', express.Router({ mergeParams: true })
-      .get('/', users.get)
       .post('/passwords/reset', passwords.reset)
       .patch('/', users.update)
       .delete('/', users.remove))

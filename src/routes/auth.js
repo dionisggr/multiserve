@@ -1,16 +1,25 @@
 const jwt = require('jsonwebtoken');
-const db = require('../db');
+const { OAuth2Client } = require('google-auth-library');
 const { customError, isBrowserRequest, logger } = require('../utils');
-const { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET } = require('../config');
+const { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET, GOOGLE_CLIENT_ID } = require('../config');
 const passwords = require('../services/passwords');
+const schemas = require('../schemas');
+const db = require('../db');
 
 async function login(req, res, next) {
-  const { username, email, password } = req.body;
+  const { id, username, email, password } = req.body;
   const { app_id } = req.params;
 
+  console.log(id, email)
+
   try {
+    const filters = (id)
+      ? { id }
+      : (username)
+        ? { username } : { email };
+    
     const user = await db(`${app_id}__users`)
-      .where((username) ? { username } : { email })
+      .where(filters)
       .first();
     
     if (!req.isMFA) {
@@ -62,6 +71,66 @@ async function login(req, res, next) {
     }
 
     return res.json(auth);
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function google(req, res, next) {
+  const { app_id } = req.params;
+  const { credential } = req.body;
+  const client = new OAuth2Client(GOOGLE_CLIENT_ID); 
+
+  try {
+    await schemas.google.validateAsync({ credential, app_id });
+
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: GOOGLE_CLIENT_ID,
+    });
+    const {
+      given_name: first_name,
+      family_name: last_name,
+      email,
+      sub,
+    } = ticket.getPayload();
+
+    const user = await db(`${app_id}__users`)
+      .where({ email, id: sub })
+      .first();
+    
+    if (!user) {
+      await db(`${app_id}__users`)
+        .insert({ id: sub, email, first_name, last_name });
+    }
+
+    const payload = {
+      id: sub,
+      user_id: sub,
+      email,
+      first_name,
+      last_name,
+      app_id,
+    }
+    const accessToken = jwt.sign(
+      payload, JWT_ACCESS_SECRET, { expiresIn: '1h' }
+    );
+    const refreshToken = jwt.sign(
+      payload, JWT_REFRESH_SECRET, { expiresIn: '7d' }
+    );
+
+    await db(`${app_id}__refresh_tokens`)
+      .insert({ user_id: sub, token: refreshToken });
+    
+    logger.info(payload, 'Login successful');
+
+    const response = {
+      token: accessToken,
+      refreshToken,
+      user: payload,
+    };
+
+    res.json(response);
   } catch (error) {
     next(error);
   }
@@ -142,4 +211,4 @@ async function check(req, res, next) {
   }
 }
 
-module.exports = { login, reauthorize, logout, check };
+module.exports = { login, google, reauthorize, logout, check };
