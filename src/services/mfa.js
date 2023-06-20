@@ -4,16 +4,14 @@ const { customError, isBrowserRequest } = require('../utils');
 const service = { email: require('./email') };
 
 async function send({ email, app_id, req }) {
-  const code = uuid.v4().substring(0, 6);
+  const code = uuid.v4().substring(0, 6).toUpperCase();
   const app = app_id
     .replace(/_/g, ' ')
     .replace(/\b\w/g, c => c.toUpperCase());
   const data = { app, email, code };
-  const expires_at = Date.now() + 1000 * 60 * 5  // +5 minutes
 
   if (isBrowserRequest(req)) {
-    // const result = await service.email.send(data);
-    const result = {};
+    const result = await service.email.send(data);
     const log = { ...data, status: result.statusCode };
 
     logger.info(log, 'Message sent.')

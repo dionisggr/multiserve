@@ -82,8 +82,6 @@ async function getAll(req, res, next) {
     const service = new Service(app_id);
     const messages = await db(service.messages.table).where(filters)
 
-    console.log(messages);
-
     if (messages.length) {
       logger.info(messages.map(({ id }) => id), 'Messages found.');
     } else {

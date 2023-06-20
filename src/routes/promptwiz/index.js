@@ -39,8 +39,6 @@ async function getPrompts(req, res, next) {
   
   logger.info({ user_id: req.auth.user_id }, 'PromptWiz prompts retrieved.')
 
-  console.log({ promptList })
-
   res.json(promptList);
 }
 

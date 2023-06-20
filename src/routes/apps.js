@@ -8,7 +8,6 @@ async function get(req, res, next) {
   
   try {
     await schemas.apps.validateAsync({ id });
-    console.log({ id });
 
     const service = new Service(id);
     const app = await service.apps.get({ filters: { id } });

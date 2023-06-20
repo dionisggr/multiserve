@@ -63,8 +63,6 @@ async function mfa(req, res, next) {
       .where({ email, code })
       .first();
     
-    console.log({ exists })
-    
     if (!exists) {
       return next(customError('Invalid 2FA code.', 400));
     }

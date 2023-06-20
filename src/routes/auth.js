@@ -10,8 +10,6 @@ async function login(req, res, next) {
   const { id, username, email, password } = req.body;
   const { app_id } = req.params;
 
-  console.log(id, email)
-
   try {
     const filters = (id)
       ? { id }
@@ -128,6 +126,7 @@ async function google(req, res, next) {
       token: accessToken,
       refreshToken,
       user: payload,
+      google: true,
     };
 
     res.json(response);

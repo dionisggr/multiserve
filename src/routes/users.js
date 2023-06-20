@@ -13,7 +13,7 @@ async function create(req, res, next) {
     await schemas.signup.validateAsync({ ...data, app_id });
 
     const service = new Service(app_id);
-    const user = await service.users.get({ filters: { email } });
+    let user = await service.users.get({ filters: { email } });
 
     if (user) {
       return next(
@@ -21,21 +21,15 @@ async function create(req, res, next) {
       );
     }
 
-    let encrypted;
+    const encrypted = (isBrowserRequest(req))
+      ? data.password
+      : service.passwords.encrypt(data.password);
+    const password = await service.passwords.hash(encrypted);
 
-    if (!user) {
-      encrypted = (isBrowserRequest(req))
-        ? data.password
-        : service.passwords.encrypt(data.password);
-      const password = await service.passwords.hash(encrypted);
-      
-      user = await service.users.create({ data: { ...data, password } });
-
-      logger.info(user, 'User created.');
-    }
-
+    user = await service.users.create({ data: { ...data, password } });
     delete user.password;
 
+    logger.info(user, 'User created.');
     logger.info({ id: user.id, email, app_id }, 'User successfully registered to app.');
 
     if (req.path.includes('/signup')) {
@@ -111,8 +105,6 @@ async function update(req, res, next) {
     );
     await schemas.apps.validateAsync({ app_id });
 
-    console.log(data.password)
-
     if (data.password) {
       const service = new Service(app_id);
       data.password = await service.passwords.hash(data.password);
@@ -122,8 +114,6 @@ async function update(req, res, next) {
       .update(data)
       .where({ id: user_id })
       .returning('*')
-    
-    console.log({ user })
     
     delete user.password;
 
