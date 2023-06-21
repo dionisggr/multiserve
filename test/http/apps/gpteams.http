@@ -1,4 +1,4 @@
-@baseUrl = http://localhost:8000
+@baseUrl = https://api.tec3devs.com
 
 ##### The following endpoints require an Admin Login first to any app (above)
 ##### One Login is enough to test all endpoints

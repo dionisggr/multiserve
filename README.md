@@ -115,7 +115,7 @@ If you prefer a fully manual setup, you can follow these steps:
   - Separate Terminal instance
 - **Prod**: `npm run start`
 - **Dev**: `npm run dev`
-> `npm run dev` starts a local server on `http://localhost:8000` using `nodemon`, which will watch for any file changes and will restart the server according to these changes.
+> `npm run dev` starts a local server on `https://api.tec3devs.com` using `nodemon`, which will watch for any file changes and will restart the server according to these changes.
 
 To turn off Redis, you can run `npm run redis:close` (`redis-cli shutdown`).
 

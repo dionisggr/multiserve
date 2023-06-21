@@ -9,8 +9,6 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "redis": "redis-server",
-    "redis:close": "redis-cli shutdown",
     "migrations": "knex --knexfile src/db/knexfile.js migrate:latest",
     "migrations:create": "knex --knexfile src/db/knexfile.js migrate:make",
     "migrations:rollback": "knex --knexfile src/db/knexfile.js migrate:rollback --all",
@@ -26,7 +24,7 @@
     "db:reset": "npx supabase db reset",
     "db:backup": "src/db/backup/index.sh",
     "setup": "npm run db:pull && npm run db:start && npm run reset && source aliases.sh",
-    "setup:aliases": "source aliases.sh"
+    "aliases": "source aliases.sh"
   },
   "dependencies": {
     "backblaze-b2": "^1.7.0",
