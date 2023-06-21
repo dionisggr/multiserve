@@ -32,8 +32,8 @@ const cors = {
   origin: [
     'http://localhost:3000',
     'http://localhost:5173',
-    'https://*.vercel.app',
-    'https://*.railway.app',
+    'https://promptwiz-dionisggr.vercel.app',
+    'https://promptwiz.vercel.app',
   ],
   credentials: true,
 };
