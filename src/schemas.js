@@ -63,7 +63,7 @@ const schemas = {
   conversations: {
     new: Joi.object({
       title: Joi.string(),
-      type: Joi.string().valid('single', 'group'),
+      type: Joi.string(),
       app_id: app_id.required(),
       created_by: id,
     }),

@@ -2,6 +2,7 @@ const { isBrowserRequest } = require('../utils');
 const { customError, logger } = require('../utils');
 const Service = require('../services/DB');
 const schemas = require('../schemas');
+const auth = require('./auth');
 const db = require('../db');
 
 async function create(req, res, next) {
@@ -95,9 +96,9 @@ async function getAll(req, res, next) {
 
 async function update(req, res, next) {
   try {
-    const { user_id } = req.auth;
+    const { user_id, email } = req.auth;
     const { app_id } = req.params;
-    const { data } = req.body;
+    const data = { ...req.body };
     data.updated_at = new Date().toISOString();
 
     await schemas.users.validateAsync(
@@ -119,7 +120,13 @@ async function update(req, res, next) {
 
     logger.info({ ...req.params, ...data }, 'User updated.');
 
-    return res.json(user);
+    if (data.password) {
+      req.body = { email, password: req.body.data.password };
+
+      return await auth.login(req, res, next);
+    } else {
+      return res.json(user);
+    }
   } catch (error) {
     return next(error);
   }

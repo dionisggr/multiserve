@@ -4,7 +4,7 @@ const {
   SLACK_GPTEAMS_DM_TOKEN,
   SLACK_GPTEAMS_BOT_ID,
   STATUSPAGE_PAGE_ID,
-  STATUSPAGE_TEC3_API_ID,
+  STATUSPAGE_ADMIN_API_ID,
   STATUSPAGE_GPTEAMS_ID,
   STATUSPAGE_API_KEY,
   STATUSPAGE_URL,
@@ -24,7 +24,7 @@ async function incidents(req, res, next) {
   const { text, channel_id: channel, user_id: slack_user_id } = req.body;
   const endpoint = 'https://api.statuspage.io/v1';
   const components = {
-    'tec3-api': STATUSPAGE_TEC3_API_ID,
+    'tec3-api': STATUSPAGE_ADMIN_API_ID,
     gpteams: STATUSPAGE_GPTEAMS_ID,
   };
   const { operation } = req.query;

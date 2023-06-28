@@ -38,12 +38,6 @@ class DB extends CRUD {
     return this;
   }
 
-  get keys() {
-    this.table = `${this.app_id}__keys AS ${this.app_id[0] + 'k'}`;
-
-    return this;
-  }
-
   get refreshTokens() {
     this.table = `${this.app_id}__refresh_tokens AS ${this.app_id[0] + 'rt'}`;
 

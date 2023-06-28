@@ -7,7 +7,7 @@ const Service = require('../../services/DB');
 const Router = express.Router();
 
 async function init(req, res, next) {
-  const service = new Service('groupgpt');
+  const service = new Service('chatterai');
 
   try {
     const user = await service.users.get({
@@ -17,7 +17,7 @@ async function init(req, res, next) {
           json_agg(
             row_to_json(gc)::jsonb || jsonb_build_object(
               'messages',
-              COALESCE((SELECT json_agg(row_to_json(gm)) FROM groupgpt__messages AS gm WHERE gm.conversation_id = gc.id), '[]')
+              COALESCE((SELECT json_agg(row_to_json(gm)) FROM chatterai__messages AS gm WHERE gm.conversation_id = gc.id), '[]')
             )
           ) AS conversations`
         ),
@@ -28,15 +28,15 @@ async function init(req, res, next) {
       },
       leftJoins: [
         [
-          'groupgpt__user_conversations AS guc',
+          'chatterai__user_conversations AS guc',
           'gu.id', 'guc.user_id'
         ],
         [
-          'groupgpt__conversations AS gc',
+          'chatterai__conversations AS gc',
           'guc.conversation_id', 'gc.id'
         ],
         [
-          'groupgpt__messages AS gm',
+          'chatterai__messages AS gm',
           'gm.conversation_id', 'guc.conversation_id'
         ]
       ],
@@ -56,16 +56,7 @@ async function init(req, res, next) {
   }
 }
 
-async function validate(req, res, next) {
-  if (!req.user.is_admin && req.user.app_id !== 'groupgpt') {
-    return next(
-      customError(`Unauthorized request from ${req.user.id}.`, 400)
-    );
-  }
-}
-
 Router
-  .all(validate)
   .get('/init', init)
 
 module.exports = Router;

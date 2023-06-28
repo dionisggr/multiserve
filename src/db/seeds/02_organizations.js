@@ -1,4 +1,4 @@
-const table = 'organizations';
+const table = 'demo__organizations';
 
 exports.seed = async function (db) {
   await db(table).del();

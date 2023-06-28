@@ -170,11 +170,11 @@ async function reauthorize(req, res, next) {
   delete payload.iat;
   delete payload.exp;
 
-  const accessToken = jwt.sign(
+  const token = jwt.sign(
     payload, JWT_ACCESS_SECRET, { expiresIn: '1h' }
   );
 
-  res.json({ accessToken });
+  res.json({ token });
 }
 
 async function logout(req, res, next) {
