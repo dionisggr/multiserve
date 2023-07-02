@@ -64,7 +64,7 @@ const schemas = {
     new: Joi.object({
       title: Joi.string(),
       type: Joi.string(),
-      app_id: app_id.required(),
+      organization_id: id,
       created_by: id,
     }),
     existing: Joi.object({

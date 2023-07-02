@@ -1,4 +1,4 @@
-const apps = ['demo'];
+const apps = ['demo', 'chatterai'];
 
 exports.seed = async function (db) {
   for (const app of apps) {
@@ -8,18 +8,14 @@ exports.seed = async function (db) {
     await db(table).insert([
       {
         conversation_id: 'bd1151f9-b562-46f2-a607-cd3aaac1c4dd',
-        user_id: 'demo',
+        user_id: app,
       },
       {
-        conversation_id: '65ca9c07-cdb6-48e9-8731-7cc7503cdb30',
-        user_id: 'demo',
-      },
-      {
-        conversation_id: '65ca9c07-cdb6-48e9-8731-7cc7503cdb30',
+        conversation_id: 'cd3a51f9-b562-46f2-a607-bd11aac1c5dd',
         user_id: 'doug',
       },
       {
-        conversation_id: '65ca9c07-cdb6-48e9-8731-7cc7503cdb30',
+        conversation_id: 'cd3a51f9-b562-46f2-a607-bd11aac1c5dd',
         user_id: 'lili',
       },
       {

@@ -41,7 +41,6 @@ async function login(req, res, next) {
       username: user.username,
       email: user.email,
       is_admin: user.is_admin,
-      organization_id: user.organization_id,
       app_id,
     }
     const accessToken = jwt.sign(

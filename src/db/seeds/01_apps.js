@@ -15,7 +15,7 @@ exports.seed = async function (db) {
     },
     {
       id: 'chatterai',
-      name: 'Financial Health Planner',
+      name: 'Chatter AI',
       created_at: db.fn.now(),
     },
     {

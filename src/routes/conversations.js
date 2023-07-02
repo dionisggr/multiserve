@@ -10,19 +10,16 @@ async function create(req, res, next) {
   const data = req.body;
 
   try {
-    await schemas.conversations.new.validateAsync(
-      { ...data, app_id }
-    );
+    await schemas.conversations.new.validateAsync(data);
 
     data.created_by = user_id;
 
     const service = new Service(app_id);
     const conversation = await service.conversations.create({ data });
-    const response = { conversation };
 
-    logger.info(response, 'Conversation successfully created.');
+    logger.info(conversation, 'Conversation successfully created.');
 
-    return res.status(201).json(response);
+    return res.status(201).json(conversation);
   } catch (error) {
     return next(error)
   }

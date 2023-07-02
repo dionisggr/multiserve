@@ -2,6 +2,7 @@ const { logger } = require('../../utils');
 const operations = require('../operations');
 
 const apps = ['demo', 'promptwiz'];
+const tables = apps.map((app) => `${app}__mfa`);
 
 exports.up = async function (db) {
   for (const app of apps) {
@@ -20,7 +21,6 @@ exports.up = async function (db) {
 };
 
 exports.down = async function (db) {
-  const tables = apps.map((app) => `${app}__mfa`);
   
   await operations.drop({ db, tables });
 

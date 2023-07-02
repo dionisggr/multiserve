@@ -17,7 +17,6 @@ async function createUsers({ db, app, apps }) {
       table.string('phone').unique();
       table.string('avatar').unique();
       table.string('openai_api_key');
-      table.string('organization_id').references('id').inTable(`${appName}__organizations`).onDelete('CASCADE');
       table.boolean('is_admin').notNullable().defaultTo(false);
       table.timestamp('created_at').defaultTo(db.fn.now());
       table.timestamp('updated_at').defaultTo(db.fn.now());
@@ -27,6 +26,38 @@ async function createUsers({ db, app, apps }) {
 
     logger.info(`Table ${tableName} created successfully!`);
   }
+};
+
+async function createOrganizations({ db, app, apps }) {
+  for (const appName of apps || [app]) {
+    const tableName = `${appName}__organizations`;
+    
+    await db.schema.dropTableIfExists(tableName);
+    await db.schema.createTable(tableName, function (table) {
+      table.string('id').primary().defaultTo(db.raw('uuid_generate_v4()'));
+      table.string('name');
+      table.string('created_by').references('id').inTable(`${appName}__users`).onDelete('CASCADE');
+      table.string("created_at").defaultTo(db.fn.now());
+      table.string('archived_at').defaultTo(db.fn.now());
+      table.string('logo').unique();
+    }).catch(error => logger.error(error, 'Error creating table.'))
+
+    logger.info(`Table ${tableName} created successfully!`);
+  }
+};
+
+async function createUserOrganizations({ db, apps, app }) {
+  for (const appName of apps || [app]) {
+    const tableName = `${appName}__user_organizations`;
+
+    await db.schema.dropTableIfExists(tableName);
+    await db.schema.createTable(tableName, function (table) {
+      table.string('user_id').references('id').inTable(`${appName}__users`).onDelete('CASCADE');
+      table.string('organization_id').references('id').inTable(`${appName}__organizations`).onDelete('CASCADE');
+    }).catch(error => logger.error(error, 'Error creating table.'));
+
+    logger.info(`Table ${tableName} created successfully!`);
+  };
 }
 
 async function createConversations({ db, apps, app }) {
@@ -36,7 +67,7 @@ async function createConversations({ db, apps, app }) {
     await db.schema.raw('CREATE EXTENSION IF NOT EXISTS "pgcrypto"');
     await db.schema.dropTableIfExists(tableName);
     await db.schema.createTable(tableName, function (table) {
-        table.uuid('id').primary().defaultTo(db.raw('uuid_generate_v4()'));
+        table.string('id').primary().defaultTo(db.raw('uuid_generate_v4()'));
         table.string('title');
         table.string('created_by').references('id').inTable(`${appName}__users`).onDelete('CASCADE');
         table.string('organization_id').references('id').inTable(`${appName}__organizations`).onDelete('CASCADE');
@@ -58,11 +89,10 @@ async function createMessages({ db, apps, app }) {
     await db.schema.raw('CREATE EXTENSION IF NOT EXISTS "pgcrypto"');
     await db.schema.dropTableIfExists(tableName);
     await db.schema.createTable(tableName, function (table) {
-      table.uuid('id').primary().defaultTo(db.raw('uuid_generate_v4()'));
-      table.uuid('conversation_id').references('id').inTable(`${appName}__conversations`).onDelete('CASCADE');
-      table.uuid('archived_by').nullable().references('id').inTable(`${appName}__messages`).onDelete('SET NULL');
+      table.string('id').primary().defaultTo(db.raw('uuid_generate_v4()'));
+      table.string('conversation_id').references('id').inTable(`${appName}__conversations`).onDelete('CASCADE');
+      table.string('archived_by').nullable().references('id').inTable(`${appName}__messages`).onDelete('SET NULL');
       table.string('user_id').nullable().references('id').inTable(`${appName}__users`).onDelete('CASCADE');
-      table.string('organization_id').nullable().references('id').inTable(`${appName}__organizations`).onDelete('CASCADE');
       table.specificType('content', 'varchar').notNullable();
       table.timestamp('created_at').defaultTo(db.fn.now());
       table.timestamp('updated_at');
@@ -81,7 +111,7 @@ async function createUserConversations({ db, apps, app }) {
     await db.schema.dropTableIfExists(tableName);
     await db.schema.createTable(tableName, function (table) {
         table.string('user_id').references('id').inTable(`${appName}__users`).onDelete('CASCADE');
-        table.uuid('conversation_id').references('id').inTable(`${appName}__conversations`).onDelete('CASCADE');
+        table.string('conversation_id').references('id').inTable(`${appName}__conversations`).onDelete('CASCADE');
       })
       .catch((error) => logger.error(error, 'Error creating table.'));
 
@@ -130,6 +160,8 @@ async function drop({ db, tables, table }) {
 }
 
 module.exports = {
+  createOrganizations,
+  createUserOrganizations,
   createUsers,
   createConversations,
   createUserConversations,
