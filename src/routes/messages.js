@@ -7,7 +7,7 @@ const db = require('../db');
 async function create(req, res, next) {
   const { user_id } = req.auth;
   const { conversation_id, app_id } = req.params;
-  const data = { ...req.body, conversation_id, user_id };
+  const data = { conversation_id, user_id, ...req.body };
 
   try {
     await schemas.conversations.existing.validateAsync(

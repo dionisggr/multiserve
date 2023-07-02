@@ -8,7 +8,7 @@ exports.seed = async function (db) {
     await db(table).insert([
       {
         conversation_id: 'bd1151f9-b562-46f2-a607-cd3aaac1c4dd',
-        user_id: app,
+        user_id: 'demo',
       },
       {
         conversation_id: 'cd3a51f9-b562-46f2-a607-bd11aac1c5dd',

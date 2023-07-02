@@ -60,7 +60,7 @@ exports.seed = async function (db) {
         openai_api_key: openai_api_keys[app] || null
       },
       {
-        id: app,
+        id: 'demo',
         username: 'demo',
         email: 'demo@demo.com',
         password: demo_password,
@@ -74,6 +74,7 @@ exports.seed = async function (db) {
     const table = app + '__users';
 
     await db(table).insert([
+      { id: 'chatterai' },
       { id: 'chatgpt' },
       { id: 'chatgpt4' },
       { id: 'dalle' },

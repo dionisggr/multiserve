@@ -9,7 +9,7 @@ exports.seed = async function (db) {
       {
         id: '4595a2e8-8024-4e29-b36c-2212d7f242e9',
         content: 'Hi, there',
-        user_id: app,
+        user_id: 'demo',
         conversation_id: 'bd1151f9-b562-46f2-a607-cd3aaac1c4dd',
       },
       {
@@ -21,7 +21,7 @@ exports.seed = async function (db) {
       {
         id: '1dbcb23d-ad11-48dc-9076-6fef3d51fe25',
         content: 'Nothing, just saying hi.',
-        user_id: app,
+        user_id: 'demo',
         conversation_id: 'bd1151f9-b562-46f2-a607-cd3aaac1c4dd',
       },
       {

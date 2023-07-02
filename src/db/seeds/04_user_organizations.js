@@ -11,11 +11,11 @@ exports.seed = async function (db) {
         organization_id: 'tec3'
       },
       {
-        user_id: app,
+        user_id: 'demo',
         organization_id: 'demo'
       },
       {
-        user_id: app,
+        user_id: 'demo',
         organization_id: 'personal'
       },
     ]);

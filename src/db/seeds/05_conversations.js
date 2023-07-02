@@ -9,7 +9,7 @@ exports.seed = async function (db) {
       {
         id: 'bd1151f9-b562-46f2-a607-cd3aaac1c4dd',
         title: 'Test Title',
-        created_by: app,
+        created_by: 'demo',
         organization_id: 'demo',
         type: 'private',
       },
