@@ -4,7 +4,6 @@ const { logger } = require('../../utils');
 const db = require('../../db');
 
 const Router = express.Router();
-const aiModels = ['chatgpt', 'gpt-4', 'dall-e', 'whisper'];
 
 async function getSpaces(req, res, next) {
   const { id: user_id } = req.auth;
