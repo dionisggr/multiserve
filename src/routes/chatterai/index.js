@@ -40,6 +40,26 @@ async function createSpace(req, res, next) {
   }
 }
 
+async function deleteSpace(req, res, next) {
+  const { id: user_id } = req.auth;
+  const { organization_id } = req.params;
+
+  try {
+    const spaces = await db('chatterai__organizations')
+      .where({ id: organization_id, created_by: user_id })
+      .delete();
+    
+    if (!spaces) {
+      return next(customError('Unauthorized', 401));
+    }
+    
+    res.json(spaces[0]);    
+  } catch (err) {
+    logger.error(err);
+    next(customError(err.message, 500));
+  }
+}
+
 async function getChats(req, res, next) {
   const { id: user_id } = req.auth;
   const { space } = req.query;
@@ -179,7 +199,23 @@ async function editSpace(req, res, next) {
   }
 }
 
+async function getUser(req, res, next) {
+  const { id: user_id } = req.auth;
+
+  try {
+    const user = await db('chatterai__users')
+      .where({ id: user_id })
+      .first();
+    
+    res.json(user);
+  } catch (err) {
+    logger.error(err);
+    next(customError(err.message, 500));
+  }
+}
+
 Router
+  .get('/user', getUser)
   .get('/spaces', getSpaces)
   .get('/chats', getChats)
   .get('/chatview', chatview)
@@ -187,6 +223,7 @@ Router
   .post('/chats/:conversation_id/join', joinChat)
   .post('/chats/:conversation_id/leave', leaveChat)
   .patch('/spaces/:organization_id', editSpace)
+  .delete('/spaces/:organization_id', deleteSpace)
   .delete('/chats/:conversation_id', deleteChat)
 
 module.exports = Router;

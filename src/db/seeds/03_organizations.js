@@ -9,14 +9,17 @@ exports.seed = async function (db) {
       {
         id: 'tec3',
         name: 'Tec3, LLC',
+        created_by: 'tec3',
       },
       {
         id: 'demo',
         name: 'Demo Org.',
+        created_by: 'demo',
       },
       {
         id: 'personal',
         name: 'Personal',
+        created_by: 'demo',
       },
     ]);
   };
