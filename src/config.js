@@ -34,6 +34,8 @@ const cors = {
     'http://localhost:5173',
     'https://promptwiz-dionisggr.vercel.app',
     'https://promptwiz.vercel.app',
+    'https://chatterai-dionisggr.vercel.app',
+    'https://chatterai-phi.vercel.app',
   ],
   credentials: true,
 };
