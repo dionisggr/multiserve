@@ -1,7 +1,9 @@
 const express = require('express');
-const { customError } = require('../../utils');
-const { logger } = require('../../utils');
+const jwt = require('jsonwebtoken');
+const { customError, logger } = require('../../utils');
+const { JWT_ACCESS_SECRET } = require('../../config');
 const db = require('../../db');
+const Service = require('../../services/DB');
 
 const Router = express.Router();
 
@@ -59,15 +61,49 @@ async function deleteSpace(req, res, next) {
   }
 }
 
+async function joinSpace(req, res, next) {
+  const { id: user_id, email } = req.auth;
+  const { organization_id } = req.params;
+
+  try {
+    const isAuthorized = await db('chatterai__invites')
+      .where({ email, organization_id })
+    
+    if (isAuthorized) {
+      return next(customError('Unauthorized', 401));
+    }
+
+    console.log('INSERTED', { user_id, organization_id })
+    
+    await db('chatterai__user_organizations')
+      .insert({ user_id, organization_id });
+    
+    // await db('chatterai__invites')
+    //   .where({ email, organization_id })
+    //   .del();
+    
+    res.json({ message: 'Joined space' });    
+  } catch (err) {
+    logger.error(err);
+    next(customError(err.message, 500));
+  }
+}
+
 async function getChats(req, res, next) {
   const { id: user_id } = req.auth;
   const { space } = req.query;
 
   try {
+    const isAuthorized = await db('chatterai__user_organizations')
+      .where({ user_id, organization_id: space });
+    
+    if (!isAuthorized) {
+      return next(customError('Unauthorized', 401));
+    }
+
     const chats = await db(`chatterai__conversations AS c`)
-      .leftJoin('chatterai__user_organizations AS uo', 'uo.organization_id', 'c.organization_id')
-      .where({ user_id, 'c.organization_id': space, type: 'public' })
-      .orWhere({ created_by: user_id, 'c.organization_id': space, type: 'private' })      
+      .where({ organization_id: space, type: 'public' })
+      .orWhere({ organization_id: space, type: 'private', created_by: user_id })      
     
     res.json(chats);    
   } catch (err) {
@@ -213,14 +249,118 @@ async function getUser(req, res, next) {
   }
 }
 
+async function getParticipants(req, res, next) {
+  const { id: user_id } = req.auth;
+  const { conversation_id } = req.params;
+
+  try {
+    const isAuthorized = await db('chatterai__conversations AS uc')
+      .where({ id: conversation_id, created_by: user_id })
+      .first();
+    
+    if (!isAuthorized) {
+      return next(customError('Unauthorized', 401));
+    }
+
+    const participants = await db('chatterai__user_conversations AS uc')
+      .leftJoin('chatterai__users AS u', 'u.id', 'uc.user_id')
+      .where({ conversation_id })
+    
+    res.json(participants);
+  } catch (err) {
+    logger.error(err);
+    next(customError(err.message, 500));
+  }
+}
+
+async function sendUsersInvites(req, res, next) {
+  const { id: sender } = req.auth;
+  const { emails, organization_id } = req.body;
+
+  try {
+    const isAuthorized = await db('chatterai__organizations')
+      .where({ id: organization_id, created_by: sender })
+      .first();
+    
+    if (!isAuthorized) {
+      return next(customError('Unauthorized', 401));
+    }
+
+    const invites = emails.map(email => ({
+      email,
+      sender,
+      organization_id,
+      token: jwt.sign(
+        { sender, organization_id },
+        JWT_ACCESS_SECRET,
+        { expiresIn: '1d' })
+    }));
+
+    await db('chatterai__invites')
+      .insert(invites);
+    
+    const service = new Service();
+    const data = invites.map(invite => {
+      const { email, token } = invite;
+
+      return { email, url: 'https://localhost:3000/space/' + token }
+    })
+    
+    await service.email.sendInvites({
+      app: 'Chatter.AI',
+      subject: 'You have been invited to join a chat space in Chatter.AI!',
+      group: organization_id,
+      data
+    });
+    
+    res.json({ message: 'Invites sent' });
+  } catch (err) {
+    logger.error(err);
+    next(customError(err.message, 500));
+  }
+}
+
+async function validateInviteToken(req, res, next) {
+  const token = req.get('Authorization')?.split(' ')?.[1];
+
+  try {
+    const { sender, organization_id } = jwt.verify(token, JWT_ACCESS_SECRET);
+    const exists = await db('chatterai__invites')
+      .where({ token, sender, organization_id })
+      .first();
+
+    if (!exists) {
+      return next(customError('Invalid invite token', 401));
+    }
+
+    // await db('chatterai__invites')
+    //   .where({ token, sender, organization_id })
+    //   .del();
+    
+    const space = await db('chatterai__organizations')
+      .where({ id: organization_id })
+      .first();
+    
+    res.json(space);
+  } catch (err) {
+    logger.error(err);
+    next(customError(err.message, 500));
+  }
+}
+
 Router
   .get('/user', getUser)
   .get('/spaces', getSpaces)
+  .get('/chats/:conversation_id/participants', getParticipants)
   .get('/chats', getChats)
   .get('/chatview', chatview)
+  .post('/spaces/:organization_id/join', joinSpace)
   .post('/spaces', createSpace)
   .post('/chats/:conversation_id/join', joinChat)
   .post('/chats/:conversation_id/leave', leaveChat)
+  .post('/chats/:conversation_id/leave', leaveChat)
+  .post('/invites/send', sendUsersInvites)
+  .post('/invites/validate', validateInviteToken)
   .patch('/spaces/:organization_id', editSpace)
   .delete('/spaces/:organization_id', deleteSpace)
   .delete('/chats/:conversation_id', deleteChat)

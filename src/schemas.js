@@ -25,6 +25,7 @@ const schemas = {
   signup: Joi.object({
     password: password.required(),
     app_id: app_id.required(),
+    organization_id: Joi.string(),
     id: id,
     email: email,
     username: username,

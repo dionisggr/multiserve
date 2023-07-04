@@ -149,6 +149,23 @@ async function createMFAStorage({ db, apps, app }) {
   }
 }
 
+async function createInvites({ db, apps, app }) {
+  for (const appName of apps || [app]) {
+    const tableName = `${appName}__invites`;
+
+    await db.schema.dropTableIfExists(tableName);
+    await db.schema.createTable(tableName, function (table) {
+      table.string('token').primary();
+      table.string('email');
+      table.string('sender').references('id').inTable(`${appName}__users`).onDelete('CASCADE');
+      table.string('organization_id').references('id').inTable(`${appName}__organizations`).onDelete('CASCADE');
+    })
+      .catch((error) => logger.error(error, 'Error creating table.'));
+
+    logger.info(`Table ${tableName} created successfully!`);
+  }
+}
+
 async function drop({ db, tables, table }) {
   for (const tableName of tables || [table]) {
     await db.schema
@@ -168,5 +185,6 @@ module.exports = {
   createMessages,
   createRefreshTokens,
   createMFAStorage,
+  createInvites,
   drop,
 };

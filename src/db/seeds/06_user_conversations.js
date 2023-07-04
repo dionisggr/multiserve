@@ -1,6 +1,6 @@
-const apps = ['demo', 'chatterai'];
-
 exports.seed = async function (db) {
+  const apps = ['demo'];
+
   for (const app of apps) {
     const table = app + '__user_conversations';
     

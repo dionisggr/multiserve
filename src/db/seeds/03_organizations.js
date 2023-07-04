@@ -1,6 +1,6 @@
-const apps = ['demo', 'promptwiz', 'chatterai']
-
 exports.seed = async function (db) {
+  const apps = ['demo', 'promptwiz']
+
   for (const app of apps) {
     const table = app + '__organizations';
 

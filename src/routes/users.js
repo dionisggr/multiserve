@@ -7,8 +7,17 @@ const db = require('../db');
 
 async function create(req, res, next) {
   const { app_id } = req.params;
-  const data = req.body;
+  const {
+    organization_id = req.body.organizationId,
+    ...data
+  } = req.body;
   const { email } = data;
+
+  for (const key in data) {
+    if (!data[key]) {
+      delete data[key];
+    }
+  }
 
   try {
     await schemas.signup.validateAsync({ ...data, app_id });
@@ -29,6 +38,13 @@ async function create(req, res, next) {
 
     user = await service.users.create({ data: { ...data, password } });
     delete user.password;
+
+    console.log({ user, organization_id })
+
+    if (organization_id) {
+      await db(`${app_id}__user_organizations`)
+        .insert({ user_id: user.id, organization_id });
+    }
 
     logger.info(user, 'User created.');
     logger.info({ id: user.id, email, app_id }, 'User successfully registered to app.');

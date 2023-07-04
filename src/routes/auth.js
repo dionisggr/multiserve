@@ -201,9 +201,9 @@ async function check(req, res, next) {
   }
 
   try {
-    jwt.verify(token, JWT_ACCESS_SECRET);
+    const auth = jwt.verify(token, JWT_ACCESS_SECRET);
 
-    res.sendStatus(200);
+    res.json(auth);
   } catch (error) {
     next(error);
   }

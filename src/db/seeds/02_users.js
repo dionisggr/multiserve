@@ -7,7 +7,7 @@ const {
 } = require('../../config');
 
 const service = new Service();
-const chat_apps = ['demo', 'promptwiz', 'chatterai'];
+const chat_apps = ['demo', 'promptwiz'];
 const apps = [...chat_apps];
 const openai_api_keys = {
   promptwiz: PROMPTWIZ_OPENAI_API_KEY,

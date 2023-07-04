@@ -1,6 +1,6 @@
-const table = 'apps';
-
 exports.seed = async function (db) {
+  const table = 'apps';
+
   await db(table).del();
   await db(table).insert([
     {
