@@ -53,9 +53,9 @@ async function reset(req, res, next) {
 
 async function mfa(req, res, next) {
   try {
+    const { email } = req.auth;
     const { app_id } = req.params;
     const { code } = req.body;
-    const { email } = req.auth;
 
     await schemas.apps.validateAsync({ app_id });
 

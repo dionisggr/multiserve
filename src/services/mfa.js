@@ -12,7 +12,7 @@ async function send({ email, app_id, req }) {
 
   if (isBrowserRequest(req)) {
     const result = await service.email.sendMFA(data);
-    const log = { ...data, status: result.statusCode };
+    const log = { ...data, status: result?.statusCode };
 
     logger.info(log, 'Message sent.')
   }

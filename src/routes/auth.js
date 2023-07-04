@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');
 const { customError, isBrowserRequest, logger } = require('../utils');
-const { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET, GOOGLE_CLIENT_ID } = require('../config');
+const { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET, GOOGLE_CLIENT_ID, CHATTERAI_GOOGLE_CLIENT_ID } = require('../config');
 const passwords = require('../services/passwords');
 const schemas = require('../schemas');
 const db = require('../db');
@@ -58,14 +58,9 @@ async function login(req, res, next) {
     const auth = {
       token: accessToken,
       refreshToken,
-      hasOpenAIApiKey: !!user.openai_api_key
+      hasOpenAIApiKey: !!user.openai_api_key,
+      user: payload,
     };
-
-    if (req.isMFA) {
-      auth.mfa = { user_id: user.id, email: user.email };
-    } else {
-      auth.user = payload;
-    }
 
     return res.json(auth);
   } catch (error) {
@@ -76,14 +71,18 @@ async function login(req, res, next) {
 async function google(req, res, next) {
   const { app_id } = req.params;
   const { credential } = req.body;
-  const client = new OAuth2Client(GOOGLE_CLIENT_ID); 
+  const CLIENT_ID = {
+    promptwiz: GOOGLE_CLIENT_ID,
+    chatterai: CHATTERAI_GOOGLE_CLIENT_ID
+  }[app_id]
+  const client = new OAuth2Client(CLIENT_ID); 
 
   try {
     await schemas.google.validateAsync({ credential, app_id });
 
     const ticket = await client.verifyIdToken({
       idToken: credential,
-      audience: GOOGLE_CLIENT_ID,
+      audience: CLIENT_ID,
     });
     const {
       given_name: first_name,
@@ -92,18 +91,24 @@ async function google(req, res, next) {
       sub,
     } = ticket.getPayload();
 
-    const user = await db(`${app_id}__users`)
-      .where({ email, id: sub })
+    let user = await db(`${app_id}__users`)
+      .where({ email })
       .first();
     
     if (!user) {
-      await db(`${app_id}__users`)
-        .insert({ id: sub, email, first_name, last_name });
+      const insert = await db(`${app_id}__users`)
+        .insert({ id: sub, email, first_name, last_name })
+        .returning('*');
+      
+      user = insert[0];
+      
+      await db(`${app_id}__user_organizations`)
+        .insert({ user_id: user.id, organization_id: 'demo' });
     }
 
     const payload = {
-      id: sub,
-      user_id: sub,
+      id: user.id,
+      user_id: user.id,
       email,
       first_name,
       last_name,
@@ -117,7 +122,7 @@ async function google(req, res, next) {
     );
 
     await db(`${app_id}__refresh_tokens`)
-      .insert({ user_id: sub, token: refreshToken });
+      .insert({ user_id: user.id, token: refreshToken });
     
     logger.info(payload, 'Login successful');
 

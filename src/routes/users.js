@@ -115,6 +115,7 @@ async function update(req, res, next) {
     const { user_id, email } = req.auth;
     const { app_id } = req.params;
     const data = { ...req.body };
+    
     data.updated_at = new Date().toISOString();
 
     await schemas.users.validateAsync(
