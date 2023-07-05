@@ -5,7 +5,22 @@ const { JWT_ACCESS_SECRET } = require('../../config');
 const db = require('../../db');
 const Service = require('../../services/DB');
 
-const Router = express.Router();
+const Router = express.Router()
+  .get('/user', getUser)
+  .get('/spaces', getSpaces)
+  .get('/chats/:conversation_id/participants', getParticipants)
+  .get('/chats', getChats)
+  .get('/chatview', chatview)
+  .post('/spaces/:organization_id/join', joinSpace)
+  .post('/spaces', createSpace)
+  .post('/chats/:conversation_id/join', joinChat)
+  .post('/chats/:conversation_id/leave', leaveChat)
+  .post('/invites/send', sendUsersInvites)
+  .post('/invites/validate', validateInviteToken)
+  .patch('/spaces/:organization_id', editSpace)
+  .delete('/spaces/:organization_id', deleteSpace)
+  .delete('/chats/:conversation_id', deleteChat)
+  .delete('/chats/:conversation_id/participants/:user_id', removeParticipant)
 
 async function getSpaces(req, res, next) {
   const { id: user_id } = req.auth;
@@ -127,7 +142,9 @@ async function chatview(req, res, next) {
     }
     
     const messages = await db('chatterai__messages')
-      .where({ conversation_id });
+      .where({ conversation_id })
+      .orderBy('created_at');
+    console.log({ messages })
     const participants = await db('chatterai__user_conversations AS uc')
       .leftJoin('chatterai__users AS u', 'u.id', 'uc.user_id')
       .where({ conversation_id });
@@ -255,7 +272,8 @@ async function getParticipants(req, res, next) {
 
   try {
     const isAuthorized = await db('chatterai__conversations AS uc')
-      .where({ id: conversation_id, created_by: user_id })
+      .rightJoin('chatterai__user_organizations AS uo', 'uo.organization_id', 'uc.organization_id')
+      .where({ id: conversation_id, user_id })
       .first();
     
     if (!isAuthorized) {
@@ -267,6 +285,38 @@ async function getParticipants(req, res, next) {
       .where({ conversation_id })
     
     res.json(participants);
+  } catch (err) {
+    logger.error(err);
+    next(customError(err.message, 500));
+  }
+}
+ 
+async function removeParticipant(req, res, next) {
+  const { id: created_by } = req.auth;
+  const { conversation_id, user_id } = req.params;
+
+  try {
+    const isAuthorized = await db('chatterai__conversations AS uc')
+      .where({ created_by })
+      .first();
+    
+    if (!isAuthorized) {
+      return next(customError('Unauthorized', 401));
+    }
+
+    console.log({ conversation_id, user_id })
+
+    const deleted = await db('chatterai__user_conversations')
+      .where({ conversation_id, user_id })
+      .del();
+    
+    console.log({ deleted })
+    
+    if (!deleted) {
+      return next(customError('Participant not found', 404));
+    }
+    
+    res.json({ message: 'Participant removed' });
   } catch (err) {
     logger.error(err);
     next(customError(err.message, 500));
@@ -333,10 +383,6 @@ async function validateInviteToken(req, res, next) {
       return next(customError('Invalid invite token', 401));
     }
 
-    // await db('chatterai__invites')
-    //   .where({ token, sender, organization_id })
-    //   .del();
-    
     const space = await db('chatterai__organizations')
       .where({ id: organization_id })
       .first();
@@ -347,22 +393,5 @@ async function validateInviteToken(req, res, next) {
     next(customError(err.message, 500));
   }
 }
-
-Router
-  .get('/user', getUser)
-  .get('/spaces', getSpaces)
-  .get('/chats/:conversation_id/participants', getParticipants)
-  .get('/chats', getChats)
-  .get('/chatview', chatview)
-  .post('/spaces/:organization_id/join', joinSpace)
-  .post('/spaces', createSpace)
-  .post('/chats/:conversation_id/join', joinChat)
-  .post('/chats/:conversation_id/leave', leaveChat)
-  .post('/chats/:conversation_id/leave', leaveChat)
-  .post('/invites/send', sendUsersInvites)
-  .post('/invites/validate', validateInviteToken)
-  .patch('/spaces/:organization_id', editSpace)
-  .delete('/spaces/:organization_id', deleteSpace)
-  .delete('/chats/:conversation_id', deleteChat)
 
 module.exports = Router;

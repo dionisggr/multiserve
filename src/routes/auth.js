@@ -192,7 +192,7 @@ async function logout(req, res, next) {
   
     logger.info({ user_id, app_id }, 'Logout successful');
   
-    res.sendStatus(200);
+    res.json({ message: 'Logout successful' })
   } catch (error) {
     next(error);
   }
