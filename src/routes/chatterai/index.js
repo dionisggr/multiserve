@@ -4,6 +4,7 @@ const { customError, logger } = require('../../utils');
 const { JWT_ACCESS_SECRET } = require('../../config');
 const db = require('../../db');
 const Service = require('../../services/DB');
+const websocket = require('../../services/websocket/setup');
 
 const Router = express.Router()
   .get('/user', getUser)

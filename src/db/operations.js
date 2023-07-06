@@ -167,6 +167,24 @@ async function createInvites({ db, apps, app }) {
   }
 }
 
+async function createWebSockets({ db, apps, app }) {
+  for (const appName of apps || [app]) {
+    const tableName = `${appName}__invites`;
+
+    await db.schema.dropTableIfExists(tableName);
+    await db.schema.createTable(tableName, function (table) {
+      table.string('ws').primary();
+      table.string('user_id').references('id').inTable(`${appName}__users`).onDelete('CASCADE');
+      table.string('conversation_id').references('id').inTable(`${appName}__conversations`).onDelete('CASCADE');
+      table.boolean('is_online').defaultTo(false);
+      table.boolean('is_typing').defaultTo(false);
+    })
+      .catch((error) => logger.error(error, 'Error creating table.'));
+
+    logger.info(`Table ${tableName} created successfully!`);
+  }
+}
+
 async function drop({ db, tables, table }) {
   for (const tableName of tables || [table]) {
     await db.schema
@@ -187,5 +205,6 @@ module.exports = {
   createRefreshTokens,
   createMFAStorage,
   createInvites,
+  createWebSockets,
   drop,
 };

@@ -3,6 +3,7 @@ const Service = require('../services/DB');
 const { logger } = require('../utils');
 const schemas = require('../schemas');
 const db = require('../db');
+const websocket = require('../services/websocket');
 
 async function create(req, res, next) {
   const { user_id } = req.auth;
@@ -19,6 +20,13 @@ async function create(req, res, next) {
 
     const service = new Service(app_id);
     const message = await service.messages.create({ data });
+
+    websocket.chatterai.sendMessage({
+      action: 'message',
+      message,
+      user_id,
+      conversation_id,
+    });
 
     logger.info(message, 'Message successfully created.');
 

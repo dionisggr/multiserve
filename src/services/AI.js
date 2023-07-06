@@ -1,10 +1,5 @@
-const fs = require('fs');
 const WebSocket = require('ws');
 const { Configuration, OpenAIApi } = require('openai');
-const { pipeline } = require('stream');
-const { promisify } = require('util');
-const fetch = require('node-fetch');
-const { logger } = require('../utils');
 
 const wss = new WebSocket.Server({ port: 8080 });
 
