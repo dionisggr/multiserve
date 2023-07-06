@@ -9,7 +9,7 @@ class WebSocketManager {
     }
     
     this.wss = new WebSocket.Server({ port, handleProtocols: this.handleProtocols.bind(this) });
-    this.appConversationClients = new Map();
+    this.appClients = new Map();
     this.baseUrl = {
       development: 'http://localhost:3000',
       production: 'https://chatterai-phi.vercel.app',
@@ -20,31 +20,31 @@ class WebSocketManager {
 
   handleProtocols(protocols, request) {
     const parsedUrl = new url.URL(request.url, this.baseUrl);
-    const conversation_id = parsedUrl.searchParams.get('conversation_id');
+    const id = parsedUrl.searchParams.get('id');
 
-    return conversation_id || null;
+    return id || null;
   }
 
   _handleConnection(ws, request) {
-    const key = request.headers['sec-websocket-protocol']; // conversation_id
+    const key = request.headers['sec-websocket-protocol']; // id
   
-    if (!this.appConversationClients.has(key)) {
-      this.appConversationClients.set(key, new Set());
+    if (!this.appClients.has(key)) {
+      this.appClients.set(key, new Set());
     }
     
-    this.appConversationClients.get(key).add(ws);
+    this.appClients.get(key).add(ws);
     
     ws.on('message', (data) => {
       this.sendMessage(JSON.parse(data));
     });
-  
+
     ws.on('close', () => {
-      this.appConversationClients.get(key).delete(ws);
+      this.appClients.get(key).delete(ws);
     });
   }
 
   sendMessage(data) {
-    const clients = this.appConversationClients.get(data?.conversation_id);
+    const clients = this.appClients.get(data?.id);
     
     if (!clients) return;
   

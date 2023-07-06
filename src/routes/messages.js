@@ -23,9 +23,9 @@ async function create(req, res, next) {
 
     websocket.chatterai.sendMessage({
       action: 'message',
-      message,
+      id: conversation_id,
       user_id,
-      conversation_id,
+      message,
     });
 
     logger.info(message, 'Message successfully created.');
