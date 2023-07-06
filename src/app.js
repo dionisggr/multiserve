@@ -18,7 +18,7 @@ app.use(
   helmet(config.helmet),
   cors(config.cors),
   bodyParser.urlencoded({ extended: true }),
-  bodyParser.json(),
+  bodyParser.json({ limit: '10mb' }),
   xss(),
   morgan(config.morgan),
 );

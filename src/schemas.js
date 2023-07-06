@@ -48,9 +48,9 @@ const schemas = {
   }).xor('id', 'app_id'),
   users: Joi.object({
     openai_api_key: Joi.string(),
-    user_id: id,
     first_name: name,
     last_name: name,
+    user_id: id,
     id,
     username,
     email,
@@ -60,7 +60,7 @@ const schemas = {
     created_at,
     updated_at,
     lastLogin,
-  }).xor('id', 'user_id', 'email'),
+  }),
   conversations: {
     new: Joi.object({
       title: Joi.string(),

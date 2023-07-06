@@ -69,8 +69,8 @@ exports.seed = async function (db) {
     },
     { id: 'chatterai' },
     { id: 'chatgpt' },
-    { id: 'chatgpt4' },
-    { id: 'dalle' },
+    { id: 'gpt-4' },
+    { id: 'dall-e' },
     { id: 'whisper' },
   ]);
 

@@ -39,12 +39,13 @@ async function create(req, res, next) {
     user = await service.users.create({ data: { ...data, password } });
     delete user.password;
 
-    console.log({ user, organization_id })
+    const newData = [{ user_id: user.id, organization_id: 'demo' }]
 
     if (organization_id) {
-      await db(`${app_id}__user_organizations`)
-        .insert({ user_id: user.id, organization_id });
+      newData.push({ user_id: user.id, organization_id })
     }
+
+    await db(`${app_id}__user_organizations`).insert(newData);
 
     logger.info(user, 'User created.');
     logger.info({ id: user.id, email, app_id }, 'User successfully registered to app.');
@@ -112,37 +113,35 @@ async function getAll(req, res, next) {
 
 async function update(req, res, next) {
   try {
-    const { user_id, email } = req.auth;
+    const { id: user_id, email } = req.auth;
     const { app_id } = req.params;
-    const data = { ...req.body };
+    const { data } = req.body;
     
     data.updated_at = new Date().toISOString();
 
-    await schemas.users.validateAsync(
-      { user_id, ...data }
-    );
     await schemas.apps.validateAsync({ app_id });
+    await schemas.users.validateAsync({ user_id, ...data });
 
     if (data.password) {
       const service = new Service(app_id);
       data.password = await service.passwords.hash(data.password);
     }
 
-    const user = await db(`${app_id}__users`)
+    const updated = await db(`${app_id}__users`)
       .update(data)
       .where({ id: user_id })
       .returning('*')
     
-    delete user.password;
+    delete updated.password;
 
-    logger.info({ ...req.params, ...data }, 'User updated.');
+    logger.info({ user_id, ...data, app_id }, 'User updated.');
 
     if (data.password) {
       req.body = { email, password: req.body.data.password };
 
       return await auth.login(req, res, next);
     } else {
-      return res.json(user);
+      return res.json(updated[0]);
     }
   } catch (error) {
     return next(error);

@@ -35,12 +35,11 @@ async function login(req, res, next) {
       }
     }
 
+    delete user.password;
+
     const payload = {
-      id: user.id,
+      ...user,
       user_id: user.id,
-      username: user.username,
-      email: user.email,
-      is_admin: user.is_admin,
       app_id,
     }
     const accessToken = jwt.sign(
@@ -59,6 +58,7 @@ async function login(req, res, next) {
       token: accessToken,
       refreshToken,
       hasOpenAIApiKey: !!user.openai_api_key,
+
       user: payload,
     };
 
@@ -97,7 +97,7 @@ async function google(req, res, next) {
     
     if (!user) {
       const insert = await db(`${app_id}__users`)
-        .insert({ id: sub, email, first_name, last_name })
+        .insert({ id: sub, email, first_name, last_name, is_google: true })
         .returning('*');
       
       user = insert[0];
@@ -106,12 +106,11 @@ async function google(req, res, next) {
         .insert({ user_id: user.id, organization_id: 'demo' });
     }
 
+    delete user.password;
+
     const payload = {
-      id: user.id,
+      ...user,
       user_id: user.id,
-      email,
-      first_name,
-      last_name,
       app_id,
     }
     const accessToken = jwt.sign(
@@ -130,7 +129,6 @@ async function google(req, res, next) {
       token: accessToken,
       refreshToken,
       user: payload,
-      google: true,
     };
 
     res.json(response);

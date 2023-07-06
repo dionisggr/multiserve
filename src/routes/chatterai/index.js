@@ -88,14 +88,8 @@ async function joinSpace(req, res, next) {
       return next(customError('Unauthorized', 401));
     }
 
-    console.log('INSERTED', { user_id, organization_id })
-    
     await db('chatterai__user_organizations')
       .insert({ user_id, organization_id });
-    
-    // await db('chatterai__invites')
-    //   .where({ email, organization_id })
-    //   .del();
     
     res.json({ message: 'Joined space' });    
   } catch (err) {
@@ -118,7 +112,8 @@ async function getChats(req, res, next) {
 
     const chats = await db(`chatterai__conversations AS c`)
       .where({ organization_id: space, type: 'public' })
-      .orWhere({ organization_id: space, type: 'private', created_by: user_id })      
+      .orWhere({ organization_id: space, type: 'private', created_by: user_id })
+      .orderBy('updated_at', 'desc');
     
     res.json(chats);    
   } catch (err) {
@@ -144,7 +139,6 @@ async function chatview(req, res, next) {
     const messages = await db('chatterai__messages')
       .where({ conversation_id })
       .orderBy('created_at');
-    console.log({ messages })
     const participants = await db('chatterai__user_conversations AS uc')
       .leftJoin('chatterai__users AS u', 'u.id', 'uc.user_id')
       .where({ conversation_id });
@@ -163,7 +157,7 @@ async function joinChat(req, res, next) {
   try {
     const isAuthorized = await db('chatterai__conversations AS c')
       .leftJoin('chatterai__user_organizations AS uo', 'uo.organization_id', 'c.organization_id')
-      .where({ id: conversation_id, user_id, type: 'public'  })
+      .where({ id: conversation_id, user_id  })
       .first();
     
     if (!isAuthorized) {
@@ -304,13 +298,9 @@ async function removeParticipant(req, res, next) {
       return next(customError('Unauthorized', 401));
     }
 
-    console.log({ conversation_id, user_id })
-
     const deleted = await db('chatterai__user_conversations')
       .where({ conversation_id, user_id })
       .del();
-    
-    console.log({ deleted })
     
     if (!deleted) {
       return next(customError('Participant not found', 404));
