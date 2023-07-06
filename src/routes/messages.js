@@ -95,31 +95,28 @@ async function getAll(req, res, next) {
 }
 
 async function update(req, res, next) {
-  const { user_id } = req.auth;
   const { message_id, conversation_id, app_id } = req.params;
-  
-  try {
-    const data = { ...req.body, updated_at: new Date().toISOString() };
+  const { data } = req.body;
 
+  try {
     await schemas.messages.existing.validateAsync(
       { message_id, conversation_id, app_id, ...data }
     );
 
-    const service = new Service(app_id);
-    const message = await service.messages.update({
-      data,
-      filters: { id: message_id, conversation_id, user_id },
-    });
-
-    if (!message) {
+    const updated = await db(`${app_id}__messages`)
+      .where({ id: message_id, conversation_id })
+      .update(data)
+      .returning('*');
+    
+    if (!updated) {
       return next(
         customError(`Message does not exist: ${message_id}`, 404)
       );
     }
 
-    logger.info({ ...req.params, ...req.body }, 'Message updated.');
+    logger.info({ ...req.params, ...data }, 'Message updated.');
 
-    return res.json(message);
+    return res.json(updated[0]);
   } catch (error) {
     return next(error);
   }
