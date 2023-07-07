@@ -3,6 +3,7 @@ const Service = require('../services/DB');
 const { logger } = require('../utils');
 const schemas = require('../schemas');
 const db = require('../db');
+const websocket = require('../services/websocket');
 
 async function create(req, res, next) {
   const { user_id } = req.auth;
@@ -16,6 +17,15 @@ async function create(req, res, next) {
 
     const service = new Service(app_id);
     const conversation = await service.conversations.create({ data });
+
+    if (app_id in websocket) {
+      websocket[app_id].sendMessage({
+        action: 'new_chat',
+        id: conversation.id,
+        user_id,
+        chat: conversation,
+      });
+    }
 
     logger.info(conversation, 'Conversation successfully created.');
 
@@ -102,6 +112,15 @@ async function update(req, res, next) {
       );
     }
 
+    if (app_id in websocket) {
+      websocket[app_id].sendMessage({
+        action: 'edit_chat',
+        id: conversation.id,
+        user_id,
+        chat: conversation,
+      });
+    }
+
     logger.info({ ...req.params, ...req.body }, 'Conversation updated.');
 
     return res.json(conversation);
@@ -136,6 +155,16 @@ async function remove(req, res, next) {
         created_by: user_id
       }
     });
+
+    if (app_id in websocket) {
+      websocket[app_id].sendMessage({
+        action: 'delete_chat',
+        id: conversation_id,
+        user_id,
+        message,
+      });
+      websocket[app_id].disconnect(conversation_id);
+    }
 
     logger.info(conversation, 'Conversation deleted permanently.');
 

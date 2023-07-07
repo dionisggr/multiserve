@@ -46,15 +46,28 @@ class WebSocketManager {
   sendMessage(data) {
     const clients = this.appClients.get(data?.id);
     
+    console.log(data.action, data)
+    
     if (!clients) return;
-  
+
     for (const client of clients) {
       if (client.readyState === WebSocket.OPEN) {
         client.send(JSON.stringify(data));
       }
     }
   }
+
+  disconnect(id) {
+    const clients = this.appClients.get(id);
+    
+    if (!clients) return;
   
+    for (const client of clients) {
+      if (client.readyState === WebSocket.OPEN) {
+        client.close();
+      }
+    }
+  }
 }
 
 module.exports = WebSocketManager;

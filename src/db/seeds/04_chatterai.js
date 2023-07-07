@@ -1,23 +1,25 @@
 const Service = require('../../services/DB');
 
+const app = 'chatterai';
+const service = new Service();
+
 exports.seed = async function (db) {
-  const service = new Service();
+  // Setup
   const demo_password = await service.passwords.hash(
     service.passwords.encrypt('password')
   );
-  
-  await db('chatterai__users').del();
-  await db('chatterai__organizations').del();
-  await db('chatterai__user_organizations').del();
-  await db('chatterai__conversations').del();
-  await db('chatterai__messages').del();
 
-  await db('chatterai__organizations').insert([
-    { id: 'demo', name: 'Chatter.AI' },
-    { id: 'personal', name: 'Personal' },
+  // App
+  await db('apps').insert([
+    {
+      id: app,
+      name: 'Chatter.AI',
+    },
   ]);
 
-  await db('chatterai__users').insert([
+  // Users
+  await db(`${app}__users`).del();
+  await db(`${app}__users`).insert([
     {
       id: 'demo',
       first_name: 'Demo',
@@ -74,7 +76,16 @@ exports.seed = async function (db) {
     { id: 'whisper' },
   ]);
 
-  await db('chatterai__user_organizations').insert([
+  // Organizations
+  await db(`${app}__organizations`).del();
+  await db(`${app}__organizations`).insert([
+    { id: 'demo', name: 'Chatter.AI', created_by: 'demo' },
+    { id: 'personal', name: 'Personal', created_by: 'demo' },
+  ]);
+
+  // User Organizations
+  await db(`${app}__user_organizations`).del();
+  await db(`${app}__user_organizations`).insert([
     { user_id: 'demo', organization_id: 'demo' },
     { user_id: 1, organization_id: 'demo' },
     { user_id: 2, organization_id: 'demo' },
@@ -83,7 +94,9 @@ exports.seed = async function (db) {
     { user_id: 5, organization_id: 'demo' },
   ]);
 
-  await db('chatterai__conversations').insert([
+  // Conversations
+  await db(`${app}__conversations`).del();
+  await db(`${app}__conversations`).insert([
     {
       id: 1,
       title: 'Groceries',
@@ -142,7 +155,9 @@ exports.seed = async function (db) {
     },
   ]);
 
-  await db('chatterai__user_conversations').insert([
+  // User Conversations
+  await db(`${app}__user_conversations`).del();
+  await db(`${app}__user_conversations`).insert([
     { user_id: 'demo', conversation_id: 1 },
     { user_id: 'demo', conversation_id: 2 },
     { user_id: 'demo', conversation_id: 3 },
@@ -183,7 +198,9 @@ exports.seed = async function (db) {
     { user_id: 5, conversation_id: 8 },
   ]);
 
-  await db('chatterai__messages').insert([
+  // Messages
+  await db(`${app}__messages`).del();
+  await db(`${app}__messages`).insert([
     // For Groceries
     {
       id: 1,

@@ -4,11 +4,12 @@ const { customError, logger } = require('../../utils');
 const { JWT_ACCESS_SECRET } = require('../../config');
 const db = require('../../db');
 const Service = require('../../services/DB');
-const websocket = require('../../services/websocket/setup');
+const websocket = require('../../services/websocket');
 
 const Router = express.Router()
   .get('/user', getUser)
   .get('/spaces', getSpaces)
+  .get('/spaces/:organization_id/users', getUsers)
   .get('/chats/:conversation_id/participants', getParticipants)
   .get('/chats', getChats)
   .get('/chatview', chatview)
@@ -20,6 +21,7 @@ const Router = express.Router()
   .post('/invites/validate', validateInviteToken)
   .patch('/spaces/:organization_id', editSpace)
   .delete('/spaces/:organization_id', deleteSpace)
+  .delete('/spaces/:organization_id/users/:user_id', removeUser)
   .delete('/chats/:conversation_id', deleteChat)
   .delete('/chats/:conversation_id/participants/:user_id', removeParticipant)
 
@@ -62,13 +64,26 @@ async function deleteSpace(req, res, next) {
   const { organization_id } = req.params;
 
   try {
-    const spaces = await db('chatterai__organizations')
-      .where({ id: organization_id, created_by: user_id })
-      .delete();
+    const isAuthorized = await db('chatterai__organizations')
+      .where({ organization_id, created_by: user_id })
+      .first();
     
-    if (!spaces) {
+    if (!isAuthorized) {
       return next(customError('Unauthorized', 401));
     }
+
+    const existing = await db('chatterai__organizations')
+      .where({ id: organization_id })
+      .first();
+    
+    await db('chatterai__organizations')
+      .where({ id: organization_id, created_by: user_id })
+      .del();
+
+    websocket.chatterai.sendMessage({
+      action: 'delete_space',
+      id: existing.id,
+    });
     
     res.json(spaces[0]);    
   } catch (err) {
@@ -84,6 +99,7 @@ async function joinSpace(req, res, next) {
   try {
     const isAuthorized = await db('chatterai__invites')
       .where({ email, organization_id })
+      .first();
     
     if (isAuthorized) {
       return next(customError('Unauthorized', 401));
@@ -105,7 +121,8 @@ async function getChats(req, res, next) {
 
   try {
     const isAuthorized = await db('chatterai__user_organizations')
-      .where({ user_id, organization_id: space });
+      .where({ user_id, organization_id: space })
+      .first();
     
     if (!isAuthorized) {
       return next(customError('Unauthorized', 401));
@@ -165,11 +182,23 @@ async function joinChat(req, res, next) {
       return next(customError('Unauthorized', 401));
     }
 
-    const result = await db('chatterai__user_conversations')
+    await db('chatterai__user_conversations')
       .insert({ user_id, conversation_id })
-      .returning('*')
+      .returning('*');
+
+    const user = await db('chatterai__users')
+      .where({ id: user_id })
+      .first();
     
-    res.json(result);
+    delete user.password;
+    
+    websocket.chatterai.sendMessage({
+      action: 'join_chat',
+      conversation_id,
+      user,
+    });
+    
+    res.json(user);
   } catch (err) {
     logger.error(err);
     next(customError(err.message, 500));
@@ -189,9 +218,19 @@ async function leaveChat(req, res, next) {
       return next(customError('User not part of chat', 401));
     }
 
+    const existing = await db('chatterai__conversations')
+      .where({ id: conversation_id })
+      .first();
+    
     await db('chatterai__user_conversations')
       .where({ user_id, conversation_id })
-      .del()
+      .del();
+    
+    websocket.chatterai.sendMessage({
+      action: 'leave_chat',
+      id: existing.id,
+      user_id,
+    });
     
     res.json({ message: 'User left chat' });
   } catch (err) {
@@ -205,13 +244,30 @@ async function deleteChat(req, res, next) {
   const { conversation_id } = req.params;
 
   try {
-    const deleted = await db('chatterai__conversations')
-      .where({ id: conversation_id, created_by: user_id })
-      .del()
+    const isAuthorized = await db('chatterai__conversations')
+      .where({ id: conversation_id, created_by: user_id });
     
-    if (!deleted) {
+    if (!isAuthorized) {
+      return next(customError('Unauthorized', 401));
+    }
+
+    const existing = await db('chatterai__conversations')
+      .where({ id: conversation_id, created_by: user_id })
+      .first();
+    
+    if (!existing) {
       return next(customError('Chat not found', 404));
     }
+
+    await db('chatterai__conversations')
+      .where({ id: conversation_id, created_by: user_id })
+      .del();
+
+    websocket.chatterai.sendMessage({
+      action: 'delete_chat',
+      id: existing.id,
+      user_id,
+    });
     
     res.json({ message: 'Chat deleted' });
   } catch (err) {
@@ -237,7 +293,16 @@ async function editSpace(req, res, next) {
     const updated = await db('chatterai__organizations')
       .where({ id: organization_id })
       .update({ name })
-      .returning('*')
+      .returning('*');
+    
+    if (!updated.length) {
+      return next(customError('Space not found', 404));
+    }
+
+    websocket.chatterai.sendMessage({
+      action: 'edit_space',
+      space: updated[0],
+    });
     
     res.json(updated[0]);
   } catch (err) {
@@ -299,15 +364,109 @@ async function removeParticipant(req, res, next) {
       return next(customError('Unauthorized', 401));
     }
 
-    const deleted = await db('chatterai__user_conversations')
+    const existing = await db('chatterai__user_conversations')
+      .where({ conversation_id, user_id })
+      .first();
+    
+    if (!existing) {
+      return next(customError('Participant not found', 404));
+    }
+
+    await db('chatterai__user_conversations')
       .where({ conversation_id, user_id })
       .del();
     
-    if (!deleted) {
-      return next(customError('Participant not found', 404));
-    }
+    websocket.chatterai.sendMessage({
+      action: 'remove_participant',
+      id: conversation_id,
+      user_id,
+    });    
     
     res.json({ message: 'Participant removed' });
+  } catch (err) {
+    logger.error(err);
+    next(customError(err.message, 500));
+  }
+}
+
+// Chat Space
+async function getUsers(req, res, next) {
+  const { id: created_by } = req.auth;
+  const { organization_id } = req.params;
+
+  try {
+    const isAuthorized = await db('chatterai__organizations')
+      .where({ id: organization_id, created_by })
+      .first();
+    
+    // if (!isAuthorized) {
+    //   return next(customError('Unauthorized', 401));
+    // }
+
+    const users = await db('chatterai__user_organizations AS uo')
+      .leftJoin('chatterai__users AS u', 'u.id', 'uo.user_id')
+      .where({ organization_id });
+    const filtered = users.map(({ password, ...user }) => user);
+    
+    res.json(filtered);
+  } catch (err) {
+    logger.error(err);
+    next(customError(err.message, 500));
+  }
+}
+
+// Chat Space
+async function removeUser(req, res, next) {
+  const { id: created_by } = req.auth;
+  const { organization_id, user_id } = req.params;
+
+  try {
+    const isAuthorized = await db('chatterai__organizations')
+      .where({ id: organization_id, created_by })
+      .first();
+    
+    if (!isAuthorized) {
+      return next(customError('Unauthorized', 401));
+    }
+
+    const existing = await db('chatterai__users AS u')
+      .leftJoin('chatterai__user_organizations AS uo', 'u.id', 'uo.user_id')
+      .where({ organization_id, user_id })
+      .first();
+    
+    if (!existing) {
+      return next(customError('User not found in space.', 404));
+    }
+
+    const conversation_ids = await db('chatterai__user_conversations AS uc')
+      .leftJoin('chatterai__conversations AS c', 'c.id', 'uc.conversation_id')
+      .where({ user_id, organization_id })
+      .pluck('conversation_id');
+    const { first_name, username, email } = existing;
+    
+    await db('chatterai__messages')
+      .insert(conversation_ids.map(conversation_id => ({
+        content: `User ${first_name || username || email} has left the chat.`,
+        user_id: 'chatterai',
+        conversation_id,
+      })));
+
+    await db('chatterai__user_conversations')
+      .where({ user_id })
+      .whereIn('conversation_id', conversation_ids)
+      .del();
+    
+    await db('chatterai__user_organizations')
+      .where({ organization_id, user_id })
+      .del();
+    
+    websocket.chatterai.sendMessage({
+      action: 'remove_user',
+      id: organization_id,
+      user_id,
+    });    
+    
+    res.json({ message: 'User removed from space' });
   } catch (err) {
     logger.error(err);
     next(customError(err.message, 500));

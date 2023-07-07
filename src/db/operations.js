@@ -94,6 +94,7 @@ async function createMessages({ db, apps, app }) {
       table.string('conversation_id').references('id').inTable(`${appName}__conversations`).onDelete('CASCADE');
       table.string('archived_by').nullable().references('id').inTable(`${appName}__messages`).onDelete('SET NULL');
       table.string('user_id').nullable().references('id').inTable(`${appName}__users`).onDelete('CASCADE');
+      table.string('type');
       table.specificType('content', 'varchar').notNullable();
       table.timestamp('created_at').defaultTo(db.fn.now());
       table.timestamp('updated_at');
@@ -156,7 +157,7 @@ async function createInvites({ db, apps, app }) {
 
     await db.schema.dropTableIfExists(tableName);
     await db.schema.createTable(tableName, function (table) {
-      table.string('token').primary();
+      table.string('token');
       table.string('email');
       table.string('sender').references('id').inTable(`${appName}__users`).onDelete('CASCADE');
       table.string('organization_id').references('id').inTable(`${appName}__organizations`).onDelete('CASCADE');
@@ -169,7 +170,7 @@ async function createInvites({ db, apps, app }) {
 
 async function createWebSockets({ db, apps, app }) {
   for (const appName of apps || [app]) {
-    const tableName = `${appName}__invites`;
+    const tableName = `${appName}__websockets`;
 
     await db.schema.dropTableIfExists(tableName);
     await db.schema.createTable(tableName, function (table) {

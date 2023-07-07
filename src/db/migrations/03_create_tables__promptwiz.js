@@ -1,6 +1,6 @@
 const operations = require('../operations');
 
-const app = 'chatterai';
+const app = 'promptwiz';
 
 exports.up = async function (db) {
   await operations.createUsers({ db, app });
@@ -11,10 +11,20 @@ exports.up = async function (db) {
   await operations.createMessages({ db, app });
   await operations.createRefreshTokens({ db, app });
   await operations.createMFAStorage({ db, app });
+
+  await db.schema.createTable(`${app}__prompts`, function (table) {
+    table.string('id').primary().defaultTo(db.raw('uuid_generate_v4()'));
+    table.string('title');
+    table.text('prompt').notNullable();
+    table.string('model').notNullable();
+    table.string("created_at").defaultTo(db.fn.now());
+    table.string('user_id').notNullable().references('id').inTable(`${app}__users`).onDelete('CASCADE');
+  });
 };
 
 exports.down = async function (db) {
   const tables = [
+    'prompts',
     'mfa',
     'refresh_tokens',
     'messages',
@@ -27,4 +37,3 @@ exports.down = async function (db) {
 
   await operations.drop({ db, tables });
 };
-

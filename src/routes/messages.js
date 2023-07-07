@@ -21,12 +21,14 @@ async function create(req, res, next) {
     const service = new Service(app_id);
     const message = await service.messages.create({ data });
 
-    websocket.chatterai.sendMessage({
-      action: 'message',
-      id: conversation_id,
-      user_id,
-      message,
-    });
+    if (app_id in websocket) {
+      websocket[app_id].sendMessage({
+        action: 'message',
+        id: conversation_id,
+        user_id,
+        message,
+      });
+    }
 
     logger.info(message, 'Message successfully created.');
 
