@@ -1,5 +1,5 @@
+const { ADMIN_EMAIL, ADMIN_PASSWORD, PROMPTWIZ_OPENAI_API_KEY } = require('../../config');
 const Service = require('../../services/DB');
-const { ADMIN_EMAIL, ADMIN_PASSWORD, TEC3_OPENAI_API_KEY } = require('../../config');
 
 const app = 'promptwiz';
 const service = new Service();
@@ -30,7 +30,7 @@ exports.seed = async function (db) {
       email: ADMIN_EMAIL,
       password: admin_password,
       is_admin: true,
-      openai_api_key: TEC3_OPENAI_API_KEY,
+      openai_api_key: PROMPTWIZ_OPENAI_API_KEY,
     },
     {
       id: 'dio',
@@ -38,7 +38,7 @@ exports.seed = async function (db) {
       email: 'dionisggr@gmail.com',
       password: admin_password,
       is_admin: true,
-      openai_api_key: TEC3_OPENAI_API_KEY,
+      openai_api_key: PROMPTWIZ_OPENAI_API_KEY,
     },
     {
       id: 'lili',
@@ -46,7 +46,7 @@ exports.seed = async function (db) {
       email: 'lile7886@gmail.com',
       password: admin_password,
       is_admin: true,
-      openai_api_key: TEC3_OPENAI_API_KEY,
+      openai_api_key: PROMPTWIZ_OPENAI_API_KEY,
     },
     {
       id: 'doug',
@@ -54,7 +54,7 @@ exports.seed = async function (db) {
       email: 'briancarter340@gmail.com',
       password: admin_password,
       is_admin: true,
-      openai_api_key: TEC3_OPENAI_API_KEY,
+      openai_api_key: PROMPTWIZ_OPENAI_API_KEY,
     },
     {
       id: 'demo',
@@ -62,7 +62,7 @@ exports.seed = async function (db) {
       email: 'demo@demo.com',
       password: demo_password,
       is_admin: false,
-      openai_api_key: TEC3_OPENAI_API_KEY,
+      openai_api_key: PROMPTWIZ_OPENAI_API_KEY,
     },
   ]);
 

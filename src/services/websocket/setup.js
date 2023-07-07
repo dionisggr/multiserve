@@ -46,8 +46,6 @@ class WebSocketManager {
   sendMessage(data) {
     const clients = this.appClients.get(data?.id);
     
-    console.log(data.action, data)
-    
     if (!clients) return;
 
     for (const client of clients) {

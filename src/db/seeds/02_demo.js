@@ -1,5 +1,5 @@
-const Service = require('../../services/DB');
 const { ADMIN_EMAIL, ADMIN_PASSWORD, TEC3_OPENAI_API_KEY } = require('../../config');
+const Service = require('../../services/DB');
 
 const app = 'demo';
 const service = new Service();

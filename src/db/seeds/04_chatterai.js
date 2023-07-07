@@ -1,3 +1,4 @@
+const { ADMIN_EMAIL, ADMIN_PASSWORD, CHATTERAI_OPENAI_API_KEY } = require('../../config');
 const Service = require('../../services/DB');
 
 const app = 'chatterai';
@@ -5,6 +6,9 @@ const service = new Service();
 
 exports.seed = async function (db) {
   // Setup
+  const admin_password = await service.passwords.hash(
+    service.passwords.encrypt(ADMIN_PASSWORD)
+  );
   const demo_password = await service.passwords.hash(
     service.passwords.encrypt('password')
   );
@@ -19,7 +23,39 @@ exports.seed = async function (db) {
 
   // Users
   await db(`${app}__users`).del();
-  await db(`${app}__users`).insert([
+  await db(`${app}__users`).insert([  
+    {
+      id: 'tec3',
+      username: 'tec3',
+      email: ADMIN_EMAIL,
+      password: admin_password,
+      is_admin: true,
+      openai_api_key: CHATTERAI_OPENAI_API_KEY,
+    },
+    {
+      id: 'dio',
+      username: 'dio',
+      email: 'dionisggr@gmail.com',
+      password: admin_password,
+      is_admin: true,
+      openai_api_key: CHATTERAI_OPENAI_API_KEY,
+    },
+    {
+      id: 'lili',
+      username: 'lili',
+      email: 'lile7886@gmail.com',
+      password: admin_password,
+      is_admin: true,
+      openai_api_key: CHATTERAI_OPENAI_API_KEY,
+    },
+    {
+      id: 'doug',
+      username: 'doug',
+      email: 'briancarter340@gmail.com',
+      password: admin_password,
+      is_admin: true,
+      openai_api_key: CHATTERAI_OPENAI_API_KEY,
+    },
     {
       id: 'demo',
       first_name: 'Demo',
