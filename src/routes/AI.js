@@ -17,7 +17,7 @@ async function chatgpt(req, res, next) {
       prompt,
       ...adjustments
     } = req.body;
-    const { user_id, app_id } = req.auth;
+    const { user_id, app_id, openai_api_key } = req.auth;
     const isStream = req.query.stream?.toLowerCase() === 'true';
     const response = {};
 
@@ -36,10 +36,6 @@ async function chatgpt(req, res, next) {
       Object.assign(adjustments, { conversation_id, history });
       Object.assign(response, { message });
     }
-
-    const { openai_api_key } = await db(`${app_id}__openai_api_keys`)
-      .select('openai_api_key')
-      .where({ user_id }).first();
   
     Object.assign(adjustments, { openai_api_key, stream: isStream });
 
@@ -55,9 +51,7 @@ async function chatgpt(req, res, next) {
     if (isStream) {
       res.sendStatus(202);
     } else {
-      Object.assign(response, { response: result });
-
-      res.json(response);
+      res.json(result);
     }
 
     return result;

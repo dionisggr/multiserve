@@ -41,7 +41,7 @@ async function send({ subject, content, email, emails }) {
     );
     return response;
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 };
 

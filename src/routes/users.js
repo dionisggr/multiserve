@@ -39,7 +39,7 @@ async function create(req, res, next) {
     user = await service.users.create({ data: { ...data, password } });
     delete user.password;
 
-    const newData = [{ user_id: user.id, organization_id: 'demo' }]
+    const newData = [];
 
     if (organization_id) {
       newData.push({ user_id: user.id, organization_id })
@@ -48,10 +48,22 @@ async function create(req, res, next) {
     await db(`${app_id}__user_organizations`).insert(newData);
 
     logger.info(user, 'User created.');
-    logger.info({ id: user.id, email, app_id }, 'User successfully registered to app.');
+    logger.info({ id: user.id, email, app_id },
+      'User successfully registered to app.'
+    );
+    
+    if (organization_id) {
+      logger.info({ user_id: user.id, organization_id },
+        'User successfully registered to organization.'
+      )
+    }
 
     if (req.path.includes('/signup')) {
-      req.body = { email, password: encrypted };
+      req.body = {
+        email,
+        password: encrypted,
+        organization_id,
+      };
       
       return next();
     }

@@ -33,13 +33,17 @@ async function enhance(req, res, next) {
 }
 
 async function getPrompts(req, res, next) {
-  const promptList = await db('promptwiz__prompts')
-    .where({ 'user_id': req.auth.user_id })
-    .orderBy('created_at', 'desc');
+  try {
+    const promptList = await db('promptwiz__prompts')
+      .where({ 'user_id': req.auth.user_id })
+      .orderBy('created_at', 'desc');
   
-  logger.info({ user_id: req.auth.user_id }, 'PromptWiz prompts retrieved.')
+    logger.info({ user_id: req.auth.user_id }, 'PromptWiz prompts retrieved.')
 
-  res.json(promptList);
+    res.json(promptList);
+  } catch (error) {
+    next(error);
+  }
 }
 
 async function remove(req, res, next) {

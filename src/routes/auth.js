@@ -70,7 +70,7 @@ async function login(req, res, next) {
 
 async function google(req, res, next) {
   const { app_id } = req.params;
-  const { credential } = req.body;
+  const { credential, organization_id } = req.body;
   const CLIENT_ID = {
     promptwiz: GOOGLE_CLIENT_ID,
     chatterai: CHATTERAI_GOOGLE_CLIENT_ID
@@ -102,8 +102,10 @@ async function google(req, res, next) {
       
       user = insert[0];
       
-      await db(`${app_id}__user_organizations`)
-        .insert({ user_id: user.id, organization_id: 'demo' });
+      if (organization_id) {
+        await db(`${app_id}__user_organizations`)
+          .insert({ user_id: user.id, organization_id });
+      }
     }
 
     delete user.password;
@@ -126,9 +128,10 @@ async function google(req, res, next) {
     logger.info(payload, 'Login successful');
 
     const response = {
+      user: payload,
       token: accessToken,
       refreshToken,
-      user: payload,
+      organization_id,
     };
 
     res.json(response);
