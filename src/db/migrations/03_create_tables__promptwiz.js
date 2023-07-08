@@ -18,6 +18,7 @@ exports.up = async function (db) {
     table.text('prompt').notNullable();
     table.string('model').notNullable();
     table.string("created_at").defaultTo(db.fn.now());
+    table.string("updated_at").defaultTo(db.fn.now());
     table.string('user_id').notNullable().references('id').inTable(`${app}__users`).onDelete('CASCADE');
   });
 };
