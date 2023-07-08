@@ -88,13 +88,18 @@ async function title(req, res, next) {
   const { title } = req.body;
 
   try {
-    await db('promptwiz__prompts')
+    const updated = await db('promptwiz__prompts')
       .update({ title })
       .where({ id, user_id })
+      .returning('*');
+    
+    if (!updated || !updated.length) {
+      return next(customError('Prompt not found.', 404));
+    }
 
     logger.info({ user_id }, 'PromptWiz prompt updated.');
 
-    res.sendStatus(200);
+    res.json(updated[0]);
   } catch (error) {
     next(error);
   }
