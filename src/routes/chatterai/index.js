@@ -22,7 +22,7 @@ const Router = express.Router()
   .patch('/spaces/:organization_id', editSpace)
   .delete('/spaces/:organization_id', deleteSpace)
   .delete('/spaces/:organization_id/users/:user_id', removeUser)
-  .delete('/chats/:conversation_id', deleteChat)
+  .delete('/chats/:conversation_id?', deleteChat)
   .delete('/chats/:conversation_id/participants/:user_id', removeParticipant)
 
 async function getSpaces(req, res, next) {
@@ -244,25 +244,17 @@ async function leaveChat(req, res, next) {
 async function deleteChat(req, res, next) {
   const { id: user_id } = req.auth;
   const { conversation_id } = req.params;
+  const { conversation_ids } = req.body;
 
   try {
-    const isAuthorized = await db('chatterai__conversations')
-      .where({ id: conversation_id, created_by: user_id });
-    
-    if (!isAuthorized) {
-      return next(customError('Unauthorized', 401));
-    }
-
-    const existing = await db('chatterai__conversations')
-      .where({ id: conversation_id, created_by: user_id })
-      .first();
-    
-    if (!existing) {
-      return next(customError('Chat not found', 404));
-    }
-
-    await db('chatterai__conversations')
-      .where({ id: conversation_id, created_by: user_id })
+    const chat_ids = conversation_ids || [conversation_id];
+    const existing = await db('chatterai__conversations AS c')
+      .leftJoin('chatterai__organizations AS o', 'o.id', 'c.organization_id')
+      .whereIn('c.id', chat_ids)
+      .where(function() {
+        this.where('c.created_by', user_id)
+          .orWhere('o.created_by', user_id)
+      })
       .del();
 
     websocket.chatterai.sendMessage({
@@ -448,7 +440,7 @@ async function removeUser(req, res, next) {
     
     await db('chatterai__messages')
       .insert(conversation_ids.map(conversation_id => ({
-        content: `User ${first_name || username || email} has left the chat.`,
+        content: `${first_name || username || email} has left the chat.`,
         user_id: 'chatterai',
         conversation_id,
       })));

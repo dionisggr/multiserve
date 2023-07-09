@@ -16,11 +16,10 @@ const Router = express.Router()
 async function enhance(req, res, next) {
   const { user_id } = req.auth;
   const { format = 'paragraph' } = req.params;
-  const { model = 'chatgpt' } = req.query;
   const { prompt } = req.body;
 
-  if (!model.toLowerCase().includes('chatgpt')) {
-    return next(customError('Invalid model.', 400));
+  if (!(format in instructions)) {
+    return next(customError('Invalid request.', 400));
   }
 
   try {

@@ -585,48 +585,54 @@ exports.seed = async function (db) {
       content: "I think you should keep your application brief and simple for now. You should highlight its potential capabilities until there is growing interest in it.",
     },
 
-    // For Personal Finances and Gym Routine (Private)
+    // For Personal Finances
     {
       id: 54,
       user_id: 'demo',
       conversation_id: 7,
-      content: 'Need to set a budget for the next month.',
+      content: 'I need to set a budget for the next month.',
     },
     {
       id: 55,
       user_id: 'chatgpt',
       conversation_id: 7,
-      content: "Sounds good. Let's start with your income from this month. Did anything rollover from the last month?",
+      content: "Understood. Let's start by reviewing your income for this month. Is there any remaining budget from the previous month?",
     },
     {
       id: 56,
       user_id: 'demo',
       conversation_id: 7,
-      content: "Yes, I have $500 from last month's budget.",
+      content: "Yes, I have a remaining budget of $500 from last month.",
     },
     {
       id: 57,
       user_id: 'chatgpt',
       conversation_id: 7,
-      content: "Great. And what are your expenses for this month?",
+      content: "Excellent. Now, could you provide an overview of your expected expenses for this month?",
     },
     {
       id: 58,
       user_id: 'demo',
       conversation_id: 7,
-      content: "I was hoping you'd help me remember what I spent on last month first.",
+      content: "Before we go into this month's expenses, I would like to review last month's spending first.",
     },
     {
       id: 59,
       user_id: 'chatgpt',
       conversation_id: 7,
-      content: "Sure. This may lead down a rabbit hole of hurt and tears, but I'll try my best!",
+      content: "Of course, let's analyze your previous month's expenses to get a better understanding.",
     },
     {
       id: 60,
       user_id: 'demo',
       conversation_id: 7,
-      content: "My body is ready.",
+      content: "Can you divide the expenses into categories?",
+    },
+    {
+      id: 61,
+      user_id: 'chatgpt',
+      conversation_id: 7,
+      content: "Should I sort them by frequency like the last time, or amount because our goal will be to set a budget?",
     },
 
     // For Game Night
@@ -664,7 +670,7 @@ exports.seed = async function (db) {
       id: 68,
       user_id: 4,
       conversation_id: 8,
-      content: 'Here we go...',
+      content: 'Awesome!',
     },
   ]);
 };
