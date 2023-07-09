@@ -582,7 +582,7 @@ exports.seed = async function (db) {
       id: 53,
       user_id: 'chatgpt',
       conversation_id: 6,
-      content: "I think you should keep your appilcation brief and simple for now. You should highlight its potential capabilities until there is growing interest in it.",
+      content: "I think you should keep your application brief and simple for now. You should highlight its potential capabilities until there is growing interest in it.",
     },
 
     // For Personal Finances and Gym Routine (Private)

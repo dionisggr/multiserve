@@ -129,9 +129,11 @@ async function getChats(req, res, next) {
     }
 
     const chats = await db(`chatterai__conversations AS c`)
+      .leftJoin('chatterai__users AS u', 'c.created_by', 'u.id')
       .where({ organization_id: space, type: 'public' })
       .orWhere({ organization_id: space, type: 'private', created_by: user_id })
-      .orderBy('updated_at', 'desc');
+      .orderBy('updated_at', 'desc')
+      .select('c.*', db.raw('COALESCE(u.username, u.first_name, u.email) AS created_by_name'));
     
     res.json(chats);    
   } catch (err) {

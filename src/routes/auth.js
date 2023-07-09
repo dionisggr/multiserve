@@ -87,9 +87,11 @@ async function google(req, res, next) {
     const {
       given_name: first_name,
       family_name: last_name,
+      picture: avatar = null,
       email,
       sub,
     } = ticket.getPayload();
+    const organization_ids = [organization_id].filter(Boolean);
 
     let user = await db(`${app_id}__users`)
       .where({ email })
@@ -97,19 +99,31 @@ async function google(req, res, next) {
     
     if (!user) {
       const insert = await db(`${app_id}__users`)
-        .insert({ id: sub, email, first_name, last_name, is_google: true })
+        .insert({
+          id: sub,
+          email,
+          first_name,
+          last_name,
+          avatar,
+          is_google: true,
+        })
         .returning('*');
       
       user = insert[0];
-      
-      if (organization_id) {
-        await db(`${app_id}__user_organizations`)
-          .insert({ user_id: user.id, organization_id });
-      }
+
+      organization_ids.push('demo');
+    }
+
+    if (organization_ids.length) {
+      await db(`${app_id}__user_organizations`)
+      .insert(organization_ids.map(id => ({
+        user_id: user.id,
+        organization_id: id,
+      })));
     }
 
     delete user.password;
-
+    
     const payload = {
       ...user,
       user_id: user.id,
