@@ -7,12 +7,12 @@ const Service = require('../../services/DB');
 const websocket = require('../../services/websocket');
 
 const Router = express.Router()
-  .get('/user', getUser)
-  .get('/spaces', getSpaces)
   .get('/spaces/:organization_id/users', getUsers)
+  .get('/spaces', getSpaces)
   .get('/chats/:conversation_id/participants', getParticipants)
   .get('/chats', getChats)
   .get('/chatview', chatview)
+  .get('/user', getUser)
   .post('/spaces/:organization_id/join', joinSpace)
   .post('/spaces', createSpace)
   .post('/chats/:conversation_id/join', joinChat)
@@ -20,6 +20,7 @@ const Router = express.Router()
   .post('/invites/send', sendUsersInvites)
   .post('/invites/validate', validateInviteToken)
   .patch('/spaces/:organization_id', editSpace)
+  .patch('/chats/:conversation_id', editChat)
   .delete('/spaces/:organization_id', deleteSpace)
   .delete('/spaces/:organization_id/users/:user_id', removeUser)
   .delete('/chats/:conversation_id?', deleteChat)
@@ -201,6 +202,34 @@ async function joinChat(req, res, next) {
     });
     
     res.json(user);
+  } catch (err) {
+    logger.error(err);
+    next(customError(err.message, 500));
+  }
+}
+
+async function editChat(req, res, next) {
+  const { id: user_id } = req.auth;
+  const { conversation_id } = req.params;
+  const { data } = req.body;
+
+  try {
+    const updated = await db('chatterai__conversations')
+      .where({ id: conversation_id, created_by: user_id })
+      .update(data)
+      .returning('*');
+    
+    if (!updated || !updated.length) {
+      return next(customError('Unauthorized', 401));
+    }
+    
+    websocket.chatterai.sendMessage({
+      action: 'edit_chat',
+      id: existing.id,
+      chat: updated[0],
+    });
+    
+    res.json({ message: 'Chat updated.' });
   } catch (err) {
     logger.error(err);
     next(customError(err.message, 500));

@@ -67,6 +67,7 @@ const schemas = {
       type: Joi.string(),
       organization_id: id,
       created_by: id,
+      type: Joi.string(),
     }),
     existing: Joi.object({
       title: Joi.string(),
@@ -76,6 +77,7 @@ const schemas = {
       created_by: id,
       id,
       updated_at,
+      type: Joi.string(),
     }).xor('id', 'conversation_id'),
   },
   messages: {

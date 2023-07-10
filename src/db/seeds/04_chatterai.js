@@ -668,7 +668,7 @@ exports.seed = async function (db) {
     },
     {
       id: 68,
-      user_id: 4,
+      user_id: 2,
       conversation_id: 8,
       content: 'Awesome!',
     },
