@@ -9,10 +9,8 @@ const secrets = require('./secrets');
 const conversations = require('./conversations');
 const messages = require('./messages');
 const { Router: AI } = require('./AI');
-const GPTeams = require('./gpteams');
 const ChatterAI = require('./chatterai');
 const PromptWiz = require('./promptwiz');
-const StatusPage = require('./gpteams/incidents');
 const auth = {
   ...require('../middleware/auth'),
   ...require('./auth'),
@@ -65,10 +63,8 @@ authenticated
             .patch('/', messages.update)
             .delete('/', messages.remove))))))
   .use(AI)
-  .use('/statuspage', StatusPage)
   .use('/promptwiz', PromptWiz)
   .use('/chatterai', ChatterAI)
-  .use('/gpteams', GPTeams)
 
 admin
   .get('/secrets', secrets.reveal)
