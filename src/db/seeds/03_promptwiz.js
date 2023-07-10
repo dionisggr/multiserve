@@ -1,4 +1,4 @@
-const { ADMIN_EMAIL, ADMIN_PASSWORD, PROMPTWIZ_OPENAI_API_KEY } = require('../../config');
+const { ADMIN_PASSWORD, PROMPTWIZ_OPENAI_API_KEY } = require('../../config');
 const Service = require('../../services/DB');
 
 const app = 'promptwiz';
@@ -25,33 +25,9 @@ exports.seed = async function (db) {
   await db(`${app}__users`).del();
   await db(`${app}__users`).insert([
     {
-      id: 'tec3',
-      username: 'tec3',
-      email: ADMIN_EMAIL,
-      password: admin_password,
-      is_admin: true,
-      openai_api_key: PROMPTWIZ_OPENAI_API_KEY,
-    },
-    {
       id: 'dio',
       username: 'dio',
       email: 'dionisggr@gmail.com',
-      password: admin_password,
-      is_admin: true,
-      openai_api_key: PROMPTWIZ_OPENAI_API_KEY,
-    },
-    {
-      id: 'lili',
-      username: 'lili',
-      email: 'lile7886@gmail.com',
-      password: admin_password,
-      is_admin: true,
-      openai_api_key: PROMPTWIZ_OPENAI_API_KEY,
-    },
-    {
-      id: 'doug',
-      username: 'doug',
-      email: 'briancarter340@gmail.com',
       password: admin_password,
       is_admin: true,
       openai_api_key: PROMPTWIZ_OPENAI_API_KEY,

@@ -7,5 +7,5 @@ const cron = require('./src/services/cron');
 cron.start();
 
 app.listen(PORT, () => {
-  logger.info(`Running Tec3 API on port ${PORT}.`)
+  logger.info(`Running MultiServe API on port ${PORT}.`)
 });

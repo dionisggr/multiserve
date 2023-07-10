@@ -1,4 +1,4 @@
-const { ADMIN_EMAIL, ADMIN_PASSWORD, TEC3_OPENAI_API_KEY } = require('../../config');
+const { ADMIN_PASSWORD, OPENAI_API_KEY } = require('../../config');
 const Service = require('../../services/DB');
 
 const app = 'demo';
@@ -25,36 +25,12 @@ exports.seed = async function (db) {
   await db(`${app}__users`).del();
   await db(`${app}__users`).insert([
     {
-      id: 'tec3',
-      username: 'tec3',
-      email: ADMIN_EMAIL,
-      password: admin_password,
-      is_admin: true,
-      openai_api_key: TEC3_OPENAI_API_KEY,
-    },
-    {
       id: 'dio',
       username: 'dio',
       email: 'dionisggr@gmail.com',
       password: admin_password,
       is_admin: true,
-      openai_api_key: TEC3_OPENAI_API_KEY,
-    },
-    {
-      id: 'lili',
-      username: 'lili',
-      email: 'lile7886@gmail.com',
-      password: admin_password,
-      is_admin: true,
-      openai_api_key: TEC3_OPENAI_API_KEY,
-    },
-    {
-      id: 'doug',
-      username: 'doug',
-      email: 'briancarter340@gmail.com',
-      password: admin_password,
-      is_admin: true,
-      openai_api_key: TEC3_OPENAI_API_KEY,
+      openai_api_key: OPENAI_API_KEY,
     },
     {
       id: 'demo',
@@ -62,7 +38,7 @@ exports.seed = async function (db) {
       email: 'demo@demo.com',
       password: demo_password,
       is_admin: false,
-      openai_api_key: TEC3_OPENAI_API_KEY,
+      openai_api_key: OPENAI_API_KEY,
     },
   ]);
 
@@ -77,11 +53,6 @@ exports.seed = async function (db) {
   // Organizations
   await db(`${app}__organizations`).del();
   await db(`${app}__organizations`).insert([
-    {
-      id: 'tec3',
-      name: 'Tec3, LLC',
-      created_by: 'tec3',
-    },
     {
       id: 'demo',
       name: 'Demo Org.',
@@ -98,23 +69,19 @@ exports.seed = async function (db) {
   await db(`${app}__user_organizations`).del();
   await db(`${app}__user_organizations`).insert([
     {
-      user_id: 'tec3',
-      organization_id: 'tec3'
-    },
-    {
-      user_id: 'tec3',
+      user_id: 'demo',
       organization_id: 'demo'
     },
     {
-      user_id: 'tec3',
+      user_id: 'demo',
       organization_id: 'personal'
     },
     {
-      user_id: 'demo',
+      user_id: 'dio',
       organization_id: 'demo'
     },
     {
-      user_id: 'demo',
+      user_id: 'dio',
       organization_id: 'personal'
     },
   ]);
@@ -132,23 +99,16 @@ exports.seed = async function (db) {
     {
       id: 'f2936c4c-5e19-4050-bf6a-cfead71fb4eb',
       title: 'Test Title',
-      created_by: 'doug',
+      created_by: 'dio',
       organization_id: 'demo',
       type: 'public',
     },
     {
       id: 'cd3a51f9-b562-46f2-a607-bd11aac1c5dd',
       title: 'Test Title',
-      created_by: 'doug',
+      created_by: 'dio',
       organization_id: 'demo',
       type: 'public',
-    },
-    {
-      id: '46f251f9-b562-cd3a-a607-bd11aac1c5dd',
-      title: 'Test Title',
-      created_by: 'lili',
-      organization_id: 'demo',
-      type: 'private',
     },
   ]);
 
@@ -161,15 +121,11 @@ exports.seed = async function (db) {
     },
     {
       conversation_id: 'cd3a51f9-b562-46f2-a607-bd11aac1c5dd',
-      user_id: 'doug',
-    },
-    {
-      conversation_id: 'cd3a51f9-b562-46f2-a607-bd11aac1c5dd',
-      user_id: 'lili',
+      user_id: 'dio',
     },
     {
       conversation_id: 'f2936c4c-5e19-4050-bf6a-cfead71fb4eb',
-      user_id: 'doug',
+      user_id: 'dio',
     },
   ]);
 
@@ -203,7 +159,7 @@ exports.seed = async function (db) {
     {
       id: '5d285529-a4ce-4b56-ad8e-bb1634afbcc4',
       content: 'Hi there, ChatGPT',
-      user_id: 'doug',
+      user_id: 'dio',
       conversation_id: 'cd3a51f9-b562-46f2-a607-bd11aac1c5dd',
     },
     {
@@ -214,8 +170,8 @@ exports.seed = async function (db) {
     },
     {
       id: '6c45f009-5bc5-458b-8f41-3cd884d3312d',
-      content: 'I\'m Doug, the CFO!',
-      user_id: 'doug',
+      content: 'I\'m Dio, the super guy!',
+      user_id: 'dio',
       conversation_id: 'cd3a51f9-b562-46f2-a607-bd11aac1c5dd',
     },
     {
@@ -225,21 +181,9 @@ exports.seed = async function (db) {
       conversation_id: 'cd3a51f9-b562-46f2-a607-bd11aac1c5dd',
     },
     {
-      id: 'bff7ee6a-6533-46fb-b170-bbf0d73573cb',
-      content: 'Play nice, ChatGPT.',
-      user_id: 'lili',
-      conversation_id: 'cd3a51f9-b562-46f2-a607-bd11aac1c5dd',
-    },
-    {
-      id: 'bff7ee6a-6533-47fb-b170-bbf0d73573cb',
-      content: 'Pfff.',
-      user_id: 'chatgpt',
-      conversation_id: 'cd3a51f9-b562-46f2-a607-bd11aac1c5dd',
-    },
-    {
       id: '9500e728-9f38-477e-ac3f-832ac0f8cc8e',
       content: 'Hey there, ChatGPT!',
-      user_id: 'doug',
+      user_id: 'dio',
       conversation_id: 'f2936c4c-5e19-4050-bf6a-cfead71fb4eb',
     },
     {

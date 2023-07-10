@@ -1,7 +1,7 @@
-<h1 align="center">Tec3 API</h1>
+<h1 align="center">MultiServe API</h1>
 
 ## Overview
-Tec3 API is a straightforward RESTful API with authentication written in JavaScript for Node.js backend apps, leveraging Docker, Express, Joi, Knex, Supabase and JWT.
+MultiServe API is a straightforward RESTful API with authentication written in JavaScript for Node.js backend apps, leveraging Docker, Express, Joi, Knex, Supabase and JWT.
 
 It sets up an Express REST API with Supabase, providing features like Docker containerization, database connection, authentication, error handling, and more. It includes some basic routes for authentication and user creation to simplykickstart most new projects as well.
 
